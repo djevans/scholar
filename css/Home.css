@@ -8,3 +8,12 @@
 div.form-item { 
     display: inline-block;
 }
+h4 {
+    color: #7C7369;
+    font-family: Verdana, Arial;
+    font-weight: normal;
+    letter-spacing: -1px;
+    line-height: 114%;
+    margin: 0;
+    padding: 0;
+}
