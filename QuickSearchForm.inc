@@ -16,7 +16,27 @@
  * @return array
  */
 function scholar_quick_search_form(array &$form_state) {
-  
+  return array(
+    'field' => array(
+      '#type' => 'select',
+      '#options' => array(
+        'title' => t('Title'),
+      ),
+    ),
+    'sort' => array(
+      '#type' => 'select',
+      '#options' => array(
+        'title' => t('Title'),
+      ),
+    ),
+    'search' => array(
+      '#type' => 'textfield'
+    ),
+    'submit' => array(
+      '#type' => 'submit',
+      '#value' => 'Search'
+    )
+  );
 }
 
 /**

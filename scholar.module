@@ -88,7 +88,7 @@ function scholar_menu() {
  */
 function scholar_theme() {
   return array(
-    'ir_home_page' => array(
+    'ir_home' => array(
       'template' => 'templates/Home',
     ),
     'ir_record' => array(
@@ -107,6 +107,14 @@ function scholar_theme() {
 }
 
 /**
+ * Implements the Theme Hook function for the ir_home theme.
+ */
+function template_preprocess_ir_home() {
+  $path = drupal_get_path('module', 'scholar');
+  drupal_add_css("$path/css/Home.css");
+}
+
+/**
  * Menu callback for 'fedorair/ir_edit_refworks'
  * 
  * Renders the Home Page.
@@ -115,7 +123,9 @@ function scholar_theme() {
  *   HTML for Institutional Repository Home Page.
  */
 function scholar_home() {
-  return theme('ir_home_page');
+  module_load_include('inc', 'scholar', 'QuickSearchForm');
+  module_load_include('inc', 'scholar', 'BrowseByUserForm');
+  return theme('ir_home');
 }
 
 /**
