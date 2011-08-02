@@ -1,0 +1,1 @@
+<div>Template for home page.</div>

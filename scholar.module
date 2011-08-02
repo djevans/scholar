@@ -33,13 +33,16 @@ function scholar_menu() {
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
-  $items['fedorair/advanced_search'] = array(
+  /**
+   * Not functional on islandscholar.ca 
+    $items['fedorair/advanced_search'] = array(
     'title' => 'Institutional Repository Advanced Search',
     'page callback' => 'scholar_advanced_search',
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
-  );
+    );
+   */
   $items['fedorair/ir_role'] = array(
     'title' => 'Institutional Repository By Department',
     'page callback' => 'scholar_role',
@@ -79,6 +82,40 @@ function scholar_menu() {
 }
 
 /**
+ * Implements Hook Theme. Registers themes.
+ *
+ * @return array
+ */
+function scholar_theme() {
+  return array(
+    'ir_home_page' => array(
+      'template' => 'templates/Home',
+    ),
+    'ir_custom_search' => array(
+      'template' => 'templates/Search',
+    ),
+    'ir_browse_by_name' => array(
+      'template' => 'templates/BrowseName',
+    ),
+    'ir_browse_by_department' => array(
+      'template' => 'templates/BrowseDepartment',
+    ),
+  );
+}
+
+/**
+ * Menu callback for 'fedorair/ir_edit_refworks'
+ * 
+ * Renders the Home Page.
+ * 
+ * @return string
+ *   HTML for Institutional Repository Home Page.
+ */
+function scholar_home() {
+  return theme('ir_home_page');
+}
+
+/**
  * Menu callback for 'fedorair/ir_edit_refworks' 
  * 
  * @param string $pid
@@ -101,9 +138,13 @@ function scholar_edit_refworks($pid) {
  * @return type 
  */
 function scholar_full_record($pid) {
-  $irClass = new IrClass();
-  $output = $irClass->show_full_record($pid);
-  return $output;
+  try {
+    $irClass = new IrClass();
+    $output = $irClass->show_full_record($pid);
+    return $output;
+  } catch (Exception $e) {
+    drupal_not_found();
+  }
 }
 
 /**
@@ -119,7 +160,7 @@ function scholar_full_record($pid) {
 function scholar_role($type, $query) {
   $role = $query; //
   $irClass = new IrClass();
-  //real bad hack to change home economics and ohters to something different (ldap groups are incorrect in ldap server so they say)
+//real bad hack to change home economics and ohters to something different (ldap groups are incorrect in ldap server so they say)
   $department = $query;
 
   if ('Home Economics' == $department) {
@@ -248,7 +289,7 @@ function validation_for_refworks(array $form, array &$form_state) {
         $form_state['rebuild'] = TRUE;
         break;
       case 2:
-        // Get the uploaded file.
+// Get the uploaded file.
         $validators = array();
         if (!empty($_FILES['files']['name']['pdf-file-location'])) {
           $fileObject = file_save_upload('pdf-file-location', $validators);
