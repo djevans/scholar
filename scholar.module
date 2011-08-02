@@ -87,31 +87,8 @@ function scholar_menu() {
  *   HTML Rendering of the drupal form.
  */
 function scholar_edit_refworks($pid) {
-  return drupal_get_form('scholar_edit_refworks_form', $pid);
-}
-
-/**
- * Builds a drupal form for editing refworks metadata.
- * 
- * @param array $form_state
- * @param string $pid
- * 
- * @return array
- */
-function scholar_edit_refworks_form(array $form_state, $pid) {
-  $edit_refworks_form = new IrClass();
-  return $edit_refworks_form->buildRefworksEditForm($pid);
-}
-
-/**
- * Submit hook for the refworks metadata form.
- * 
- * @param array $form
- * @param array $form_state 
- */
-function scholar_edit_refworks_form_submit(array $form, array &$form_state) {
-  $irClass = new IrClass();
-  $form_state['redirect'] = $irClass->updateRefworksMetaData($form_state['values']);
+  module_load_include('inc', 'scholar', 'RefworksForm');
+  return drupal_get_form('scholar_refworks_form', $pid);
 }
 
 /**
