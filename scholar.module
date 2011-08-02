@@ -91,6 +91,9 @@ function scholar_theme() {
     'ir_home_page' => array(
       'template' => 'templates/Home',
     ),
+    'ir_record' => array(
+      'template' => 'templates/Record',
+    ),
     'ir_custom_search' => array(
       'template' => 'templates/Search',
     ),
@@ -99,7 +102,7 @@ function scholar_theme() {
     ),
     'ir_browse_by_department' => array(
       'template' => 'templates/BrowseDepartment',
-    ),
+    )
   );
 }
 
