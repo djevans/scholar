@@ -1,29 +1,144 @@
 <?php
 
-module_load_include('inc', 'scholar', 'IrClass');
+// $Id$
 
+/**
+ * @file
+ *
+ * Implements hooks and callbacks for this module.
+ */
+module_load_include('inc', 'scholar', 'IrClass');
+/**
+ * Constants
+ */
+define("PERM_SCHOLAR_VIEW_RESEARCH", 'view scholarly research');
+define("PERM_SCHOLAR_ADD_RESEARCH", 'add scholarly research');
+
+/**
+ * Implements Menu Hook. Registers Menus.
+ */
+function scholar_menu() {
+  $items = array();
+  $items['fedorair/ir'] = array(
+    'title' => 'Institutional Repository',
+    'page callback' => 'scholar_home',
+    'type' => MENU_NORMAL_ITEM,
+    'access callback' => 'user_access',
+    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+  );
+  $items['fedorair/custom_search'] = array(
+    'title' => 'Institutional Repository',
+    'page callback' => 'scholar_custom_search',
+    'access callback' => 'user_access',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+  );
+  $items['fedorair/advanced_search'] = array(
+    'title' => 'Institutional Repository Advanced Search',
+    'page callback' => 'scholar_advanced_search',
+    'access callback' => 'user_access',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+  );
+  $items['fedorair/ir_role'] = array(
+    'title' => 'Institutional Repository By Department',
+    'page callback' => 'scholar_role',
+    'access callback' => 'user_access',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+  );
+  $items['fedorair/ir_by_name'] = array(
+    'title' => 'Institutional Repository By User Name',
+    'page callback' => 'scholar_by_name',
+    'access callback' => 'user_access',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+  );
+  $items['fedorair/ir_full_record'] = array(
+    'title' => 'Citation',
+    'page callback' => 'scholar_full_record',
+    'access callback' => 'user_access',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+  );
+  $items['fedorair/ir_edit_refworks'] = array(
+    'title' => 'Edit Metadata',
+    'page callback' => 'scholar_edit_refworks',
+    'access callback' => 'user_access',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
+  );
+  $items['fedorair/ir_create_roles_for_users'] = array(
+    'title' => 'Edit Metadata',
+    'page callback' => 'scholar_create_roles_for_users',
+    'access callback' => 'user_access',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
+  );
+  return $items;
+}
+
+/**
+ * Menu callback for 'fedorair/ir_edit_refworks' 
+ * 
+ * @param string $pid
+ * 
+ * @return string
+ *   HTML Rendering of the drupal form.
+ */
 function scholar_edit_refworks($pid) {
   return drupal_get_form('scholar_edit_refworks_form', $pid);
 }
 
-function scholar_edit_refworks_form($form_state, $pid) {
-
+/**
+ * Builds a drupal form for editing refworks metadata.
+ * 
+ * @param array $form_state
+ * @param string $pid
+ * 
+ * @return array
+ */
+function scholar_edit_refworks_form(array $form_state, $pid) {
   $edit_refworks_form = new IrClass();
   return $edit_refworks_form->buildRefworksEditForm($pid);
 }
 
-function scholar_edit_refworks_form_submit($form, &$form_state) {
+/**
+ * Submit hook for the refworks metadata form.
+ * 
+ * @param array $form
+ * @param array $form_state 
+ */
+function scholar_edit_refworks_form_submit(array $form, array &$form_state) {
   $irClass = new IrClass();
   $form_state['redirect'] = $irClass->updateRefworksMetaData($form_state['values']);
 }
 
+/**
+ * Menu callback for 'fedorair/ir_full_record'
+ * 
+ * @todo Find out what this function does, and returns.
+ * 
+ * @param string $pid
+ * 
+ * @return type 
+ */
 function scholar_full_record($pid) {
   $irClass = new IrClass();
   $output = $irClass->show_full_record($pid);
-
   return $output;
 }
 
+/**
+ * Menu callback for 'fedorair/ir_role'
+ * 
+ * @todo Find out what this returns and what it accepts as parameters.
+ * 
+ * @param type $type
+ * @param type $query
+ * 
+ * @return type 
+ */
 function scholar_role($type, $query) {
   $role = $query; //
   $irClass = new IrClass();
@@ -54,151 +169,119 @@ function scholar_role($type, $query) {
   return $output . $results;
 }
 
-function scholar_add_ir_datastream_form($form_state, $pid) {
+/**
+ * Builds a drupal form for adding a new datastream.
+ * 
+ * @todo determine if this is called from anywhere.
+ * 
+ * @param array $form_state
+ * @param string $pid
+ * 
+ * @return array 
+ */
+function scholar_add_ir_datastream_form(array $form_state, $pid) {
   $datastream_form = new IrClass();
   return $datastream_form->build_add_datastream_form($pid);
 }
 
-function scholar_add_ir_datastream_form_submit($form, &$form_state) {
+/**
+ * Submit hook for the add datasteam form.
+ * 
+ * @param array $form
+ * @param array $form_state 
+ */
+function scholar_add_ir_datastream_form_submit(array $form, array &$form_state) {
   $ir = new IrClass();
   $ir->addStreamFormSubmit($form_state['values']['form_id'], $form_state['values']);
 }
 
+/**
+ * Menu callbacke for 'fedorair/ir_create_roles_for_users'
+ * 
+ * @todo determine what this function does.
+ * 
+ * @return string
+ */
 function scholar_create_roles_for_users() {
   $irClass = new IrClass();
   $irClass->get_and_create_roles();
   return 'created roles and associated users.';
 }
 
-/*
- * defines the list of paths and hooks/callbacks for the scholar module
- */
-
-function scholar_menu() {
-
-  $items = array();
-
-
-
-  $items['fedorair/ir'] = array(
-    'title' => 'Institutional Repository',
-    'page callback' => 'scholar_home',
-    'type' => MENU_NORMAL_ITEM,
-    'access callback' => 'user_access',
-    'access arguments' => array('view scholarly research'),
-  );
-
-  $items['fedorair/custom_search'] = array(
-    'title' => 'Institutional Repository',
-    'page callback' => 'scholar_custom_search',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('view scholarly research'),
-  );
-
-  $items['fedorair/advanced_search'] = array(
-    'title' => 'Institutional Repository Advanced Search',
-    'page callback' => 'scholar_advanced_search',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('view scholarly research'),
-  );
-
-  $items['fedorair/ir_role'] = array(
-    'title' => 'Institutional Repository By Department',
-    'page callback' => 'scholar_role',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('view scholarly research'),
-  );
-
-  $items['fedorair/ir_by_name'] = array(
-    'title' => 'Institutional Repository By User Name',
-    'page callback' => 'scholar_by_name',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('view scholarly research'),
-  );
-
-  $items['fedorair/ir_full_record'] = array(
-    'title' => 'Citation',
-    'page callback' => 'scholar_full_record',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('view scholarly research'),
-  );
-
-  $items['fedorair/ir_edit_refworks'] = array(
-    'title' => 'Edit Metadata',
-    'page callback' => 'scholar_edit_refworks',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('add scholarly research'),
-  );
-
-  $items['fedorair/ir_create_roles_for_users'] = array(
-    'title' => 'Edit Metadata',
-    'page callback' => 'scholar_create_roles_for_users',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array('add scholarly research'),
-  );
-
-
-  return $items;
-}
-
-// end function ir_menu
-
 /**
- * Valid permissions for this module
- * @return array An array of valid permissions for the IR module
+ * Implements Permissions Hook.
+ * 
+ * Valid permissions for this module.
+ * 
+ * @return array 
+ *   An array of valid permissions for the IR module.
  */
 function scholar_perm() {
-  return array('view scholarly research', 'add scholarly research');
+  return array(PERM_SCHOLAR_VIEW_RESEARCH, PERM_SCHOLAR_ADD_RESEARCH);
 }
 
-// end function scholar_perm()
-
+/**
+ * Implements Uninstall Hook. 
+ * 
+ * Currently this does nothing.
+ * 
+ * @return boolean
+ *   TRUE on success FALSE otherwise.
+ */
 function scholar_uninstall() {
-
-  return true; // there isn't really anything to uninstall
+  return true;
 }
 
-// end function scholar_uninstall
-
+/**
+ * Implements Settings Page Hook.
+ * 
+ * Currently this does nothing.
+ */
 function fedora_repository_scholar_settings_page() {
   
 }
 
-function scholar_form_fedora_repository_ingest_form_alter(&$form, &$form_state) {
+/**
+ * Implements Form Alter Hook.
+ * 
+ * Alters the fedora_repository ingest form. It modifies the description of the datastream upload field so that it only
+ * references 'Ref Works' documents.
+ * 
+ * @param array $form
+ * @param array $form_state 
+ */
+function scholar_form_fedora_repository_ingest_form_alter(array &$form, array &$form_state) {
   array_unshift($form['#validate'], 'validation_for_refworks');
   $form['indicator']['ingest-file-location']['#title'] = t('Upload Refworks Document');
   $form['indicator']['ingest-file-location']['#description'] = t('Upload refworks xml document containing one or more records.');
 }
 
-function validation_for_refworks($form, &$form_state) {
+/**
+ * Implements a validation hook for the fedora_repository ingest form.
+ * 
+ * Ensures that a file is uploaded and it is of the correct type.
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function validation_for_refworks(array $form, array &$form_state) {
   if ($form_state['clicked_button']['#id'] == 'edit-submit') {
     switch ($form_state['storage']['step']) {
       case 1:
         $form_state['rebuild'] = TRUE;
         break;
-
       case 2:
-
         // Get the uploaded file.
         $validators = array();
-
         if (!empty($_FILES['files']['name']['pdf-file-location'])) {
           $fileObject = file_save_upload('pdf-file-location', $validators);
           file_move($fileObject->filepath, 0, 'FILE_EXISTS_RENAME');
           $form_state['values']['pdf-file-location'] = $fileObject->filepath;
         }
-
         if (file_exists($form_state['values']['pdf-file-location'])) {
           $file = $form_state['values']['pdf-file-location'];
           $extention = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-          if ($extention!='pdf') {
+          if ($extention != 'pdf') {
             form_set_error('pdf-file-location', t("$file does not appear to be a valid PDF."));
             file_delete($file);
             return;
@@ -209,5 +292,3 @@ function validation_for_refworks($form, &$form_state) {
     }
   }
 }
-
-?>
