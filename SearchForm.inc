@@ -15,7 +15,7 @@
  * 
  * @return array
  */
-function scholar_quick_search_form(array &$form_state) {
+function scholar_search_form(array &$form_state) {
   return array(
     'field' => array(
       '#type' => 'select',
@@ -48,6 +48,6 @@ function scholar_quick_search_form(array &$form_state) {
  * @param array $form
  * @param array $form_state 
  */
-function scholar_quick_search_form_submit(array $form, array &$form_state) {
+function scholar_search_form_submit(array $form, array &$form_state) {
   $form_state['redirect'] = MENU_SCHOLAR_SEARCH;
 }
