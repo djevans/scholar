@@ -1,4 +1,11 @@
 <br/>
+<div>
+  Place holder For Citation and Citation Form.
+</div>
+<br/>
+<div>
+  Place holder For Link
+</div>
 <?php
 print theme_fieldset(array(
       '#title' => t("Technical Details"),

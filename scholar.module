@@ -9,69 +9,71 @@
  */
 module_load_include('inc', 'scholar', 'IrClass');
 /**
- * Constants
+ * Constants Permission/Menu/Theme
  */
-define("PERM_SCHOLAR_VIEW_RESEARCH", 'view scholarly research');
-define("PERM_SCHOLAR_ADD_RESEARCH", 'add scholarly research');
+define('PERM_SCHOLAR_VIEW_RESEARCH', 'view scholarly research');
+define('PERM_SCHOLAR_ADD_RESEARCH', 'add scholarly research');
+define('MENU_SCHOLAR_HOME', 'fedorair/ir');
+define('MENU_SCHOLAR_SEARCH', 'fedorair/custom_search');
+define('MENU_SCHOLAR_BROWSE_USER', 'fedorair/ir_by_name');
+define('MENU_SCHOLAR_BROWSE_DEPARTMENT', 'fedorair/ir_role');
+define('MENU_SCHOLAR_RECORD', 'fedorair/ir_full_record');
+define('MENU_SCHOLAR_REFWORKS_EDIT', 'fedorair/ir_edit_refworks');
+define('MENU_SCHOLAR_USERS_CREATE_ROLE', 'fedorair/ir_create_roles_for_users');
+define('THEME_SCHOLAR_HOME', 'ir_home');
+define('THEME_SCHOLAR_RECORD', 'ir_record');
+define('THEME_SCHOLAR_SEARCH', 'ir_custom_search');
+define('THEME_SCHOLAR_BROWSE_USER', 'ir_browse_by_name');
+define('THEME_SCHOLAR_BROWSE_DEPARTMENT', 'ir_browse_by_department');
 
 /**
  * Implements Menu Hook. Registers Menus.
  */
 function scholar_menu() {
   $items = array();
-  $items['fedorair/ir'] = array(
+  $items[MENU_SCHOLAR_HOME] = array(
     'title' => 'Institutional Repository',
     'page callback' => 'scholar_home',
     'type' => MENU_NORMAL_ITEM,
     'access callback' => 'user_access',
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
-  $items['fedorair/custom_search'] = array(
+  $items[MENU_SCHOLAR_SEARCH] = array(
     'title' => 'Institutional Repository',
     'page callback' => 'scholar_custom_search',
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
-  /**
-   * Not functional on islandscholar.ca 
-    $items['fedorair/advanced_search'] = array(
-    'title' => 'Institutional Repository Advanced Search',
-    'page callback' => 'scholar_advanced_search',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
-    );
-   */
-  $items['fedorair/ir_role'] = array(
+  $items[MENU_SCHOLAR_BROWSE_DEPARTMENT] = array(
     'title' => 'Institutional Repository By Department',
     'page callback' => 'scholar_role',
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
-  $items['fedorair/ir_by_name'] = array(
+  $items[MENU_SCHOLAR_BROWSE_USER] = array(
     'title' => 'Institutional Repository By User Name',
     'page callback' => 'scholar_by_name',
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
-  $items['fedorair/ir_full_record'] = array(
+  $items[MENU_SCHOLAR_RECORD] = array(
     'title' => 'Citation',
     'page callback' => 'scholar_full_record',
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
-  $items['fedorair/ir_edit_refworks'] = array(
+  $items[MENU_SCHOLAR_REFWORKS_EDIT] = array(
     'title' => 'Edit Metadata',
     'page callback' => 'scholar_edit_refworks',
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
   );
-  $items['fedorair/ir_create_roles_for_users'] = array(
+  $items[MENU_SCHOLAR_USERS_CREATE_ROLE] = array(
     'title' => 'Edit Metadata',
     'page callback' => 'scholar_create_roles_for_users',
     'access callback' => 'user_access',
@@ -88,20 +90,20 @@ function scholar_menu() {
  */
 function scholar_theme() {
   return array(
-    'ir_home' => array(
+    THEME_SCHOLAR_HOME => array(
       'template' => 'templates/Home',
     ),
-    'ir_record' => array(
+    THEME_SCHOLAR_RECORD => array(
       'arguments' => array('pid' => NULL),
       'template' => 'templates/Record',
     ),
-    'ir_custom_search' => array(
+    THEME_SCHOLAR_SEARCH => array(
       'template' => 'templates/Search',
     ),
-    'ir_browse_by_name' => array(
+    THEME_SCHOLAR_BROWSE_USER => array(
       'template' => 'templates/BrowseName',
     ),
-    'ir_browse_by_department' => array(
+    THEME_SCHOLAR_BROWSE_DEPARTMENT => array(
       'template' => 'templates/BrowseDepartment',
     )
   );
@@ -147,7 +149,7 @@ function template_preprocess_ir_record(array &$variables) {
 function scholar_home() {
   module_load_include('inc', 'scholar', 'QuickSearchForm');
   module_load_include('inc', 'scholar', 'BrowseByUserForm');
-  return theme('ir_home');
+  return theme(THEME_SCHOLAR_HOME);
 }
 
 /**
@@ -174,100 +176,7 @@ function scholar_edit_refworks($pid) {
  *   HTML
  */
 function scholar_full_record($pid) {
-  return theme('ir_record', $pid);
-  /*
-    //theme_fieldset($element)
-    global $user;
-    module_load_include('inc', 'Fedora_Repository', 'ObjectHelper');
-    $objectHelper = new ObjectHelper();
-    $refworksRecord = $objectHelper->getStream($pid, 'refworks', 1);
-    $path = drupal_get_path('module', 'scholar');
-    $proc = null;
-    if (!$refworksRecord) {
-    drupal_set_message(t('No Results for refworks record!'));
-    return ' '; //no results
-    }
-
-    try {
-    $proc = new XsltProcessor();
-    } catch (Exception $e) {
-    drupal_set_message(t('Error loading results xslt! ') . $e->getMessage());
-    return ' ';
-    }
-
-    //inject into xsl stylesheet
-    $proc->setParameter('', 'pid', $pid); //needed in our xsl
-    $proc->setParameter('', 'objectsPage', base_path());
-    $xsl = new DomDocument();
-
-    $test = $xsl->load($path . '/xsl/refworks.xsl');
-    if (!isset($test)) {
-    drupal_set_message(t('Error loading refworks xslt!'));
-    return t('Error loading search results xslt! ');
-    }
-
-    $input = new DomDocument();
-    $didLoadOk = $input->loadXML($refworksRecord);
-    $status = $input->getElementsByTagName('status');
-    $status = $status->item(0)->nodeValue;
-
-    if (!isset($didLoadOk)) {
-    drupal_set_message(t('Error loading search results!'));
-    return t('Error loading search results! ');
-    }
-    else {
-
-    $proc->importStylesheet($xsl);
-
-    $newdom = $proc->transformToDoc($input);
-
-    $output .= $newdom->saveXML();
-    }
-    //we should change this to only show the form if the user can actually edit it
-    //we know the user and we have the refworks record so should be doable
-    if (0 < $user->uid && ('NO_OBJ' == $status || $status == null)) { //show the author stuff
-    $status = "test";
-    $output .= '<br />';
-    module_load_include('inc', 'Fedora_Repository', 'plugins/ShowStreamsInFieldSets');
-    $romeo = new ShowStreamsInFieldSets($pid);
-    $output .= $romeo->showRomeo();
-    $output .= '<br />';
-    $output .= drupal_get_form('scholar_add_ir_datastream_form', $pid);
-    }
-    $object = $objectHelper->get_datastreams_list_asSimpleXML($pid);
-    if (!isset($object)) {
-    drupal_set_message(t("No datastreams available"));
-    return ' ';
-    }
-    $hasOBJStream = null;
-    $dataStreamBody = "<br /><table>\n";
-    $dataStreamBody .= '<tr><th colspan="4"><h3>' . t("Technical Details") . '</h3></th></tr>';
-    foreach ($object as $datastream) {
-    foreach ($datastream as $datastreamValue) {
-    if ($datastreamValue->ID == 'OBJ') {
-    $hasOBJStream = '1';
-    $mainStreamLabel = $datastreamValue->label;
-    $mainStreamLabel = str_replace("_", " ", $mainStreamLabel);
-    }
-    //create the links to each datastream
-    $dataStreamBody .= $objectHelper->create_link_for_ds($pid, $datastreamValue); //"<tr><td><b>$key :</b></td><td>$value</td></tr>\n";
-    }
-    }
-    global $base_url;
-    $dataStreamBody .= "</table>\n";
-    if (0 < $user->uid) {
-    $dataStreamBody.='<br /><a href="' . $base_url . '/fedorair/ir_edit_refworks/' . $pid . '">Edit Metadata</a>';
-    $dataStreamBody.='<br /><a href="' . $base_url . '/fedora/repository/' . $pid . '">Manage Object</a>';
-    }
-    $fieldset = array(
-    '#title' => t("Technical Details"
-    ), '#collapsible' => TRUE, '#collapsed' => TRUE, '#value' => $dataStreamBody);
-    $output .= '<br />' . theme('fieldset', $fieldset);
-    //module_load_include('php', 'Fedora_Repository', 'plugins/ShowStreamsInFieldSets');
-    //$romeo = new ShowStreamsInFieldSets($pid);
-    //$output .= $romeo->showRomeo(true); //collapsed this time
-
-    return $output; */
+  return theme(THEME_SCHOLAR_RECORD, $pid);
 }
 
 /**
