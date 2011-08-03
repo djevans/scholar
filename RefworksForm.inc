@@ -22,7 +22,7 @@ function scholar_refworks_form(array $form_state, $pid) {
   $refworks = $object->getStream($pid, 'refworks', 0);
   if (!isset($refworks)) {
     drupal_set_message(t('Error getting refworks metadata stream'), 'error');
-    return null;
+    return NULL;
   }
   // Authors
   $xml = new SimpleXMLElement($refworks);
@@ -131,14 +131,14 @@ function scholar_refworks_form(array $form_state, $pid) {
   );
   $form['a1'] = array(
     '#type' => 'textarea',
-    '#required' => true,
+    '#required' => TRUE,
     '#default_value' => $authors,
     '#description' => t('Separate multiple entries with a semicolon'),
     '#title' => t('Authors - a1')
   );
   $form['t1'] = array(
     '#type' => 'textarea',
-    '#required' => true,
+    '#required' => TRUE,
     '#default_value' => $titles,
     '#title' => t('Primary Title - t1')
   );
@@ -632,7 +632,7 @@ function scholar_refworks_create_refworks_document(array &$form_state) {
   $form_values = $form_state['values'];
   $refworks = new DomDocument("1.0", "UTF-8");
   $refworks->substituteEntities = FALSE;
-  $refworks->formatOutput = true;
+  $refworks->formatOutput = TRUE;
   $reference = $refworks->createElement("reference");
   $refworks->appendChild($reference);
   foreach ($form_values as $key => $value) {

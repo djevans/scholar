@@ -13,19 +13,25 @@ module_load_include('inc', 'scholar', 'IrClass');
  */
 define('PERM_SCHOLAR_VIEW_RESEARCH', 'view scholarly research');
 define('PERM_SCHOLAR_ADD_RESEARCH', 'add scholarly research');
-define('MENU_SCHOLAR_HOME', 'fedorair/ir');
-define('MENU_SCHOLAR_SEARCH', 'ir/search/%/%');
-define('MENU_SCHOLAR_BROWSE_USER', 'fedorair/ir_by_name');
-define('MENU_SCHOLAR_BROWSE_DEPARTMENT', 'fedorair/ir_role');
-define('MENU_SCHOLAR_RECORD', 'fedorair/ir_full_record');
-define('MENU_SCHOLAR_REFWORKS_EDIT', 'fedorair/ir_edit_refworks');
-define('MENU_SCHOLAR_USERS_CREATE_ROLE', 'fedorair/ir_create_roles_for_users');
+define('MENU_SCHOLAR_HOME', 'ir');
+define('MENU_SCHOLAR_SEARCH', 'ir/search/%/%/%');
+define('MENU_SCHOLAR_BROWSE_USER', 'ir/user/%');
+define('MENU_SCHOLAR_BROWSE_DEPARTMENT', 'ir/department/%');
+define('MENU_SCHOLAR_RECORD', 'ir/record/%');
+//define('MENU_SCHOLAR_REFWORKS_EDIT', 'fedorair/ir_edit_refworks');
+//define('MENU_SCHOLAR_USERS_CREATE_ROLE', 'fedorair/ir_create_roles_for_users');
 define('MENU_SCHOLAR_ADMIN_SETTINGS', 'admin/settings/institutional_repository');
 define('THEME_SCHOLAR_HOME', 'ir_home');
 define('THEME_SCHOLAR_RECORD', 'ir_record');
 define('THEME_SCHOLAR_SEARCH', 'ir_search');
 define('THEME_SCHOLAR_BROWSE_USER', 'ir_browse_by_name');
 define('THEME_SCHOLAR_BROWSE_DEPARTMENT', 'ir_browse_by_department');
+define('VAR_SCHOLAR_SEARCH_FIELD_TITLE', 'scholar_search_title_field');
+define('VAR_SCHOLAR_SEARCH_FIELD_AUTHOR', 'scholar_search_author_field');
+define('VAR_SCHOLAR_SEARCH_FIELD_TEXT', 'scholar_search_text_field');
+define('VAR_SCHOLAR_SEARCH_FIELD_USER', 'scholar_search_user_field');
+
+
 
 /**
  * Implements Menu Hook. Registers Menus.
@@ -43,7 +49,7 @@ function scholar_menu() {
     'title' => 'Institutional Repository',
     'page callback' => 'scholar_search',
     'access callback' => 'user_access',
-    'page arguments' => array(2, 3),
+    'page arguments' => array(2, 3, 4),
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
@@ -68,6 +74,7 @@ function scholar_menu() {
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
+  /*
   $items[MENU_SCHOLAR_REFWORKS_EDIT] = array(
     'title' => 'Edit Metadata',
     'page callback' => 'scholar_edit_refworks',
@@ -81,7 +88,7 @@ function scholar_menu() {
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
-  );
+  );*/
   $items[MENU_SCHOLAR_ADMIN_SETTINGS] = array(
     'title' => t('Institutional Repository'),
     'description' => t('Configure Settings'),
@@ -139,8 +146,8 @@ function scholar_theme() {
 function template_preprocess_ir_home(array &$variables) {
   $path = drupal_get_path('module', 'scholar');
   drupal_add_css("$path/css/Home.css");
-  $variables['browse_by_user'] = db_result(db_query("SELECT COUNT(uid) FROM users WHERE uid > 1")) > 0;
-  $variables['browse_by_department'] = true;
+  $variables['browse_by_user'] = db_result(db_query("SELECT COUNT(uid) FROM {users} WHERE uid > 1")) > 0;
+  $variables['browse_by_department'] = TRUE;
 }
 
 /**
@@ -232,76 +239,35 @@ function scholar_full_record($pid) {
  */
 function scholar_admin_settings(array &$form_state) {
   $form = array();
-  $form['scholar_search_title_field'] = array(
+  $form[VAR_SCHOLAR_SEARCH_FIELD_TITLE] = array(
     '#type' => 'textfield',
     '#title' => t('Title Search Field'),
     '#description' => t('The SOLR search field used for title.'),
-    '#default_value' => variable_get('scholar_search_title_field', 'Not Specified'),
+    '#default_value' => variable_get(VAR_SCHOLAR_SEARCH_FIELD_TITLE, 'title'),
     '#required' => TRUE,
   );
-  $form['scholar_search_author_field'] = array(
+  $form[VAR_SCHOLAR_SEARCH_FIELD_AUTHOR] = array(
     '#type' => 'textfield',
     '#title' => t('Author Search Field'),
     '#description' => t('The SOLR search field used for author.'),
-    '#default_value' => variable_get('scholar_search_author_field', 'Not Specified'),
+    '#default_value' => variable_get(VAR_SCHOLAR_SEARCH_FIELD_AUTHOR, 'author'),
     '#required' => TRUE,
   );
-  $form['scholar_search_text_field'] = array(
+  $form[VAR_SCHOLAR_SEARCH_FIELD_TEXT] = array(
     '#type' => 'textfield',
     '#title' => t('Text Search Field'),
     '#description' => t('The SOLR search field used for text.'),
-    '#default_value' => variable_get('scholar_search_text_field', 'Not Specified'),
+    '#default_value' => variable_get(VAR_SCHOLAR_SEARCH_FIELD_TEXT, 'text'),
     '#required' => TRUE,
   );
-  $form['scholar_search_user_field'] = array(
+  $form[VAR_SCHOLAR_SEARCH_FIELD_USER] = array(
     '#type' => 'textfield',
     '#title' => t('User Search Field'),
     '#description' => t('The SOLR search field used for user.'),
-    '#default_value' => variable_get('scholar_search_user_field', 'Not Specified'),
+    '#default_value' => variable_get(VAR_SCHOLAR_SEARCH_FIELD_USER, 'user'),
     '#required' => TRUE,
   );
-  
   return system_settings_form($form);
-}
-
-/**
- * Menu callback for 'fedorair/ir_role'
- * 
- * @todo Find out what this returns and what it accepts as parameters.
- * 
- * @param type $type
- * @param type $query
- * 
- * @return type 
- */
-function scholar_role($type, $query) {
-  $role = $query; //
-  $irClass = new IrClass();
-//real bad hack to change home economics and ohters to something different (ldap groups are incorrect in ldap server so they say)
-  $department = $query;
-
-  if ('Home Economics' == $department) {
-    $department = 'Family and Nutritional Sciences';
-  }
-  else if ('Anatomy Physiology' == $department) {
-    $department = 'Biomedical Sciences';
-  }
-  else if ('Womens Studies' == $department) {
-    $department = "Women's Studies";
-  }
-  else if ('Path Micro' == $department) {
-    $department = "Pathology and Microbiology";
-  }
-  else if ('Soc Anth' == $department) {
-    $department = "Sociology and Anthropology";
-  }
-  $output = "<h4 align='center'>$department</h4>";
-  $usersArray = array();
-
-  $results = scholar_custom_search($type, $query, 0, 0, $usersArray);
-  $output.='<center><table class="table-form"><tr>' . drupal_get_form('scholar_browse_by_user_form', $role, $usersArray) . '</tr></table></center>';
-
-  return $output . $results;
 }
 
 /**
