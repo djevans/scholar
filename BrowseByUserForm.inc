@@ -16,12 +16,15 @@
  * @return array
  */
 function scholar_browse_by_user_form(array &$form_state) {
+  $users = array();
+  $result = db_query("SELECT uid, name FROM {users} WHERE uid > 1");
+  while ($user = db_fetch_object($result)) {
+    $users[$user->uid] = $user->name;
+  }
   return array(
     'user' => array(
       '#type' => 'select',
-      '#options' => array(
-        'title' => t('Name'),
-      ),
+      '#options' => $users
     ),
     'submit' => array(
       '#type' => 'submit',

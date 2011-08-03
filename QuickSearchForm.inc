@@ -21,12 +21,15 @@ function scholar_quick_search_form(array &$form_state) {
       '#type' => 'select',
       '#options' => array(
         'title' => t('Title'),
+        'author' => t('Author'),
+        'text' => t('Text'),
       ),
     ),
     'sort' => array(
       '#type' => 'select',
       '#options' => array(
-        'title' => t('Title'),
+        'date' => t('Date'),
+        'relevance' => t('Relevance'),
       ),
     ),
     'search' => array(
