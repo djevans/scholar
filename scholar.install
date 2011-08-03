@@ -17,31 +17,6 @@ function scholar_add_required_namespaces() {
     variable_set('fedora_pids_allowed', $namespaces . ' ir:');
     drupal_set_message('Added \'ir:\' to the set of allowed namespaces.', 'info');
   }
-  if (preg_match('/cyct\:/', $namespaces) > 0) {
-    variable_set('fedora_pids_allowed', $namespaces . ' cyct:');
-    drupal_set_message('Added \'cyct:\' to the set of allowed namespaces.', 'info');
-  }
-}
-
-/**
- * Creates a Cyct Collection object.
- */
-function scholar_create_cyct_collection() {
-  global $base_url;
-  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  if (!Fedora_Item::fedora_item_exists('cyct:collection')) {
-    $foxml = Fedora_Item::create_object_FOXML('cyct:collection', 'A', 'CYCT Collection');
-    $collection = Fedora_Item::ingest_from_FOXML($foxml);
-    if (!empty($collection)) {
-      $collection->add_datastream_from_url($base_url . '/' . drupal_get_path('module', 'fedora_repository') . '/collection_policies/REFWORKS_COLLECTION_POLICY.xml', 'COLLECTION_POLICY', 'Collection Policy', 'text/xml', 'E');
-      $collection->add_datastream_from_url($base_url . '/' . drupal_get_path('module', 'fedora_repository') . '/collection_views/REFWORKS-COLLECTION_VIEW.xml', 'COLLECTION_VIEW', 'Collection View', 'text/xml', 'E');
-      $collection->add_relationship('hasModel', 'islandora:collectionCModel', FEDORA_MODEL_URI);
-      $collection->add_relationship('isMemberOfCollection', 'islandora:top');
-    }
-    else {
-      drupal_set_message('There was an error creating the Institutional Repository collection object. See watchdog for details', 'Error');
-    }
-  }
 }
 
 /**
@@ -68,6 +43,5 @@ function scholar_create_reworks_content_model() {
  */
 function scholar_enable() {
   scholar_add_required_namespaces();
-  scholar_create_cyct_collection();
   scholar_create_reworks_content_model();
 }
