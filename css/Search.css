@@ -1,0 +1,10 @@
+/* 
+    Document   : Search
+    Created on : Aug 3, 2011, 1:41:40 PM
+    Author     : nbanks
+    Description:
+        Purpose of the stylesheet follows.
+*/
+div.form-item { 
+    display: inline-block;
+}

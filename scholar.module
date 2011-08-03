@@ -20,6 +20,7 @@ define('MENU_SCHOLAR_BROWSE_DEPARTMENT', 'fedorair/ir_role');
 define('MENU_SCHOLAR_RECORD', 'fedorair/ir_full_record');
 define('MENU_SCHOLAR_REFWORKS_EDIT', 'fedorair/ir_edit_refworks');
 define('MENU_SCHOLAR_USERS_CREATE_ROLE', 'fedorair/ir_create_roles_for_users');
+define('MENU_SCHOLAR_ADMIN_SETTINGS', 'admin/settings/institutional_repository');
 define('THEME_SCHOLAR_HOME', 'ir_home');
 define('THEME_SCHOLAR_RECORD', 'ir_record');
 define('THEME_SCHOLAR_SEARCH', 'ir_search');
@@ -80,6 +81,14 @@ function scholar_menu() {
     'access callback' => 'user_access',
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
+  );
+  $items[MENU_SCHOLAR_ADMIN_SETTINGS] = array(
+    'title' => t('Institutional Repository'),
+    'description' => t('Configure Settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('scholar_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
   );
   return $items;
 }
@@ -152,6 +161,15 @@ function template_preprocess_ir_record(array &$variables) {
 }
 
 /**
+ * Implements the Theme Hook function for the ir_record theme.
+ *
+ * @param $variables
+ */
+function template_preprocess_ir_search(array &$variables) {
+  drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
+}
+
+/**
  * Menu callback for 'fedorair/ir_edit_refworks'
  * 
  * Renders the Home Page.
@@ -203,6 +221,47 @@ function scholar_edit_refworks($pid) {
  */
 function scholar_full_record($pid) {
   return theme(THEME_SCHOLAR_RECORD, $pid);
+}
+
+/**
+ * Build the Admin settings form.
+ * 
+ * @param array $form_state 
+ * 
+ * @return array
+ */
+function scholar_admin_settings(array &$form_state) {
+  $form = array();
+  $form['scholar_search_title_field'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title Search Field'),
+    '#description' => t('The SOLR search field used for title.'),
+    '#default_value' => variable_get('scholar_search_title_field', 'Not Specified'),
+    '#required' => TRUE,
+  );
+  $form['scholar_search_author_field'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Author Search Field'),
+    '#description' => t('The SOLR search field used for author.'),
+    '#default_value' => variable_get('scholar_search_author_field', 'Not Specified'),
+    '#required' => TRUE,
+  );
+  $form['scholar_search_text_field'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Text Search Field'),
+    '#description' => t('The SOLR search field used for text.'),
+    '#default_value' => variable_get('scholar_search_text_field', 'Not Specified'),
+    '#required' => TRUE,
+  );
+  $form['scholar_search_user_field'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User Search Field'),
+    '#description' => t('The SOLR search field used for user.'),
+    '#default_value' => variable_get('scholar_search_user_field', 'Not Specified'),
+    '#required' => TRUE,
+  );
+  
+  return system_settings_form($form);
 }
 
 /**
@@ -282,18 +341,6 @@ function scholar_create_roles_for_users() {
   $irClass = new IrClass();
   $irClass->get_and_create_roles();
   return 'created roles and associated users.';
-}
-
-/**
- * Implements Uninstall Hook. 
- * 
- * Currently this does nothing.
- * 
- * @return boolean
- *   TRUE on success FALSE otherwise.
- */
-function scholar_uninstall() {
-  return true;
 }
 
 /**
