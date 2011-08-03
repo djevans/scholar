@@ -14,7 +14,7 @@ module_load_include('inc', 'scholar', 'IrClass');
 define('PERM_SCHOLAR_VIEW_RESEARCH', 'view scholarly research');
 define('PERM_SCHOLAR_ADD_RESEARCH', 'add scholarly research');
 define('MENU_SCHOLAR_HOME', 'fedorair/ir');
-define('MENU_SCHOLAR_SEARCH', 'fedorair/custom_search');
+define('MENU_SCHOLAR_SEARCH', 'ir/search/%/%');
 define('MENU_SCHOLAR_BROWSE_USER', 'fedorair/ir_by_name');
 define('MENU_SCHOLAR_BROWSE_DEPARTMENT', 'fedorair/ir_role');
 define('MENU_SCHOLAR_RECORD', 'fedorair/ir_full_record');
@@ -22,7 +22,7 @@ define('MENU_SCHOLAR_REFWORKS_EDIT', 'fedorair/ir_edit_refworks');
 define('MENU_SCHOLAR_USERS_CREATE_ROLE', 'fedorair/ir_create_roles_for_users');
 define('THEME_SCHOLAR_HOME', 'ir_home');
 define('THEME_SCHOLAR_RECORD', 'ir_record');
-define('THEME_SCHOLAR_SEARCH', 'ir_custom_search');
+define('THEME_SCHOLAR_SEARCH', 'ir_search');
 define('THEME_SCHOLAR_BROWSE_USER', 'ir_browse_by_name');
 define('THEME_SCHOLAR_BROWSE_DEPARTMENT', 'ir_browse_by_department');
 
@@ -40,8 +40,9 @@ function scholar_menu() {
   );
   $items[MENU_SCHOLAR_SEARCH] = array(
     'title' => 'Institutional Repository',
-    'page callback' => 'scholar_custom_search',
+    'page callback' => 'scholar_search',
     'access callback' => 'user_access',
+    'page arguments' => array(2, 3),
     'type' => MENU_CALLBACK,
     'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
   );
@@ -81,6 +82,18 @@ function scholar_menu() {
     'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
   );
   return $items;
+}
+
+/**
+ * Implements Permissions Hook.
+ * 
+ * Valid permissions for this module.
+ * 
+ * @return array 
+ *   An array of valid permissions for the IR module.
+ */
+function scholar_perm() {
+  return array(PERM_SCHOLAR_VIEW_RESEARCH, PERM_SCHOLAR_ADD_RESEARCH);
 }
 
 /**
@@ -150,6 +163,19 @@ function scholar_home() {
   module_load_include('inc', 'scholar', 'QuickSearchForm');
   module_load_include('inc', 'scholar', 'BrowseByUserForm');
   return theme(THEME_SCHOLAR_HOME);
+}
+
+/**
+ * Renders the Search page.
+ * 
+ * @param string $field
+ * @param string $order 
+ *  
+ * @return string
+ */
+function scholar_search($field, $order) {
+  module_load_include('inc', 'scholar', 'QuickSearchForm');
+  return theme(THEME_SCHOLAR_SEARCH);
 }
 
 /**
@@ -256,18 +282,6 @@ function scholar_create_roles_for_users() {
   $irClass = new IrClass();
   $irClass->get_and_create_roles();
   return 'created roles and associated users.';
-}
-
-/**
- * Implements Permissions Hook.
- * 
- * Valid permissions for this module.
- * 
- * @return array 
- *   An array of valid permissions for the IR module.
- */
-function scholar_perm() {
-  return array(PERM_SCHOLAR_VIEW_RESEARCH, PERM_SCHOLAR_ADD_RESEARCH);
 }
 
 /**

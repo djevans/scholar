@@ -18,6 +18,7 @@ print theme_fieldset(array(
         ),
         array(
           'data' => 'Mime Type'
-          )), $rows)
+          )), $rows
+      ) . l('Edit Metadata', '') . '<br/>' . l('Manage Object', '')
     ));
 ?>
