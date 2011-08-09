@@ -20,20 +20,38 @@ function scholar_add_required_namespaces() {
 }
 
 /**
- * Creates a Refworks Content Model object.
+ * Creates a Citation Content Model object.
  */
-function scholar_create_reworks_content_model() {
+function scholar_create_top_level_collection() {
   global $base_url;
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  if (!Fedora_Item::fedora_item_exists('islandora:refworksCModel')) {
-    $foxml = Fedora_Item::create_object_FOXML('islandora:refworksCModel', 'A', 'Refworks Content Model');
-    $cmodel_item = Fedora_Item::ingest_from_FOXML($foxml);
+  if (!Fedora_Item::fedora_item_exists('ir:top')) {
+    $foxml = Fedora_Item::create_object_FOXML('ir:top', 'A', 'Institutional Repository Top Level Collection');
+    $collection = Fedora_Item::ingest_from_FOXML($foxml);
+    if (!empty($collection)) {
+      $collection->add_relationship('hasModel', 'info:fedora/islandora:collectionCModel');
+    }
+    else {
+      drupal_set_message('There was an error creating the Top Level Collection. See watchdog for details.', 'Error');
+    }
+  }
+}
+
+/**
+ * Creates a Citation Content Model object.
+ */
+function scholar_create_citation_content_model() {
+  global $base_url;
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  if (!Fedora_Item::fedora_item_exists('ir:citationCModel')) {
+    $foxml = Fedora_Item::create_object_FOXML('ir:citationCModel', 'A', 'Citation Content Model');
+    $content_model = Fedora_Item::ingest_from_FOXML($foxml);
     if (!empty($content_model)) {
-      $content_model->add_datastream_from_url($base_url . '/' . drupal_get_path('module', 'fedora_repository') . '/content_models/REFWORKSCM.xml', 'ISLANDORACM', 'Islandora Content Model', 'text/xml', 'E');
+      $content_model->add_datastream_from_url($base_url . '/' . drupal_get_path('module', 'scholar') . '/models/CITATIONCM.xml', 'ISLANDORACM', 'Islandora Content Model', 'text/xml', 'E');
       $content_model->add_relationship('hasModel', 'info:fedora/fedora-system:ContentModel-3.0');
     }
     else {
-      drupal_set_message('There was an error creating the Content Model object. See watchdog for details.', 'Error');
+      drupal_set_message('There was an error creating the Citation Content Model object. See watchdog for details.', 'Error');
     }
   }
 }
@@ -43,5 +61,6 @@ function scholar_create_reworks_content_model() {
  */
 function scholar_enable() {
   scholar_add_required_namespaces();
-  scholar_create_reworks_content_model();
+  scholar_create_citation_content_model();
+  scholar_create_top_level_collection();
 }

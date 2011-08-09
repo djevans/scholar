@@ -31,74 +31,72 @@ define('VAR_SCHOLAR_SEARCH_FIELD_AUTHOR', 'scholar_search_author_field');
 define('VAR_SCHOLAR_SEARCH_FIELD_TEXT', 'scholar_search_text_field');
 define('VAR_SCHOLAR_SEARCH_FIELD_USER', 'scholar_search_user_field');
 
-
-
 /**
  * Implements Menu Hook. Registers Menus.
  */
 function scholar_menu() {
-  $items = array();
-  $items[MENU_SCHOLAR_HOME] = array(
-    'title' => 'Institutional Repository',
-    'page callback' => 'scholar_home',
-    'type' => MENU_NORMAL_ITEM,
-    'access callback' => 'user_access',
-    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
-  );
-  $items[MENU_SCHOLAR_SEARCH] = array(
-    'title' => 'Institutional Repository',
-    'page callback' => 'scholar_search',
-    'access callback' => 'user_access',
-    'page arguments' => array(2, 3, 4),
-    'type' => MENU_CALLBACK,
-    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
-  );
-  $items[MENU_SCHOLAR_BROWSE_DEPARTMENT] = array(
-    'title' => 'Institutional Repository By Department',
-    'page callback' => 'scholar_role',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
-  );
-  $items[MENU_SCHOLAR_BROWSE_USER] = array(
-    'title' => 'Institutional Repository By User Name',
-    'page callback' => 'scholar_by_name',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
-  );
-  $items[MENU_SCHOLAR_RECORD] = array(
-    'title' => 'Citation',
-    'page callback' => 'scholar_full_record',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
-  );
-  /*
-  $items[MENU_SCHOLAR_REFWORKS_EDIT] = array(
-    'title' => 'Edit Metadata',
-    'page callback' => 'scholar_edit_refworks',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
-  );
-  $items[MENU_SCHOLAR_USERS_CREATE_ROLE] = array(
-    'title' => 'Edit Metadata',
-    'page callback' => 'scholar_create_roles_for_users',
-    'access callback' => 'user_access',
-    'type' => MENU_CALLBACK,
-    'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
-  );*/
-  $items[MENU_SCHOLAR_ADMIN_SETTINGS] = array(
-    'title' => t('Institutional Repository'),
-    'description' => t('Configure Settings'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('scholar_admin_settings'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'scholar.admin.inc',
-    'type' => MENU_NORMAL_ITEM,
-  );
-  return $items;
+    $items = array();
+    $items[MENU_SCHOLAR_HOME] = array(
+        'title' => 'Institutional Repository',
+        'page callback' => 'scholar_home',
+        'type' => MENU_NORMAL_ITEM,
+        'access callback' => 'user_access',
+        'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+    );
+    $items[MENU_SCHOLAR_SEARCH] = array(
+        'title' => 'Institutional Repository',
+        'page callback' => 'scholar_search',
+        'access callback' => 'user_access',
+        'page arguments' => array(2, 3, 4),
+        'type' => MENU_CALLBACK,
+        'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+    );
+    $items[MENU_SCHOLAR_BROWSE_DEPARTMENT] = array(
+        'title' => 'Institutional Repository By Department',
+        'page callback' => 'scholar_role',
+        'access callback' => 'user_access',
+        'type' => MENU_CALLBACK,
+        'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+    );
+    $items[MENU_SCHOLAR_BROWSE_USER] = array(
+        'title' => 'Institutional Repository By User Name',
+        'page callback' => 'scholar_by_name',
+        'access callback' => 'user_access',
+        'type' => MENU_CALLBACK,
+        'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+    );
+    $items[MENU_SCHOLAR_RECORD] = array(
+        'title' => 'Citation',
+        'page callback' => 'scholar_full_record',
+        'access callback' => 'user_access',
+        'type' => MENU_CALLBACK,
+        'access arguments' => array(PERM_SCHOLAR_VIEW_RESEARCH),
+    );
+    /*
+      $items[MENU_SCHOLAR_REFWORKS_EDIT] = array(
+      'title' => 'Edit Metadata',
+      'page callback' => 'scholar_edit_refworks',
+      'access callback' => 'user_access',
+      'type' => MENU_CALLBACK,
+      'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
+      );
+      $items[MENU_SCHOLAR_USERS_CREATE_ROLE] = array(
+      'title' => 'Edit Metadata',
+      'page callback' => 'scholar_create_roles_for_users',
+      'access callback' => 'user_access',
+      'type' => MENU_CALLBACK,
+      'access arguments' => array(PERM_SCHOLAR_ADD_RESEARCH),
+      ); */
+    $items[MENU_SCHOLAR_ADMIN_SETTINGS] = array(
+        'title' => t('Institutional Repository'),
+        'description' => t('Configure Settings'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('scholar_admin_settings'),
+        'access arguments' => array('administer site configuration'),
+        'file' => 'scholar.admin.inc',
+        'type' => MENU_NORMAL_ITEM,
+    );
+    return $items;
 }
 
 /**
@@ -110,7 +108,7 @@ function scholar_menu() {
  *   An array of valid permissions for the IR module.
  */
 function scholar_perm() {
-  return array(PERM_SCHOLAR_VIEW_RESEARCH, PERM_SCHOLAR_ADD_RESEARCH);
+    return array(PERM_SCHOLAR_VIEW_RESEARCH, PERM_SCHOLAR_ADD_RESEARCH);
 }
 
 /**
@@ -119,24 +117,24 @@ function scholar_perm() {
  * @return array
  */
 function scholar_theme() {
-  return array(
-    THEME_SCHOLAR_HOME => array(
-      'template' => 'templates/Home',
-    ),
-    THEME_SCHOLAR_RECORD => array(
-      'arguments' => array('pid' => NULL),
-      'template' => 'templates/Record',
-    ),
-    THEME_SCHOLAR_SEARCH => array(
-      'template' => 'templates/Search',
-    ),
-    THEME_SCHOLAR_BROWSE_USER => array(
-      'template' => 'templates/BrowseName',
-    ),
-    THEME_SCHOLAR_BROWSE_DEPARTMENT => array(
-      'template' => 'templates/BrowseDepartment',
-    )
-  );
+    return array(
+        THEME_SCHOLAR_HOME => array(
+            'template' => 'templates/Home',
+        ),
+        THEME_SCHOLAR_RECORD => array(
+            'arguments' => array('pid' => NULL),
+            'template' => 'templates/Record',
+        ),
+        THEME_SCHOLAR_SEARCH => array(
+            'template' => 'templates/Search',
+        ),
+        THEME_SCHOLAR_BROWSE_USER => array(
+            'template' => 'templates/BrowseName',
+        ),
+        THEME_SCHOLAR_BROWSE_DEPARTMENT => array(
+            'template' => 'templates/BrowseDepartment',
+        )
+    );
 }
 
 /**
@@ -145,10 +143,10 @@ function scholar_theme() {
  * @param $variables
  */
 function template_preprocess_ir_home(array &$variables) {
-  $path = drupal_get_path('module', 'scholar');
-  drupal_add_css("$path/css/Home.css");
-  $variables['browse_by_user'] = db_result(db_query("SELECT COUNT(uid) FROM {users} WHERE uid > 1")) > 0;
-  $variables['browse_by_department'] = TRUE;
+    $path = drupal_get_path('module', 'scholar');
+    drupal_add_css("$path/css/Home.css");
+    $variables['browse_by_user'] = db_result(db_query("SELECT COUNT(uid) FROM {users} WHERE uid > 1")) > 0;
+    $variables['browse_by_department'] = TRUE;
 }
 
 /**
@@ -157,15 +155,15 @@ function template_preprocess_ir_home(array &$variables) {
  * @param $variables
  */
 function template_preprocess_ir_record(array &$variables) {
-  module_load_include('inc', 'Fedora_Repository', 'api/fedora_item');
-  drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Record.css');
-  $pid = $variables['pid'];
-  $item = new Fedora_Item($pid);
-  foreach ($item->datastreams as $dsid => $attributes) {
-    $view = 'fedora/repository/' . $pid . '/' . $dsid;
-    $download = 'fedora/repository/object_download/' . $pid . '/' . $dsid;
-    $variables['rows'][] = array($attributes['label'], l(t('View'), $view), l(t('Download'), $download), $attributes['MIMEType']);
-  }
+    module_load_include('inc', 'Fedora_Repository', 'api/fedora_item');
+    drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Record.css');
+    $pid = $variables['pid'];
+    $item = new Fedora_Item($pid);
+    foreach ($item->datastreams as $dsid => $attributes) {
+        $view = 'fedora/repository/' . $pid . '/' . $dsid;
+        $download = 'fedora/repository/object_download/' . $pid . '/' . $dsid;
+        $variables['rows'][] = array($attributes['label'], l(t('View'), $view), l(t('Download'), $download), $attributes['MIMEType']);
+    }
 }
 
 /**
@@ -174,7 +172,7 @@ function template_preprocess_ir_record(array &$variables) {
  * @param $variables
  */
 function template_preprocess_ir_search(array &$variables) {
-  drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
+    drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
 }
 
 /**
@@ -186,9 +184,9 @@ function template_preprocess_ir_search(array &$variables) {
  *   HTML for Institutional Repository Home Page.
  */
 function scholar_home() {
-  module_load_include('inc', 'scholar', 'SearchForm');
-  module_load_include('inc', 'scholar', 'BrowseByUserForm');
-  return theme(THEME_SCHOLAR_HOME);
+    module_load_include('inc', 'scholar', 'SearchForm');
+    module_load_include('inc', 'scholar', 'BrowseByUserForm');
+    return theme(THEME_SCHOLAR_HOME);
 }
 
 /**
@@ -199,9 +197,25 @@ function scholar_home() {
  *  
  * @return string
  */
-function scholar_search($field, $order) {
-  module_load_include('inc', 'scholar', 'SearchForm');
-  return theme(THEME_SCHOLAR_SEARCH);
+function scholar_search($field, $order, $value) {
+    module_load_include('inc', 'scholar', 'SearchForm');
+    module_load_include('php', 'islandora_solr_search', 'SolrPhpClient/Apache/Solr/Service');
+    $url = variable_get('islandora_solr_search_block_url', 'http://localhost:8080/solr');
+    $components = parse_url($url);
+    try {
+        $solr = new Apache_Solr_Service($components['host'], $components['port'], $components['path'] . '/');
+        $solr->setCreateDocuments(0);
+        $results = $solr->search($query, 0, 30, $params);
+        if (empty($results)) {
+            throw new Exception(t('solr index. Is the solr search block configured properly?'), 'error');
+        }
+    } catch (Exception $e) {
+        unset($results);
+        drupal_set_message(t('Error searching ') . $e->getMessage(), 'error');
+    }
+    if (isset($results))
+        var_dump($results);
+    return theme(THEME_SCHOLAR_SEARCH);
 }
 
 /**
@@ -213,8 +227,8 @@ function scholar_search($field, $order) {
  *   HTML Rendering of the drupal form.
  */
 function scholar_edit_refworks($pid) {
-  module_load_include('inc', 'scholar', 'RefworksForm');
-  return drupal_get_form('scholar_refworks_form', $pid);
+    module_load_include('inc', 'scholar', 'RefworksForm');
+    return drupal_get_form('scholar_refworks_form', $pid);
 }
 
 /**
@@ -228,7 +242,7 @@ function scholar_edit_refworks($pid) {
  *   HTML
  */
 function scholar_full_record($pid) {
-  return theme(THEME_SCHOLAR_RECORD, $pid);
+    return theme(THEME_SCHOLAR_RECORD, $pid);
 }
 
 /**
@@ -242,8 +256,8 @@ function scholar_full_record($pid) {
  * @return array 
  */
 function scholar_add_ir_datastream_form(array $form_state, $pid) {
-  $datastream_form = new IrClass();
-  return $datastream_form->build_add_datastream_form($pid);
+    $datastream_form = new IrClass();
+    return $datastream_form->build_add_datastream_form($pid);
 }
 
 /**
@@ -253,8 +267,8 @@ function scholar_add_ir_datastream_form(array $form_state, $pid) {
  * @param array $form_state 
  */
 function scholar_add_ir_datastream_form_submit(array $form, array &$form_state) {
-  $ir = new IrClass();
-  $ir->addStreamFormSubmit($form_state['values']['form_id'], $form_state['values']);
+    $ir = new IrClass();
+    $ir->addStreamFormSubmit($form_state['values']['form_id'], $form_state['values']);
 }
 
 /**
@@ -265,9 +279,9 @@ function scholar_add_ir_datastream_form_submit(array $form, array &$form_state) 
  * @return string
  */
 function scholar_create_roles_for_users() {
-  $irClass = new IrClass();
-  $irClass->get_and_create_roles();
-  return 'created roles and associated users.';
+    $irClass = new IrClass();
+    $irClass->get_and_create_roles();
+    return 'created roles and associated users.';
 }
 
 /**
@@ -276,7 +290,7 @@ function scholar_create_roles_for_users() {
  * Currently this does nothing.
  */
 function fedora_repository_scholar_settings_page() {
-  
+    
 }
 
 /**
@@ -289,9 +303,9 @@ function fedora_repository_scholar_settings_page() {
  * @param array $form_state 
  */
 function scholar_form_fedora_repository_ingest_form_alter(array &$form, array &$form_state) {
-  array_unshift($form['#validate'], 'validation_for_refworks');
-  $form['indicator']['ingest-file-location']['#title'] = t('Upload Refworks Document');
-  $form['indicator']['ingest-file-location']['#description'] = t('Upload refworks xml document containing one or more records.');
+    array_unshift($form['#validate'], 'validation_for_refworks');
+    $form['indicator']['ingest-file-location']['#title'] = t('Upload Refworks Document');
+    $form['indicator']['ingest-file-location']['#description'] = t('Upload refworks xml document containing one or more records.');
 }
 
 /**
@@ -303,30 +317,30 @@ function scholar_form_fedora_repository_ingest_form_alter(array &$form, array &$
  * @param array $form_state
  */
 function validation_for_refworks(array $form, array &$form_state) {
-  if ($form_state['clicked_button']['#id'] == 'edit-submit') {
-    switch ($form_state['storage']['step']) {
-      case 1:
-        $form_state['rebuild'] = TRUE;
-        break;
-      case 2:
+    if ($form_state['clicked_button']['#id'] == 'edit-submit') {
+        switch ($form_state['storage']['step']) {
+            case 1:
+                $form_state['rebuild'] = TRUE;
+                break;
+            case 2:
 // Get the uploaded file.
-        $validators = array();
-        if (!empty($_FILES['files']['name']['pdf-file-location'])) {
-          $fileObject = file_save_upload('pdf-file-location', $validators);
-          file_move($fileObject->filepath, 0, 'FILE_EXISTS_RENAME');
-          $form_state['values']['pdf-file-location'] = $fileObject->filepath;
+                $validators = array();
+                if (!empty($_FILES['files']['name']['pdf-file-location'])) {
+                    $fileObject = file_save_upload('pdf-file-location', $validators);
+                    file_move($fileObject->filepath, 0, 'FILE_EXISTS_RENAME');
+                    $form_state['values']['pdf-file-location'] = $fileObject->filepath;
+                }
+                if (file_exists($form_state['values']['pdf-file-location'])) {
+                    $file = $form_state['values']['pdf-file-location'];
+                    $extention = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                    if ($extention != 'pdf') {
+                        form_set_error('pdf-file-location', t("$file does not appear to be a valid PDF."));
+                        file_delete($file);
+                        return;
+                    }
+                }
+                $form_state['rebuild'] = FALSE;
+                break;
         }
-        if (file_exists($form_state['values']['pdf-file-location'])) {
-          $file = $form_state['values']['pdf-file-location'];
-          $extention = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-          if ($extention != 'pdf') {
-            form_set_error('pdf-file-location', t("$file does not appear to be a valid PDF."));
-            file_delete($file);
-            return;
-          }
-        }
-        $form_state['rebuild'] = FALSE;
-        break;
     }
-  }
 }
