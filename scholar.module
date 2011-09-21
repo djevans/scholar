@@ -114,8 +114,9 @@ function scholar_theme() {
       'template' => 'templates/BrowseDepartment',
     ),
     THEME_SCHOLOR_OVERVIEW_PANEL_CITATION => array(
-      'template' => 'templates/CitationViewer',
-      'file' => 'CitationViewer.inc'
+      'template' => 'templates/CitationModel',
+      'file' => 'CitationModel.inc',
+      'arguments' => array('pid' => NULL)
     )
   );
 }
@@ -130,8 +131,8 @@ function scholar_register_content_models_for_viewer() {
   $models['ir:citationCModel'] = array(
     'type' => 'inc',
     'module' => 'scholar',
-    'file' => 'CitationViewer',
-    'class' => 'CitationViewer'
+    'file' => 'CitationModel',
+    'class' => 'CitationModel'
   );
   return $models;
 }

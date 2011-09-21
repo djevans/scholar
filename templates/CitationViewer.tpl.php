@@ -1,4 +1,4 @@
 <div id="overview">
-  <div>testubg</div>
-  <?php print $table; ?>
+  <div>Testing!!!!</div>
+  <?php print print_r($citation, TRUE); ?>
 </div>
