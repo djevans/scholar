@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="ir:citationCollectionCModel"
+    xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+    <foxml:objectProperties>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Citation Collection Content Model"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2011-09-16T14:40:16.288Z"/>
+        <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2011-09-16T14:47:09.580Z"/>
+    </foxml:objectProperties>
+    <foxml:datastream ID="AUDIT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+        <foxml:datastreamVersion ID="AUDIT.0" LABEL="Audit Trail for this object" CREATED="2011-09-16T14:40:16.288Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit">
+            <foxml:xmlContent>
+                <audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
+                    <audit:record ID="AUDREC1">
+                        <audit:process type="Fedora API-M"/>
+                        <audit:action>ingest</audit:action>
+                        <audit:componentID></audit:componentID>
+                        <audit:responsibility>admin</audit:responsibility>
+                        <audit:date>2011-09-16T14:40:16.288Z</audit:date>
+                        <audit:justification>Fedora Object Ingested</audit:justification>
+                    </audit:record>
+                    <audit:record ID="AUDREC2">
+                        <audit:process type="Fedora API-M"/>
+                        <audit:action>addDatastream</audit:action>
+                        <audit:componentID>ISLANDORACM</audit:componentID>
+                        <audit:responsibility>admin</audit:responsibility>
+                        <audit:date>2011-09-16T14:40:16.445Z</audit:date>
+                        <audit:justification>Ingested object ISLANDORACM</audit:justification>
+                    </audit:record>
+                    <audit:record ID="AUDREC3">
+                        <audit:process type="Fedora API-M"/>
+                        <audit:action>addDatastream</audit:action>
+                        <audit:componentID>RELS-EXT</audit:componentID>
+                        <audit:responsibility>fedoraAdmin</audit:responsibility>
+                        <audit:date>2011-09-16T14:47:09.580Z</audit:date>
+                        <audit:justification></audit:justification>
+                    </audit:record>
+                </audit:auditTrail>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+    <foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+        <foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Record for this object" CREATED="2011-09-16T14:40:16.288Z" MIMETYPE="text/xml" FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" SIZE="392">
+            <foxml:xmlContent>
+                <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+                    <dc:title>Citation Collection Content Model</dc:title>
+                    <dc:identifier>ir:citationCollectionCModel</dc:identifier>
+                </oai_dc:dc>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+    <foxml:datastream ID="ISLANDORACM" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+        <foxml:datastreamVersion ID="ISLANDORACM.0" LABEL="Islandora Content Model"
+            CREATED="2011-09-16T14:40:16.445Z" MIMETYPE="text/xml">
+            <foxml:xmlContent>
+                <content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    name="Citation Collection Object"
+                    xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+                    <mimetypes>
+                        <type>application/msaccess</type>
+                        <type>application/msexcel</type>
+                        <type>application/mspowerpoint</type>
+                        <type>application/msword</type>
+                        <type>application/octet-stream</type>
+                        <type>application/pdf</type>
+                        <type>application/rtf</type>
+                        <type>application/vnd.ms-excel.sheet.macroEnabled.12</type>
+                        <type>application/vnd.ms-excel</type>
+                        <type>application/vnd.ms-powerpoint.presentation.macroEnabled.12</type>
+                        <type>application/vnd.ms-powerpoint.slideshow.macroEnabled.12</type>
+                        <type>application/vnd.ms-powerpoint</type>
+                        <type>application/vnd.ms-project</type>
+                        <type>application/vnd.ms-word.document.macroEnabled.12</type>
+                        <type>application/vnd.openxmlformats-officedocument.wordprocessingml.document</type>
+                        <type>application/vnd.openxmlformats-officedocument.presentationml.presentation</type>
+                        <type>application/vnd.openxmlformats-officedocument.presentationml.slideshow</type>
+                        <type>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</type>
+                        <type>application/xml</type>
+                        <type>application/x-shockwave-flash</type>
+                        <type>application/x-zip</type>
+                        <type>application/zip</type>
+                        <type>audio/midi</type>
+                        <type>audio/mpeg</type>
+                        <type>audio/wav</type>
+                        <type>audio/x-aiff</type>
+                        <type>audio/x-mpeg</type>
+                        <type>audio/x-pn-realaudio</type>
+                        <type>audio/x-wav</type>
+                        <type>image/gif</type>
+                        <type>image/jp2</type>
+                        <type>image/jpeg</type>
+                        <type>image/png</type>
+                        <type>image/raw</type>
+                        <type>image/tiff</type>
+                        <type>image/x-raw</type>
+                        <type>text/html</type>
+                        <type>text/plain</type>
+                        <type>text/rtf</type>
+                        <type>text/xml</type>
+                        <type>video/mp4</type>
+                        <type>video/mpeg</type>
+                        <type>video/quicktime</type>
+                        <type>video/x-msvideo</type>
+                    </mimetypes>
+                    <ingest_rules/>
+                    <datastreams>
+                        <datastream dsid="JPG">
+                            <display_method class="IslandoraHook" default="true" file="IslandoraHook.inc" method="render"
+                                module="content_model_viewer"/>
+                        </datastream>
+                    </datastreams>
+                    <ingest_form dsid="MODS" hide_file_chooser="true" page="2">
+                        <form_builder_method class="CoCCCModsFormBuilder" file="plugins/CoCCCModsFormBuilder.inc"
+                            handler="handleModsForm" method="buildQDCForm" module="fedora_repository"/>
+                        <form_elements/>
+                    </ingest_form>
+                </content_model>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+    <foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+        <foxml:datastreamVersion ID="RELS-EXT.0" LABEL="RDF Statements about this object" CREATED="2011-09-16T14:47:09.580Z" MIMETYPE="application/rdf+xml" FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" SIZE="329">
+            <foxml:xmlContent>
+                <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+                    <rdf:Description rdf:about="info:fedora/ir:citationCollectionCModel">
+                        <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ContentModel-3.0"></fedora-model:hasModel>
+                    </rdf:Description>
+                </rdf:RDF>
+            </foxml:xmlContent>
+        </foxml:datastreamVersion>
+    </foxml:datastream>
+</foxml:digitalObject>

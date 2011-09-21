@@ -20,47 +20,93 @@ function scholar_add_required_namespaces() {
 }
 
 /**
- * Creates a Citation Content Model object.
+ * Creates a new fedora object.
+ * 
+ * @param string $pid
+ *   The Fedora Object's PID
+ * @param string $label
+ *   The Fedora Objects label.
+ * @param array $relationships
+
+ * @param array $datastreams
+
  */
-function scholar_create_top_level_collection() {
-  global $base_url;
+function scholar_create_fedora_object($pid, $label, array $relationships = array(), array $datastreams = array()) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  if (!Fedora_Item::fedora_item_exists('ir:top')) {
-    $foxml = Fedora_Item::create_object_FOXML('ir:top', 'A', 'Institutional Repository Top Level Collection');
-    $collection = Fedora_Item::ingest_from_FOXML($foxml);
-    if (!empty($collection)) {
-      $collection->add_relationship('hasModel', 'info:fedora/islandora:collectionCModel');
+  if (!Fedora_Item::fedora_item_exists($pid)) {
+    $foxml = Fedora_Item::create_object_FOXML($pid, 'A', $label);
+    $object = Fedora_Item::ingest_from_FOXML($foxml);
+    if ($object->exists()) {
+      foreach ($relationships as $type => $values) {
+        $values = is_array($values) ? $values : array($values);
+        foreach ($values as $value) {
+          $object->add_relationship($type, $value);
+        }
+      }
+      foreach ($datastreams as $datastream) {
+        list($url, $dsid, $label, $mime, $control) = $datastream;
+        $object->add_datastream_from_url($url, $dsid, $label, $mime, $control);
+      }
+      return;
     }
     else {
-      drupal_set_message('There was an error creating the Top Level Collection. See watchdog for details.', 'Error');
+      drupal_set_message('MORE TIME NEEDED.');
     }
+    drupal_set_message(t('There was an error creating %pid (%label). See watchdog for details.', array('%pid' => $pid, '%label' => $label)), 'Error');
   }
 }
 
 /**
- * Creates a Citation Content Model object.
+ *
  */
-function scholar_create_citation_content_model() {
-  global $base_url;
+function scholar_delete_fedora_object($pid) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  if (!Fedora_Item::fedora_item_exists('ir:citationCModel')) {
-    $foxml = Fedora_Item::create_object_FOXML('ir:citationCModel', 'A', 'Citation Content Model');
-    $content_model = Fedora_Item::ingest_from_FOXML($foxml);
-    if (!empty($content_model)) {
-      $content_model->add_datastream_from_url($base_url . '/' . drupal_get_path('module', 'scholar') . '/models/CITATIONCM.xml', 'ISLANDORACM', 'Islandora Content Model', 'text/xml', 'E');
-      $content_model->add_relationship('hasModel', 'info:fedora/fedora-system:ContentModel-3.0');
-    }
-    else {
-      drupal_set_message('There was an error creating the Citation Content Model object. See watchdog for details.', 'Error');
-    }
+  $item = new Fedora_Item($pid);
+  if ($item->exists()) {
+    $item->purge();
   }
 }
 
 /**
  * Implementation of Enable Hook.
  */
-function scholar_enable() {
+function scholar_install() {
+  global $base_url;
+  $path = $base_url . '/' . drupal_get_path('module', 'scholar');
   scholar_add_required_namespaces();
-  scholar_create_citation_content_model();
-  scholar_create_top_level_collection();
+  $foxml = new DOMDocument();
+  $foxml->load($path . '/models/ir:citationCModel/FOXML.xml');
+  Fedora_Item::ingest_from_FOXML($foxml);
+  $foxml->load($path . '/models/ir:citationCollectionCModel/FOXML.xml');
+  Fedora_Item::ingest_from_FOXML($foxml);
+  $foxml->load($path . '/models/ir:top/FOXML.xml');
+  Fedora_Item::ingest_from_FOXML($foxml);
+  // Install a default form.
+  module_load_include('inc', 'xml_form_builder', 'XMLFormDatabase');
+  if (!XMLFormDatabase::Exists(SCHOLAR_MODS_FORM_NAME)) {
+    $module_path = drupal_get_path('module', 'scholar');
+    $definition = new DOMDocument();
+    $definition->load($module_path . '/forms/default.xml');
+    XMLFormDatabase::Create(SCHOLAR_MODS_FORM_NAME, $definition);
+  }
+  // Associates the form with the content model
+  $result = db_result(db_query('Select content_model from {islandora_content_model_forms} where  content_model = "%s" and form_name = "%s"', 'ir:citationCModel', SCHOLAR_MODS_FORM_NAME));
+  if (!$result) {
+    $object = new stdClass();
+    $object->content_model = 'ir:citationCModel';
+    $object->form_name = SCHOLAR_MODS_FORM_NAME;
+    $object->dsid = 'MODS';
+    $object->title_field = "['titleInfo']['title']";
+    $object->transform = 'mods_to_dc.xsl';
+    $result = drupal_write_record('islandora_content_model_forms', $object);
+  }
+}
+
+/**
+ * Implementation of Enable Hook.
+ */
+function scholar_uninstall() {
+  scholar_delete_fedora_object('ir:citationCModel');
+  scholar_delete_fedora_object('ir:citationCollectionCModel');
+  scholar_delete_fedora_object('ir:top');
 }
