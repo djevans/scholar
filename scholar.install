@@ -96,7 +96,7 @@ function scholar_install() {
     $object->content_model = 'ir:citationCModel';
     $object->form_name = SCHOLAR_MODS_FORM_NAME;
     $object->dsid = 'MODS';
-    $object->title_field = "['titleInfo']['title']";
+    $object->title_field = "['title']";
     $object->transform = 'mods_to_dc.xsl';
     $result = drupal_write_record('islandora_content_model_forms', $object);
   }
@@ -109,4 +109,13 @@ function scholar_uninstall() {
   scholar_delete_fedora_object('ir:citationCModel');
   scholar_delete_fedora_object('ir:citationCollectionCModel');
   scholar_delete_fedora_object('ir:top');
+  // Remove the default form.
+  module_load_include('inc', 'xml_form_builder', 'XMLFormDatabase');
+  if (XMLFormDatabase::Exists(SCHOLAR_MODS_FORM_NAME)) {
+    XMLFormDatabase::Delete(SCHOLAR_MODS_FORM_NAME);
+  }
+  // Remove Association
+  if (db_result(db_query('Select count(content_model) from {islandora_content_model_forms} where  content_model = "%s" and form_name = "%s"', 'ir:citationCModel', SCHOLAR_MODS_FORM_NAME)) == 1) {    
+    $result = db_query('DELETE FROM {islandora_content_model_forms} WHERE content_model = "%s" and form_name = "%s"', 'ir:citationCModel', SCHOLAR_MODS_FORM_NAME);
+  }
 }
