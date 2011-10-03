@@ -20,7 +20,7 @@
 function command_exists($name) {
   $return_value = FALSE;
   system("hash $name 2>&-", $return_value);
-  return $return_value == 0;
+  return $return_value === 0;
 }
 
 /**
