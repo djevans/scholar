@@ -202,10 +202,13 @@ function scholar_search($field, $order, $value) {
   module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrQueryProcessor');
   //$url = variable_get('islandora_solr_search_block_url', 'http://localhost:8080/solr');
   //$components = parse_url($url);
+  $query = $value;
+  $fq = NULL;
+  $dismax = NULL;
   try {
     var_dump($components);
     $solr = new IslandoraSolrQueryProcessor();
-    $results = $solr->buildAndExecuteQuery(); // XML
+    $results = $solr->buildAndExecuteQuery($query, $fq, $dismax); // XML
     if (empty($results)) {
       throw new Exception(t('solr index. Is the solr search block configured properly?'));
     }
