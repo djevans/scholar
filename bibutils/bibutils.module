@@ -59,6 +59,33 @@ function _bibutils_convert_to_mods_document($command) {
 }
 
 /**
+ * An internal function that is not meant to be used outside of this file.
+ * 
+ * Generates a DOMDocument for each <mods> element within the given MODS document.
+ * 
+ * @param DOMDocument $mods 
+ *   A Valid MODS Document.
+ * 
+ * @return DOMDocument[]
+ *   An array of DOMDocuments that repersent each <mods> record within the <modsCollection>
+ */
+function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
+  $xpath = new DOMXPath($mods);
+  $xpath->registerNamespace('mods', 'http://www.loc.gov/mods/v3');
+  $results = $xpath->query('/mods:modsCollection/mods:mods');
+  $documents = array();
+  $count = $results->length;
+  for ($i = 0; $i < $count; $i++) {
+    $doc = new DOMDocument();
+    $child = $results->item($i);
+    $child->setAttribute('xmlns', 'http://www.loc.gov/mods/v3');
+    $doc->importNode($child, TRUE);
+    $documents[] = $doc;
+  }
+  return $documents;
+}
+
+/**
  * Converts an Endnote XML document to a MODS document.
  * 
  * @param string $filename
@@ -99,7 +126,10 @@ function bibutils_ris_file_to_mods_document($filename) {
  *   An array of generated MODS documents, FALSE if the function failed.
  */
 function bibutils_endnote_xml_file_to_mods_documents($filename) {
-  
+  $mods = bibutils_endnote_xml_file_to_mods_document($filename);
+  return ($mods !== FALSE) ?
+      _split_mods_collection_into_mulitiple_documents($mods) :
+      FALSE;
 }
 
 /**
@@ -115,5 +145,8 @@ function bibutils_endnote_xml_file_to_mods_documents($filename) {
  *   An array of generated MODS documents, FALSE if the function failed.
  */
 function bibutils_ris_file_to_mods_documents($filename) {
-  
+  $mods = bibutils_ris_file_to_mods_document($filename);
+  return ($mods !== FALSE) ?
+      _split_mods_collection_into_mulitiple_documents($mods) :
+      FALSE;
 }
