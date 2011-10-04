@@ -5,7 +5,9 @@
 /**
  * @file
  *
- * Implements hooks and callbacks for installing this module.
+ * Implements hooks and callbacks for installing this module. As well as some functions that allow for conversions.
+ * 
+ * Note that bibutils converts to mods 3.1 and not any other version!
  */
 
 /**
@@ -46,7 +48,7 @@ function command_exists($name) {
  */
 function bibutils_requirements($phase) {
   $requriements = array();
-  $commands = array('ris2xml', 'endx2xml');
+  $commands = array('ris2xml', 'endx2xml', 'modsclean');
   foreach ($commands as $command) {
     $title = t('%command in $PATH', array('%command' => $command));
     if (command_exists($command)) { // Exists on $PATH

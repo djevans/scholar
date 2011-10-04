@@ -9,6 +9,8 @@
  */
 
 /**
+ * An internal function that is not meant to be used outside of this file.
+ * 
  * Executes the given command and the exit status and output of the command.
  * 
  * @param string $command
@@ -17,7 +19,7 @@
  * @return array
  *   Where the first parameter was the exit status of the command and the second is the commands output.
  */
-function bibutils_execute_command($command) {
+function _bibutils_execute_command($command) {
   $return_value = FALSE;
   ob_start();
   passthru($command, $return_value);
@@ -37,13 +39,18 @@ function bibutils_execute_command($command) {
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
  */
-function _bibutils_convert_to_mods($command) {
-  list($return_value, $output) = bibutils_execute_command($command);
+function _bibutils_convert_to_mods_document($command) {
+  list($return_value, $output) = _bibutils_execute_command($command);
   $successful = $return_value === 0;
   if ($successful && !empty($output)) { // Successfully executed the command.
+    $transform_filename = drupal_get_path('module', 'bibutils') . '/xsl/FixBibutilsModsOutput.xsl';
+    $transform = new DOMDocument();
+    $transform->load($transform_filename);
     $doc = new DOMDocument();
     $doc->loadXML($output);
-    return $doc;
+    $xslt = new XSLTProcessor();
+    $xslt->importStyleSheet($transform);
+    return $xslt->transformToDoc($doc->documentElement);
   }
   else {
     drupal_set_message(t('Could not convert %filename, to MODS.', array('%filename' => $filename)), 'error');
@@ -60,9 +67,9 @@ function _bibutils_convert_to_mods($command) {
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
  */
-function bibutils_endnote_xml_file_to_mods_file($filename) {
-  $command = 'endx2xml ' . $filename;
-  return _bibutils_convert_to_mods($command);
+function bibutils_endnote_xml_file_to_mods_document($filename) {
+  $command = 'endx2xml ' . $filename . ' 2>&- | modsclean 2>&-';
+  return _bibutils_convert_to_mods_document($command);
 }
 
 /**
@@ -74,7 +81,39 @@ function bibutils_endnote_xml_file_to_mods_file($filename) {
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
  */
-function bibutils_ris_file_to_mods_file($filename) {
-  $command = 'ris2xml ' . $filename;
-  return _bibutils_convert_to_mods($command);
+function bibutils_ris_file_to_mods_document($filename) {
+  $command = 'ris2xml ' . $filename . ' 2>&- | modsclean 2>&-';
+  return _bibutils_convert_to_mods_document($command);
+}
+
+/**
+ * Converts an Endnote XML document to many MODS documents.
+ *
+ * Unlike "bibutils_endnote_xml_file_to_mods_document" function this functions splits the 
+ * modsCollection's child elements into many separate documents.
+ * 
+ * @param string $filename
+ *   The filename of the EndNote XML document.
+ * 
+ * @return DOMDocument[]
+ *   An array of generated MODS documents, FALSE if the function failed.
+ */
+function bibutils_endnote_xml_file_to_mods_documents($filename) {
+  
+}
+
+/**
+ * Converts an RIS document to many MODS documents.
+ *
+ * Unlike "bibutils_ris_file_to_mods_document" function this functions splits the 
+ * modsCollection's child elements into many separate documents.
+ * 
+ * @param string $filename
+ *   The filename of the EndNote XML document.
+ * 
+ * @return DOMDocument[]
+ *   An array of generated MODS documents, FALSE if the function failed.
+ */
+function bibutils_ris_file_to_mods_documents($filename) {
+  
 }
