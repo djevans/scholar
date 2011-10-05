@@ -67,6 +67,7 @@ class CitationModel extends AbstractModel {
    * @return string
    */
   public function getCitation() {
+    module_load_include('inc', 'ir_citation', 'ir_citation.api');
     $module_path = drupal_get_path('module', 'scholar');
     $citation_file = $module_path . '/citations/apa.csl';
     $csl = new DOMDocument();
