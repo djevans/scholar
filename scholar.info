@@ -2,6 +2,8 @@
 name = Scholarly Research Data
 dependencies[] = fedora_repository
 dependencies[] = content_model_viewer
+dependencies[] = ir_citation
+dependencies[] = bibutils
 description = Shows a list of items in a fedora collection, specific to scholarly publications
 package = Fedora Repository
 version = 6.x-$Format:%h$-dev
