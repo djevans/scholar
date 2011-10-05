@@ -79,7 +79,7 @@ function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
     $doc = new DOMDocument();
     $child = $results->item($i);
     $child->setAttribute('xmlns', 'http://www.loc.gov/mods/v3');
-    $doc->importNode($child, TRUE);
+    $doc->loadXML($mods->saveXML($child));
     $documents[] = $doc;
   }
   return $documents;

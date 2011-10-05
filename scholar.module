@@ -384,6 +384,11 @@ function scholar_form_content_model_viewer_ingest_metadata_form_alter(array &$fo
  *   The Drupal form.
  */
 function scholar_bulk_ingest_form(array &$form_state, $collection_pid) {
+  $potential_models = scholar_bulk_ingest_get_potential_models($collection_pid);
+  reset($potential_models);
+  $identifier = key($potential_models);
+  $name = current($potential_models);
+  $selected_model = isset($form_state['values']['models']) ? $form_state['values']['models'] : $identifier;
   $form = array(
     'bulk_ingest' => array(
       '#type' => 'fieldset',
@@ -393,6 +398,13 @@ function scholar_bulk_ingest_form(array &$form_state, $collection_pid) {
         '#title' => t('Upload "RIS" or "EndNote XML" Document'),
         '#description' => t('A RIS or EndNote XML document that will generate multiple digital objects on ingest. One for each record within the RIS or EndNote XML document.'),
         '#element_validate' => array('scholar_bulk_ingest_file_upload_validate'),
+      ),
+      'content_model_pid' => array(
+        '#type' => 'select',
+        '#title' => t('Content models available'),
+        '#options' => $potential_models,
+        '#default_value' => $selected_model,
+        '#description' => t('Content models define datastream composition, relationships between this and other content models, and the mandatory behaviors associated with each digital object.<br /> Additional information may be found <a href="https://wiki.duraspace.org/display/FEDORACREATE/Content+Models+Overview">here.</a> '),
       ),
       'submit' => array(
         '#type' => 'submit',
@@ -406,6 +418,29 @@ function scholar_bulk_ingest_form(array &$form_state, $collection_pid) {
 }
 
 /**
+ *
+ * @param type $collection_pid
+ * @return array
+ */
+function scholar_bulk_ingest_get_potential_models($collection_pid) {
+  if (($collection_policy = CollectionPolicy::loadFromCollection($collection_pid)) === FALSE) {
+    drupal_set_message(t('Unable to load collection policy \'' . $collection_pid . '\'.'));
+    return FALSE;
+  }
+  if (!($content_models = $collection_policy->getContentModels())) {
+    drupal_set_message(t('No content models associated with this collection: !collection_pid. Please contact your administrator.', array('!collection_pid' => $collection_pid)), 'error');
+    return FALSE;
+  }
+  $potential_models = array();
+  foreach ($content_models as $content_model) {
+    $identifier = $content_model->getIdentifier();
+    $name = $content_model->name;
+    $potential_models["$identifier"] = "$name";
+  }
+  return $potential_models;
+}
+
+/**
  * Over writes the default 'content_model_viewer_edit_metadata_form_validate' function.
  * 
  * @param array $form
@@ -415,7 +450,7 @@ function scholar_bulk_ingest_form(array &$form_state, $collection_pid) {
  */
 function scholar_edit_metadata_form_validate(array &$form, array &$form_state) {
   $bulk_ingest_clicked = $form_state['clicked_button']['#value'] == t('Ingest');
-  if(!$bulk_ingest_clicked) {
+  if (!$bulk_ingest_clicked) {
     if ($form_state['storage']['step'] == 1) {
       $form_state['storage']['step']++;
       $form_state['rebuild'] = TRUE;
@@ -463,9 +498,99 @@ function scholar_bulk_ingest_file_upload_validate(array $element, array &$form_s
  */
 function scholar_bulk_ingest_form_submit(array &$form, array &$form_state) {
   global $base_url;
+  $operations = array();
   $collection_pid = $form_state['values']['collection_pid'];
-  // Do some batch ingesting.
-  
-  // Finish batch ingesting.
+  $content_model_pid = ContentModel::getPidFromIdentifier($form_state['values']['content_model_pid']);
+  $mime_type = $_FILES['files']['type']['file'];
+  $tmp_filename = $_FILES['files']['tmp_name']['file'];
+  $documents = $mime_type == 'text/xml' ?
+      bibutils_endnote_xml_file_to_mods_documents($tmp_filename) :
+      bibutils_ris_file_to_mods_documents($tmp_filename);
+  /**
+   * We need to convert the DOMDocuments to strings because DOMDocuments don't support serialization.
+   */
+  foreach ($documents as $key => $document) {
+    $documents[$key] = $document->saveXML();
+  }
+  $operations[] = array('scholar_batch_ingest_mods_documents', array($documents, $collection_pid, $content_model_pid));
+  $batch = array(
+    'title' => t('Ingesting Files'),
+    'operations' => $operations,
+  );
+  batch_set($batch);
   unset($form_state['storage']); // Return to the viewer.  
+}
+
+/**
+ * Batch function that will ingest all the documents provided into the MODS datastream.
+ * 
+ * @param array $documents
+ *   An array of MODS DOMDocuments.
+ * @param string $collection_pid
+ *   The collection to ingest into.
+ * @param string $content_model_pid
+ *   The content model to give to the new object. 
+ * @param array $context
+ *   Information related to the batch functions status.
+ */
+function scholar_batch_ingest_mods_documents(array $documents, $collection_pid, $content_model_pid, array &$context) {
+  $current = $context['sandbox']['progress'] = isset($context['sandbox']['progress']) ? $context['sandbox']['progress'] : 0;
+  $document = new DOMDocument();
+  $document->loadXML($documents[$current]);
+  scholar_batch_ingest_mods_document($document, $collection_pid, $content_model_pid);
+  $context['sandbox']['progress']++;
+  $context['finished'] = $context['sandbox']['progress'] / count($documents);
+}
+
+/**
+ * Ingests a single MODS document.
+ * 
+ * @param DOMDocument $mods
+ *   A MODS document to ingest.
+ * @param string $collection_pid
+ *   The collection to ingest into.
+ * @param string $content_model_pid
+ *   The content to give to the new object. 
+ */
+function scholar_batch_ingest_mods_document(DOMDocument $mods, $collection_pid, $content_model_pid) {
+  module_load_include('inc', 'islandora_content_model_forms', 'FOXML');
+  module_load_include('inc', 'fedora_repository', 'CollectionPolicy');
+  $collection_policy = CollectionPolicy::loadFromCollection($collection_pid);
+  if ($collection_policy !== FALSE) {
+    $label = scholar_batch_ingest_mods_guess_title($mods); // Find a best guess solution... to pull from the mods.  
+    $pid = $collection_policy->getNextPid('ISLANDORACM');
+    $dsid = 'MODS';
+    $relationship = $collection_policy->getRelationship();
+    $ingest_file_location = NULL;
+    $transform = drupal_get_path('module', 'scholar') . '/xsl/mods_to_dc.xsl';
+    $state = 'A';
+    $foxml = new FOXML($label, $pid, $dsid, $content_model_pid, $collection_pid, $relationship, $ingest_file_location, $mods, $transform, $state);
+    $foxml->ingest();
+  }
+}
+
+/**
+ * Guess the title for the object generated from mods.
+ * 
+ * @param DOMDocument $mods
+ *   The MODS document in which to extract the title from.
+ * 
+ * @return string
+ *   The extracted title or a default title.
+ */
+function scholar_batch_ingest_mods_guess_title(DOMDocument $mods) {
+  $default_title = t('Default Title (Please Correct)');
+  $xpath = new DOMXPath($mods);
+  $xpath->registerNamespace('mods', 'http://www.loc.gov/mods/v3');
+  $results = $xpath->query('/mods:mods/mods:titleInfo[not(@type)]/mods:title[1]'); // Ingnore extras.
+  if ($results->length == 1) {
+    $title = $results->item(0);
+    return $title->textContent;
+  }
+  $results = $xpath->query('/mods:mods/mods:titleInfo/mods:title[1]'); // Ingnore extras, can be abbr or whatever.
+  if ($results->length > 0) { // Can be more than one.
+    $title = $results->item(0); // Get first
+    return $title->textContent;
+  }
+  return $default_title;
 }
