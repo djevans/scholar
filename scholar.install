@@ -81,24 +81,22 @@ function scholar_install() {
   Fedora_Item::ingest_from_FOXML($foxml);
   $foxml->load($path . '/models/ir:top/FOXML.xml');
   Fedora_Item::ingest_from_FOXML($foxml);
-  // Install a default form.
+  // Install a default forms.
   module_load_include('inc', 'xml_form_builder', 'XMLFormDatabase');
-  if (!XMLFormDatabase::Exists(SCHOLAR_MODS_FORM_NAME)) {
-    $module_path = drupal_get_path('module', 'scholar');
-    $definition = new DOMDocument();
-    $definition->load($module_path . '/forms/default.xml');
-    XMLFormDatabase::Create(SCHOLAR_MODS_FORM_NAME, $definition);
-  }
-  // Associates the form with the content model
-  $result = db_result(db_query('Select content_model from {islandora_content_model_forms} where  content_model = "%s" and form_name = "%s"', 'ir:citationCModel', SCHOLAR_MODS_FORM_NAME));
-  if (!$result) {
-    $object = new stdClass();
-    $object->content_model = 'ir:citationCModel';
-    $object->form_name = SCHOLAR_MODS_FORM_NAME;
-    $object->dsid = 'MODS';
-    $object->title_field = "['title']";
-    $object->transform = 'mods_to_dc.xsl';
-    $result = drupal_write_record('islandora_content_model_forms', $object);
+  $forms = array(
+    'book' => 'book form.xml',
+    'book chapter' => 'book chapter form.xml',
+    'conference paper' => 'conference paper form.xml',
+    'journal article' => 'journal article form.xml',
+    'thesis' => 'thesis form.xml',
+  );
+  foreach ($forms as $name => $file) {
+    if (!XMLFormDatabase::Exists($name)) {
+      $module_path = drupal_get_path('module', 'scholar');
+      $definition = new DOMDocument();
+      $definition->load($module_path . '/forms/' . $file);
+      XMLFormDatabase::Create($name, $definition);
+    }
   }
 }
 
@@ -109,13 +107,18 @@ function scholar_uninstall() {
   scholar_delete_fedora_object('ir:citationCModel');
   scholar_delete_fedora_object('ir:citationCollectionCModel');
   scholar_delete_fedora_object('ir:top');
-  // Remove the default form.
   module_load_include('inc', 'xml_form_builder', 'XMLFormDatabase');
-  if (XMLFormDatabase::Exists(SCHOLAR_MODS_FORM_NAME)) {
-    XMLFormDatabase::Delete(SCHOLAR_MODS_FORM_NAME);
-  }
-  // Remove Association
-  if (db_result(db_query('Select count(content_model) from {islandora_content_model_forms} where  content_model = "%s" and form_name = "%s"', 'ir:citationCModel', SCHOLAR_MODS_FORM_NAME)) == 1) {    
-    $result = db_query('DELETE FROM {islandora_content_model_forms} WHERE content_model = "%s" and form_name = "%s"', 'ir:citationCModel', SCHOLAR_MODS_FORM_NAME);
+  // Remove the default form.
+  $forms = array(
+    'book' => 'book form.xml',
+    'book chapter' => 'book chapter form.xml',
+    'conference paper' => 'conference paper form.xml',
+    'journal article' => 'journal article form.xml',
+    'thesis' => 'thesis form.xml',
+  );
+  foreach ($forms as $name => $file) {
+    if (XMLFormDatabase::Exists($name)) {
+      XMLFormDatabase::Delete($name);
+    }
   }
 }

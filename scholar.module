@@ -9,8 +9,6 @@
  */
 module_load_include('inc', 'scholar', 'IrClass');
 
-define('SCHOLAR_MODS_FORM_NAME', 'Scholar MODS Form');
-
 /**
  * Constants Permission/Menu/Theme
  */
