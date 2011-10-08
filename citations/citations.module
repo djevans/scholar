@@ -1,0 +1,31 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ *
+ * Implements hooks and callbacks for this module.
+ */
+
+/**
+ * Tempory Menu for rendering some test junk.
+ */
+function citations_menu() {
+  $items = array();
+  $items['test/citations'] = array(
+    'title' => 'Citations Test',
+    'description' => 'Test Citations Functionality',
+    'page callback' => 'citations_test',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM
+  );
+  return $items;
+}
+
+/**
+ * 
+ */
+function citations_test() {
+  return 'Some Content';
+}
