@@ -1,0 +1,170 @@
+{
+    "abbreviations": false, 
+    "bibentries": false, 
+    "bibsection": false, 
+    "citation_items": [
+        [
+            {
+                "id": "ITEM-1"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-2"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-1"
+            }, 
+            {
+                "id": "ITEM-2"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-3"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-4"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-3"
+            }, 
+            {
+                "id": "ITEM-4"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-1"
+            }, 
+            {
+                "id": "ITEM-3"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-4"
+            }, 
+            {
+                "id": "ITEM-2"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-4"
+            }, 
+            {
+                "id": "ITEM-2"
+            }, 
+            {
+                "id": "ITEM-3"
+            }
+        ], 
+        [
+            {
+                "id": "ITEM-2"
+            }, 
+            {
+                "id": "ITEM-3"
+            }, 
+            {
+                "id": "ITEM-1"
+            }
+        ]
+    ], 
+    "citations": false, 
+    "csl": "<style \n      xmlns=\"http://purl.org/net/xbiblio/csl\"\n      class=\"note\"\n      version=\"1.1mlz1\"\n      default-locale=\"ja-JP\">\n  <info>\n    <id />\n    <title />\n    <updated>2009-08-10T04:49:00+09:00</updated>\n  </info>\n  <locale xml:lang=\"ja-JP\">\n    <terms>\n      <term name=\"open-quote\">「</term>\n      <term name=\"close-quote\">」</term>\n    </terms>\n  </locale>\n  <macro name=\"cite-japanese\">\n    <group delimiter=\"、\">\n      <names variable=\"author\">\n        <name />\n      </names>\n      <text variable=\"title\" quotes=\"true\"/>\n      <date variable=\"issued\" form=\"text\" date-parts=\"year-month-day\"/>\n    </group>\n  </macro>\n  <macro name=\"cite-english\">\n    <group delimiter=\", \">\n      <names variable=\"author\">\n        <name initialize-with=\". \" name-as-sort-order=\"all\" sort-separator=\", \"/>\n      </names>\n      <text variable=\"title\" quotes=\"true\"/>\n      <date variable=\"issued\" form=\"text\" date-parts=\"year-month-day\">\n        <date-part name=\"month\" form=\"short\"/>\n        <date-part name=\"day\" form=\"numeric\"/>\n      </date>\n    </group>\n  </macro>\n  <citation>\n    <layout locale=\"en\" delimiter=\"; \" suffix=\".\">\n      <text macro=\"cite-english\"/>\n    </layout>\n    <layout delimiter=\"。\" suffix=\"。\">\n      <text macro=\"cite-japanese\"/>\n    </layout>\n  </citation>\n</style>", 
+    "input": [
+        {
+            "author": [
+                {
+                    "family": "北野", 
+                    "given": "猛"
+                }
+            ], 
+            "id": "ITEM-1", 
+            "issued": {
+                "date-parts": [
+                    [
+                        "1999", 
+                        "2", 
+                        "11"
+                    ]
+                ]
+            }, 
+            "language": "ja", 
+            "title": "監督の目", 
+            "type": "book"
+        }, 
+        {
+            "author": [
+                {
+                    "family": "島田", 
+                    "given": "紳助"
+                }
+            ], 
+            "id": "ITEM-2", 
+            "issued": {
+                "date-parts": [
+                    [
+                        "2000", 
+                        "6", 
+                        "1"
+                    ]
+                ]
+            }, 
+            "language": "ja", 
+            "title": "ネタ作り", 
+            "type": "book"
+        }, 
+        {
+            "author": [
+                {
+                    "family": "Partridge", 
+                    "given": "Alan"
+                }
+            ], 
+            "id": "ITEM-3", 
+            "issued": {
+                "date-parts": [
+                    [
+                        "1988", 
+                        "10", 
+                        "1"
+                    ]
+                ]
+            }, 
+            "language": "en", 
+            "title": "Radiant Radio", 
+            "type": "book"
+        }, 
+        {
+            "author": [
+                {
+                    "family": "Only Me"
+                }
+            ], 
+            "id": "ITEM-4", 
+            "issued": {
+                "date-parts": [
+                    [
+                        "1992", 
+                        "11", 
+                        "13"
+                    ]
+                ]
+            }, 
+            "language": "en", 
+            "title": "My Way, the Right Way", 
+            "type": "book"
+        }
+    ], 
+    "mode": "citation", 
+    "result": "北野猛、「監督の目」、1999年2月11日。\n島田紳助、「ネタ作り」、2000年6月1日。\n北野猛、「監督の目」、1999年2月11日。島田紳助、「ネタ作り」、2000年6月1日。\nPartridge, A., “Radiant Radio”, Oct. 1, 1988.\nOnly Me, “My Way, the Right Way”, Nov. 13, 1992.\nPartridge, A., “Radiant Radio”, Oct. 1, 1988; Only Me, “My Way, the Right Way”, Nov. 13, 1992.\n北野猛、「監督の目」、1999年2月11日。Partridge, A., “Radiant Radio”, Oct. 1, 1988.\nOnly Me, “My Way, the Right Way”, Nov. 13, 1992; 島田紳助、「ネタ作り」、2000年6月1日。\nOnly Me, “My Way, the Right Way”, Nov. 13, 1992; 島田紳助、「ネタ作り」、2000年6月1日。Partridge, A., “Radiant Radio”, Oct. 1, 1988.\n島田紳助、「ネタ作り」、2000年6月1日。Partridge, A., “Radiant Radio”, Oct. 1, 1988; 北野猛、「監督の目」、1999年2月11日。"
+}

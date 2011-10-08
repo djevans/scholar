@@ -1,0 +1,37 @@
+{
+    "abbreviations": false, 
+    "bibentries": false, 
+    "bibsection": false, 
+    "citation_items": false, 
+    "citations": false, 
+    "csl": "<style \n      xmlns=\"http://purl.org/net/xbiblio/csl\"\n      class=\"note\"\n      version=\"1.0\">\n  <info>\n    <id />\n    <title />\n    <updated>2009-08-10T04:49:00+09:00</updated>\n  </info>\n  <citation>\n    <sort>\n      <key variable=\"volume\"/>\n    </sort>\n    <layout delimiter=\"&#x0A;\">\n      <number variable=\"volume\" form=\"ordinal\"/>\n      <text variable=\"volume\" prefix=\" (\" suffix=\")\"/>\n    </layout>\n  </citation>\n</style>", 
+    "input": [
+        {
+            "id": "ITEM-1", 
+            "type": "book", 
+            "volume": "11"
+        }, 
+        {
+            "id": "ITEM-2", 
+            "type": "book", 
+            "volume": "10 - 20"
+        }, 
+        {
+            "id": "ITEM-3", 
+            "type": "book", 
+            "volume": "10"
+        }, 
+        {
+            "id": "ITEM-4", 
+            "type": "book", 
+            "volume": "2"
+        }, 
+        {
+            "id": "ITEM-5", 
+            "type": "book", 
+            "volume": "1"
+        }
+    ], 
+    "mode": "citation", 
+    "result": "1st (1)\n2nd (2)\n10th (10)\n10th–20th (10 - 20)\n11th (11)"
+}
