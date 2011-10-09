@@ -71,38 +71,13 @@ class CitationModel extends AbstractModel {
     if (isset($this->item->datastreams['MODS'])) {
       $mods = $this->item->get_datastream_dissemination('MODS');
       $mods = trim($mods);
-      /* if (!empty($mods)) {
+      if (!empty($mods)) {
         $doc = new DOMDocument();
         $doc->loadXML($mods);
-
+        $style = citeproc_style($style_filename);
         $bibliography = citeproc_bibliography_from_mods($doc);
         return $bibliography->render($style);
-        } */
-      // HACK!!!!
-      module_load_include('inc', 'citeproc', 'CiteProcItem');
-      module_load_include('inc', 'citeproc', 'CiteProcCitation');
-      module_load_include('inc', 'citeproc', 'CiteProcBibliography');
-      
-      $style = citeproc_style($style_filename);
-      $item = new CiteProcItem();
-      $item->setVariable('title', 'Boundaries of Dissent: Protest and State Power in the Media Age');
-      $item->addName('author', array(
-        'family' => 'D\'Arcus',
-        'given' => 'Bruce',
-        'static-ordering' => false
-      ));
-      $item->setVariable('note', 'The apostrophe in Bruce\'s name appears in proper typeset form.');
-      $item->setVariable('publisher', 'Routledge');
-      $item->setVariable('publisher-place', 'New York');
-      $item->setDate('issued', array(
-        'date-parts' => array(2006)
-      ));
-      $item->setVariable('type', 'book');
-      $citation = new CiteProcCitation();
-      $citation->addItem($item);
-      $bibliography = new CiteProcBibliography();
-      $bibliography->addCitation($citation);
-      return $bibliography->render($style);
+      }
     }
     return '';
   }
