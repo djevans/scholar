@@ -108,10 +108,12 @@ function islandora_bibliography_form(array &$form_state) {
         ),
         'export' => array(
           '#type' => 'submit',
+          '#action' => 'export',
           '#value' => t('Export Selected'),
         ),
         'remove' => array(
           '#type' => 'submit',
+          '#action' => 'remove',
           '#value' => t('Remove Selected'),
         ),
       )
@@ -119,12 +121,56 @@ function islandora_bibliography_form(array &$form_state) {
   }
 }
 
+/**
+ * Removes one citation from the bibliography.
+ * 
+ * @param array $form
+ *   The drupal form.
+ * @param array $form_state 
+ *   The drupal form state.
+ */
 function islandora_bibliography_form_remove_citation_submit(array $form, array &$form_state) {
-  
+  $pid = $form_state['clicked_button']['#pid'];
+  islandora_bibliography_remove_citation($pid);
+  drupal_set_message('Removed Citation');
 }
 
 function islandora_bibliography_form_submit(array $form, array &$form_state) {
-  
+  $action = $form_state['clicked_button']['#action'];
+  $selections = $form_state['values']['table']['selections'];
+  if ($action == 'export') {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    module_load_include('inc', 'citeproc', 'CiteProcBibliography');
+    $bibliography = new CiteProcBibliography();
+    foreach ($selections as $pid => $selected) {
+      if ($selected) {
+        $item = new Fedora_Item($pid);
+        if (isset($item->datastreams['MODS'])) {
+          $mods = $item->get_datastream_dissemination('MODS');
+          $mods = trim($mods);
+          if (!empty($mods)) {
+            $doc = new DOMDocument();
+            $doc->loadXML($mods);
+            $citation = citeproc_citation_from_mods($doc);
+            $bibliography->addCitation($citation);
+          }
+        }
+      }
+    }
+    $style_filename = drupal_get_path('module', 'citeproc') . '/data/' . $form_state['values']['style'];
+    $style = citeproc_style($style_filename);
+    $output = $bibliography->render($style);
+    $output .= l(t('Return to the Bibliography.'), 'bibliography');
+    print theme('page', $output, FALSE);
+    exit();
+  }
+  else if ($action == 'remove') {
+    foreach ($selections as $pid => $selected) {
+      if ($selected) {
+        islandora_bibliography_remove_citation($pid);
+      }
+    }
+  }
 }
 
 /**
@@ -158,24 +204,6 @@ function theme_islandora_bibliography_form_table(array $element) {
 }
 
 /**
- * An internal function not mean to be called from outside this module.
- * 
- * @param string $pid
- *   The citations object's pid.
- * @param int $uid
- *   The user who is storing the $pid.
- *   
- * @return boolean
- *   TRUE if successfully stored in the database, FALSE otherwise.
- */
-function _islandora_bibliography_store_pid_in_database($pid, $uid) {
-  $record = new stdClass();
-  $record->uid = $uid;
-  $record->pid = $pid;
-  return drupal_write_record('islandora_bibliography', $object) !== FALSE;
-}
-
-/**
  * Gets the the current user id if non is provided.
  * 
  * @global object $user
@@ -204,6 +232,24 @@ function _islandora_bibliography_get_uid($uid = NULL) {
  */
 function _islandora_bibliography_is_user_anonymous($uid) {
   return $uid == 0;
+}
+
+/**
+ * An internal function not mean to be called from outside this module.
+ * 
+ * @param string $pid
+ *   The citations object's pid.
+ * @param int $uid
+ *   The user who is storing the $pid.
+ *   
+ * @return boolean
+ *   TRUE if successfully stored in the database, FALSE otherwise.
+ */
+function _islandora_bibliography_store_pid_in_database($pid, $uid) {
+  $record = new stdClass();
+  $record->uid = $uid;
+  $record->pid = $pid;
+  return drupal_write_record('islandora_bibliography', $object) !== FALSE;
 }
 
 /**
@@ -312,8 +358,8 @@ function _islandora_bibliography_get_citations_from_session() {
 function islandora_bibliography_store_citation($pid, $uid = NULL) {
   $uid = _islandora_bibliography_get_uid($uid);
   return (_islandora_bibliography_is_user_anonymous($uid)) ?
-      _islandora_bibliography_store_citation_in_session($pid) :
-      _islandora_bibliography_store_citation_in_database($pid, $uid);
+      _islandora_bibliography_store_pid_in_session($pid) :
+      _islandora_bibliography_store_pid_in_database($pid, $uid);
 }
 
 /**
@@ -345,8 +391,8 @@ function islandora_bibliography_is_citation_stored($pid, $uid = NULL) {
 function islandora_bibliography_remove_citation($pid, $uid = NULL) {
   $uid = _islandora_bibliography_get_uid($uid);
   _islandora_bibliography_is_user_anonymous($uid) ?
-          _islandora_bibliography_store_citation_in_session($pid) :
-          _islandora_bibliography_store_citation_in_database($pid, $uid);
+          _islandora_bibliography_remove_pid_from_session($pid) :
+          _islandora_bibliography_remove_pid_from_database($pid, $uid);
 }
 
 /**
