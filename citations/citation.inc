@@ -141,15 +141,13 @@ class CiteProc {
    *   The item to register.
    */
   public function addItem(CiteProcItem $item) {
-    if (array_search($this->items[$item->id])) {
+    if (array_search($this->items[$item->getID()])) {
       drupal_set_message('CiteProcItem %id, has already been added to the page.', array('%id' => $item->id));
     }
     else {
-      $data = array(
-        'items' => array(
-          $item->id => $item->toJSON()
-        )
-      );
+      list($id, $json) = $item->toJSON();
+      $this->items[] = $id;
+      $data = array('items' => array($id => $json));
       $this->storeInSettings($data);
     }
   }
@@ -207,17 +205,4 @@ class CiteProc {
     $this->storeInSettings($data);
   }
 
-}
-
-
-
-class CiteProcCitation {
-  // Render struct
-  //  Include the style
-  //  Any Abbre
-  //  extra properties used by citeproc-js
-}
-
-class CiteProcBibliography {
-  // Collection of CiteProcCitation instuctions
 }

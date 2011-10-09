@@ -106,6 +106,16 @@ class CiteProcAbbreviation {
   }
 
   /**
+   * Gets this objects identifier.
+   * 
+   * @return hash
+   *   This objects ID.
+   */
+  public function getID() {
+    return $this->id;
+  }
+
+  /**
    * Adds an abbreviation for the container-title CSL variable field.
    * 
    * @param string $full
