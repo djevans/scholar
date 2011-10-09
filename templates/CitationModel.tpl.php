@@ -2,7 +2,7 @@
   <div id="citation">
     <h3>
       <?php print t('Citation:') ?>
-      <select name="" class="form-select">
+      <select class="form-select" onchange="">
         <option value="0">APA</option>
       </select>
     </h3> 
@@ -10,7 +10,7 @@
     <?php print theme_button(array('#value' => 'Add To Bibliography')); ?>
   </div>
 
-  <?php if (isset($abstract)): ?>
+  <?php if (!empty($abstract)): ?>
     <div id="abstract">
       <h3><?php print t('Abstract:') ?></h3>
       <div id="abstract-content"><?php print print_r($abstract, TRUE); ?></div>
