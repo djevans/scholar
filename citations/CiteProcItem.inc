@@ -252,6 +252,8 @@ class CiteProcItem {
   /**
    * Sets a date type CSL variable field.
    * 
+   * @todo finish documenting
+   * 
    * @param string $field 
    *   One of the self::$NAMES,
    */
