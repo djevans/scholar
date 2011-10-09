@@ -3,8 +3,10 @@ Drupal.behaviors.citeproc = function (context){
   var appendCitations = function (citeproc, items) {
     for(id in items) {
       var citation = items[id];
-      var output = citeproc.appendCitationCluster(citation);
-      jQuery('#' + id + '.citeproc-in-text').html(output);
+      var output = citeproc.appendCitationCluster(citation, true);
+      if (output[0] && output[0].length && output[0][1].length){
+        jQuery('#' + id + '.citeproc-in-text').html(output[0][1]);
+      }
     }
   }
   var sys = new citeproc_sys();

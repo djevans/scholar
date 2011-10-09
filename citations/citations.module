@@ -48,5 +48,6 @@ function citations_test() {
   $citation->addItem($item);
   $bibliography = new CiteProcBibliography();
   $bibliography->addCitation($citation);
-  return $bibliography->render($style); // Gets html for the bibliography
+  $pre = $citation->render($style);
+  return $pre . '<br/>' . $bibliography->render($style); // Gets html for the bibliography
 }
