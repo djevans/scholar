@@ -24,7 +24,7 @@ class CiteProcCitation {
    * Create a CiteProcCitation instance.
    */
   public function __construct() {
-    $items = array();
+    $this->items = array();
   }
 
   /**
@@ -62,7 +62,9 @@ class CiteProcCitation {
    *   An html string where the citation will be rendered into.
    */
   public function renderInText(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL, $note_index = 0) {
-    //
+    /**
+     *  @todo Implement
+     */
   }
 
   /**

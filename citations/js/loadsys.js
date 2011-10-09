@@ -10,8 +10,8 @@
 /**
  * Constructor
  */
-var ir_citation_sys = function(){
-	return;
+var citeproc_sys = function(){
+  return;
 };
 
 /**
@@ -19,8 +19,8 @@ var ir_citation_sys = function(){
  * @param string id
  *   Identifier for the citaiton data
  */
-ir_citation_sys.prototype.retrieveItem = function(id){
-	return ir_citation_jQuery.parseJSON(Drupal.settings.ir_citation.meta_data_objects[id]);
+citeproc_sys.prototype.retrieveItem = function(id){
+  return jQuery.parseJSON(Drupal.settings.citeproc.item[id]);
 };
 
 /**
@@ -28,12 +28,12 @@ ir_citation_sys.prototype.retrieveItem = function(id){
  * @param string lang
  *   Identifier for the localization data
  */
-ir_citation_sys.prototype.retrieveLocale = function(lang){
-	/*drupal made me do it, Drupal makes sure to preserve a string sent to settings as 
+citeproc_sys.prototype.retrieveLocale = function(lang){
+  /*drupal made me do it, Drupal makes sure to preserve a string sent to settings as 
 	 * it exists in PHP so we have to re-eval to get the intended value much like jQuery.parseJSON()
 	 * is doing in the other sys functions*/
-	var locale = eval("'"+Drupal.settings.ir_citation.locale[lang]+"'");
-	return locale;
+  var locale = eval("'"+Drupal.settings.citeproc.locale[lang]+"'");
+  return locale;
 };
 
 /**
@@ -43,6 +43,6 @@ ir_citation_sys.prototype.retrieveLocale = function(lang){
  * @param string vartype
  *   Indicates which sub-section of abbreviation data to retrieve
  */
-ir_citation_sys.prototype.getAbbreviations = function(name, vartype){
-	return ir_citation_jQuery.parseJSON(Drupal.settings.ir_citation.abbreviations[name][vartype]);
+citeproc_sys.prototype.getAbbreviations = function(name, vartype){
+  return jQuery.parseJSON(Drupal.settings.citeproc.abbreviation[name][vartype]);
 };
