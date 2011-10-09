@@ -10,6 +10,14 @@
   margin: 2em;
 }
 
+#citation .citeproc-bibliography {
+  padding: 0.4em;
+}
+
 #abstract {
   margin: 2em;
+}
+
+#abstract-content {
+  margin: 0.4em;
 }

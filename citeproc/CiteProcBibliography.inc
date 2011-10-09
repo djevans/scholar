@@ -107,7 +107,7 @@ class CiteProcBibliography {
     $data = $this->createRenderData($style, $abbreviation);
     $citeproc = CiteProc::getInstance();
     $citeproc->addBibliography($data);
-    return '<span id="' . $this->id . '" class="citeproc-bibliography">[Page generation failure.  The bibliography processor requires a browser with Javascript enabled.]</span>';
+    return '<div id="' . $this->id . '" class="citeproc-bibliography">[Page generation failure.  The bibliography processor requires a browser with Javascript enabled.]</div>';
   }
 
 }
