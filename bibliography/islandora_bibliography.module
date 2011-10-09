@@ -67,9 +67,10 @@ function islandora_bibliography_form(array &$form_state) {
     );
   }
   else {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     $checkboxes = array_fill_keys($pids, '');
     $table = array(
-      '#header' => array(theme('table_select_header_cell'), t('Title'), t('Author'), ''),
+      '#header' => array(theme('table_select_header_cell'), t('Title'), t('Author(s)'), ''),
       '#theme' => 'islandora_bibliography_form_table',
       '#tree' => TRUE,
       'selections' => array(
@@ -78,10 +79,22 @@ function islandora_bibliography_form(array &$form_state) {
       ),
     );
     foreach ($pids as $pid) {
+      $title = $authors = 'Missing';
+      $item = new Fedora_Item($pid);
+      if (isset($item->datastreams['MODS'])) {
+        $mods = $item->get_datastream_dissemination('MODS');
+        $mods = trim($mods);
+        if (!empty($mods)) {
+          $mods = new SimpleXMLElement($mods);
+          $mods->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
+          $title = implode(' ', $mods->xpath('/mods:mods/mods:titleInfo/mods:title'));
+          $authors = implode(' ', $mods->xpath('/mods:mods/mods:name/mods:role[mods:roleTerm = "author"]/../mods:namePart[@type="family"]'));
+        }
+      }
       $table['rows'][] = array(
         '#pid' => $pid,
-        'title' => array('#value' => 'Title of: ' . $pid),
-        'author' => array('#value' => 'Author of: ' . $pid),
+        'title' => array('#value' => check_plain($title)),
+        'author' => array('#value' => check_plain($authors)),
         'remove' => array(
           '#type' => 'submit',
           '#value' => t('Remove'),
@@ -135,42 +148,74 @@ function islandora_bibliography_form_remove_citation_submit(array $form, array &
   drupal_set_message('Removed Citation');
 }
 
+/**
+ * Exports or Removes the selected citations from the bibliography.
+ * 
+ * @param array $form
+ *   The drupal form.
+ * @param array $form_state 
+ *   The drupal form state.
+ */
 function islandora_bibliography_form_submit(array $form, array &$form_state) {
   $action = $form_state['clicked_button']['#action'];
   $selections = $form_state['values']['table']['selections'];
-  if ($action == 'export') {
-    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    module_load_include('inc', 'citeproc', 'CiteProcBibliography');
-    $bibliography = new CiteProcBibliography();
-    foreach ($selections as $pid => $selected) {
-      if ($selected) {
-        $item = new Fedora_Item($pid);
-        if (isset($item->datastreams['MODS'])) {
-          $mods = $item->get_datastream_dissemination('MODS');
-          $mods = trim($mods);
-          if (!empty($mods)) {
-            $doc = new DOMDocument();
-            $doc->loadXML($mods);
-            $citation = citeproc_citation_from_mods($doc);
-            $bibliography->addCitation($citation);
-          }
-        }
+  ($action == 'export') ?
+          _islandora_bibliography_form_export_selections($selections, $form_state['values']['style']) :
+          _islandora_bibliography_form_remove_selections();
+}
+
+/**
+ * Export the users selections.
+ * 
+ * Helper function for islandora_bibliography_form_submit().
+ * 
+ * @param array $selections
+ *   The users selections, the keys are pids and the values indicated if it was selected.
+ * @param string $style 
+ *   The name of the style file to use.
+ */
+function _islandora_bibliography_form_export_selections(array $selections, $style) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  module_load_include('inc', 'citeproc', 'CiteProcBibliography');
+  $bibliography = new CiteProcBibliography();
+  $selections = array_filter($selections);
+  foreach ($selections as $pid => $selected) {
+    $item = new Fedora_Item($pid);
+    if (isset($item->datastreams['MODS'])) {
+      $mods = trim($item->get_datastream_dissemination('MODS'));
+      if (!empty($mods)) {
+        $doc = new DOMDocument();
+        $doc->loadXML($mods);
+        $citation = citeproc_citation_from_mods($doc);
+        $bibliography->addCitation($citation);
       }
     }
-    $style_filename = drupal_get_path('module', 'citeproc') . '/data/' . $form_state['values']['style'];
-    $style = citeproc_style($style_filename);
-    $output = $bibliography->render($style);
-    $output .= l(t('Return to the Bibliography.'), 'bibliography');
-    print theme('page', $output, FALSE);
-    exit();
   }
-  else if ($action == 'remove') {
-    foreach ($selections as $pid => $selected) {
-      if ($selected) {
-        islandora_bibliography_remove_citation($pid);
-      }
+  $style_filename = drupal_get_path('module', 'citeproc') . '/data/' . $style;
+  $style = citeproc_style($style_filename);
+  $output = $bibliography->render($style);
+  $output .= l(t('Return to the Bibliography.'), 'bibliography');
+  print theme('page', $output, FALSE);
+  exit();
+}
+
+/**
+ * Remove the users selections from the bibliography.
+ * 
+ * Helper function for islandora_bibliography_form_submit().
+ * 
+ * @param array $selections 
+ *   The users selections, the keys are pids and the values indicated if it was selected.
+ */
+function _islandora_bibliography_form_remove_selections(array $selections) {
+  $count = 0;
+  foreach ($selections as $pid => $selected) {
+    if ($selected) {
+      islandora_bibliography_remove_citation($pid);
+      $count++;
     }
   }
+  drupal_set_message(t('Removed %num Citation(s)', array('%num' => $count)));
 }
 
 /**
