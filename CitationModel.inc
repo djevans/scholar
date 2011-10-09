@@ -81,7 +81,6 @@ class CitationModel extends AbstractModel {
     }
     return '';
   }
-
 }
 
 /**
