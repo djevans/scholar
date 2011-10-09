@@ -1,3 +1,6 @@
+This module is meant to fully encapsulate the functionality of the citeproc-js library but for use within Drupal. At the 
+moment it does not really support in-text citations or footnotes, only bibliographies.
+
 Useful Links.
 
 Cite-Proc Library Documentation:

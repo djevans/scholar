@@ -46,3 +46,21 @@ citeproc_sys.prototype.retrieveLocale = function(lang){
 citeproc_sys.prototype.getAbbreviations = function(name, vartype){
   return jQuery.parseJSON(Drupal.settings.citeproc.abbreviation[name][vartype]);
 };
+
+/**
+ * This function is not used by citeproc-js, but instead is used by the runcites.js to get a style for a render object.
+ * 
+ * @param string id
+ *   Identifier for style.
+ */
+citeproc_sys.prototype.retrieveStyle = function(id) {
+  return Drupal.settings.citeproc.style[id];
+};
+
+/**
+ * This function is not used by citeproc-js, but instead is used by the runcites.js to the required info 
+ * to render the bibliography.
+ */
+citeproc_sys.prototype.retrieveBibliography = function() {
+  return Drupal.settings.citeproc.bibliography;
+};

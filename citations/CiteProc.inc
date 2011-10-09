@@ -3,7 +3,8 @@
 /**
  * @file
  *
- * Citation Class.
+ * Citation Class this is used to register various objects required to render citations. This class is not mean for 
+ * general users of this module, it will be used internally by the classes defined within this module.
  */
 
 /**
@@ -94,7 +95,7 @@ class CiteProc {
    * Includes the default locale.
    */
   private function __construct() {
-    $this->includeLocale(self::$DEFAULT_LOCALE);
+    $this->addLocale(self::$DEFAULT_LOCALE);
     $this->items = array();
   }
 
@@ -123,7 +124,7 @@ class CiteProc {
     }
     else {
       $data = array(
-        'abbreviations' => array(
+        'abbreviation' => array(
           $item->id => $item->toJSON()
         )
       );
@@ -147,7 +148,7 @@ class CiteProc {
     else {
       list($id, $json) = $item->toJSON();
       $this->items[] = $id;
-      $data = array('items' => array($id => $json));
+      $data = array('item' => array($id => $json));
       $this->storeInSettings($data);
     }
   }
@@ -165,7 +166,7 @@ class CiteProc {
       $locale = new DOMDocument();
       $filename = drupal_get_path('module', 'citations') . self::LOCALE_DIRECTORY . self::$LOCALES[$name];
       $locale->load($filename);
-      $this->addCustomLocale($name, $locale->saveXML());
+      $this->addCustomLocale($name, $locale);
       return TRUE;
     }
     return FALSE;
@@ -181,7 +182,7 @@ class CiteProc {
    */
   public function addCustomLocale($name, DOMDocument $locale) {
     $data = array(
-      'locales' => array(
+      'locale' => array(
         $name => $locale->saveXML()
       )
     );
@@ -196,12 +197,17 @@ class CiteProc {
    * @param DOMDocument $style
    *   The CSL style definition. Must be CSL version 1.0.
    */
-  public function addStyle($name, DOMDocument $style) {
-    $data = array(
-      'styles' => array(
-        $name => $locale->saveXML()
-      )
-    );
+  public function addStyle(CiteProcStyle $style) {
+    $data = array('style' => array($style->getID() => $style->toJSON()));
+    $this->storeInSettings($data);
+  }
+
+  /**
+   * This function is used by the CiteProcBibliography, and shouldn't be used by any other class.
+   */
+  public function addBibliography($data) {
+    // Only one supported for the moment.
+    $data = array('bibliography' => $data);
     $this->storeInSettings($data);
   }
 

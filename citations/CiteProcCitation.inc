@@ -7,14 +7,24 @@
  * 
  * http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#data-input
  */
-module_load_include('module', 'citations', 'CiteProcItem');
-module_load_include('module', 'citations', 'CiteProcStyle');
-module_load_include('module', 'citations', 'CiteProcAbbreviation');
+module_load_include('inc', 'citations', 'CiteProcItem');
+module_load_include('inc', 'citations', 'CiteProcStyle');
+module_load_include('inc', 'citations', 'CiteProcAbbreviation');
 
+/**
+ * Models a Citation.
+ */
 class CiteProcCitation {
 
   /**
+   * Uniquely identifies this object
    * 
+   * @var array
+   */
+  private $id;
+
+  /**
+   * A array of CiteProcItem's to include in this citation.
    * 
    * @var array
    */
@@ -24,7 +34,25 @@ class CiteProcCitation {
    * Create a CiteProcCitation instance.
    */
   public function __construct() {
+    $this->id = spl_object_hash($this);
     $this->items = array();
+  }
+
+  /**
+   * Clone this CiteProcCitation.
+   */
+  public function __clone() {
+    $this->id = spl_object_hash($this); // Preserve uniqueness.
+  }
+
+  /**
+   * Gets this objects identifier.
+   * 
+   * @return hash
+   *   This objects ID.
+   */
+  public function getID() {
+    return $this->id;
   }
 
   /**
@@ -45,36 +73,48 @@ class CiteProcCitation {
    *      suffix: a string to print after this cite item.
    */
   public function addItem(CiteProcItem $item, array $config = array()) {
-    $data = array('id' => $item->getID());
+    $item_id = $item->getID();
+    $data = array('id' => $item_id);
     $this->items[] = array_merge($data, $config);
   }
 
   /**
-   * Renders an in-text citation.
+   * Creates a JSON repersentation of this object.
+   */
+  public function toJSON() {
+    return array(
+      'citationItems' => array(
+        $this->items
+      ),
+      'properties' => array(
+        'noteIndex' => 0
+      )
+    );
+  }
+
+  /**
+   * Renders an in-text citation. If this Citation is going to be part of a bibliography.
+   * 
+   * If you tell it to render without a bibili
    * 
    * @param CiteProcStyle $style
+   *   The CSL style to render with. Must be CSL version 1.0.
    * @param CiteProcAbbreviation $abbreviation
+   *   Any abbreviations we wan't to apply.
    * @param int $note_index 
    *   Indicates the footnote number in which the citation is located within the document. 
    *   Citations within the main text of the document have a noteIndex of zero.
    * 
    * @return string
-   *   An html string where the citation will be rendered into.
+   *   An html string where the in-text citation will be rendered into.
    */
-  public function renderInText(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL, $note_index = 0) {
+  public function render(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL, $note_index = 0) {
+    drupal_set_message('The rendering of in-text citations is not fully implemented');
     /**
-     *  @todo Implement
+     * @todo Create render object determine how to deal with the difference of interfaces
+     * This will only get populated if CiteProcBibliography::render() gets called.
      */
-  }
-
-  /**
-   * Renders an bibliography entry citation.
-   * 
-   * @return string
-   *   An html string where the citation will be rendered into.
-   */
-  public function renderBibliographyEntry(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL) {
-    
+    return '<span id="' . $this->id . '" class="citeproc-in-text"></span>';
   }
 
 }

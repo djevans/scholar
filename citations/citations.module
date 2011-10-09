@@ -22,8 +22,31 @@ function citations_menu() {
 }
 
 /**
- * 
+ * test function to be removed.
  */
 function citations_test() {
-  return 'Some Content';
+  module_load_include('inc', 'citations', 'CiteProcBibliography');
+  $filename = drupal_get_path('module', 'citations') . '/data/apa.csl';
+  $doc = new DOMDocument();
+  $doc->load($filename);
+  $style = new CiteProcStyle($doc);
+  $item = new CiteProcItem();
+  $item->setVariable('title', 'Boundaries of Dissent: Protest and State Power in the Media Age');
+  $item->addName('author', array(
+    'family' => 'D\'Arcus',
+    'given' => 'Bruce',
+    'static-ordering' => false
+  ));
+  $item->setVariable('note', 'The apostrophe in Bruce\'s name appears in proper typeset form.');
+  $item->setVariable('publisher', 'Routledge');
+  $item->setVariable('publisher-place', 'New York');
+  $item->setDate('issued', array(
+    'date-parts' => array(2006)
+  ));
+  $item->setVariable('type', 'book');
+  $citation = new CiteProcCitation();
+  $citation->addItem($item);
+  $bibliography = new CiteProcBibliography();
+  $bibliography->addCitation($citation);
+  return $bibliography->render($style); // Gets html for the bibliography
 }

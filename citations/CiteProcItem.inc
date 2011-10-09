@@ -257,9 +257,9 @@ class CiteProcItem {
    * @param string $field 
    *   One of the self::$NAMES,
    */
-  public function setDate($field, $date) {
+  public function setDate($field, array $date) {
     if (array_search($field, self::$DATES) !== FALSE) {
-      $members = array(
+      $fields = array(
         'date-parts',
         'literal',
         'season',
