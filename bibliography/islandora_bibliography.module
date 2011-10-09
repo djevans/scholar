@@ -43,63 +43,79 @@ function islandora_bibliography_theme() {
  * 
  * From here the user can add/remove and export citations.
  * 
+ * @global string $base_path
+ *   The base path of the site.
+ * 
  * @param array $form_state
+ *   The drupal form state.
  * 
  * @return array
  *   The drupal form.
  */
 function islandora_bibliography_form(array &$form_state) {
+  global $base_path;
   // Assume these pids came from the database.
   $pids = array('ir:1465', 'ir:1466', 'ir:1467');
-  $pids = array();
-  $checkboxes = array_fill_keys($pids, '');
-  $table = array(
-    '#header' => array(theme('table_select_header_cell'), t('Title'), t('Author'), ''),
-    '#theme' => 'islandora_bibliography_form_table',
-    '#tree' => TRUE,
-    'selections' => array(
-      '#type' => 'checkboxes',
-      '#options' => $checkboxes,
-    ),
-  );
-  foreach ($pids as $pid) {
-    $table['rows'][] = array(
-      '#pid' => $pid,
-      'title' => array('#value' => 'Title of: ' . $pid),
-      'author' => array('#value' => 'Author of: ' . $pid),
-      'remove' => array(
-        '#type' => 'submit',
-        '#value' => t('Remove'),
-        '#pid' => $pid,
-        '#submit' => array('islandora_bibliography_form_remove_citation_submit')
+  if (empty($pids)) {
+    drupal_set_message(t('You have no citations in your bibliography.'));
+    return array(
+      'redirect' => array(
+        '#prefix' => '<p>',
+        '#value' => l(t('Return to the Home Page.'), ''),
+        '#suffix' => '</p>'
       )
     );
   }
-  return array(
-    'fieldset' => array(
-      '#type' => 'fieldset',
-      '#title' => t('My Citations'),
-      '#description' => t('<p>Here you can remove or export citations from your bibliography.</p>'),
-      'table' => $table,
-      'style' => array(
-        '#type' => 'select',
-        '#options' => array(
-          'apa.csl' => 'APA',
-          'annotated.csl' => 'Annotated',
-          'nih.csl' => 'NIH',
-          'nlm.csl' => 'NLM',
+  else {
+    $checkboxes = array_fill_keys($pids, '');
+    $table = array(
+      '#header' => array(theme('table_select_header_cell'), t('Title'), t('Author'), ''),
+      '#theme' => 'islandora_bibliography_form_table',
+      '#tree' => TRUE,
+      'selections' => array(
+        '#type' => 'checkboxes',
+        '#options' => $checkboxes,
+      ),
+    );
+    foreach ($pids as $pid) {
+      $table['rows'][] = array(
+        '#pid' => $pid,
+        'title' => array('#value' => 'Title of: ' . $pid),
+        'author' => array('#value' => 'Author of: ' . $pid),
+        'remove' => array(
+          '#type' => 'submit',
+          '#value' => t('Remove'),
+          '#pid' => $pid,
+          '#submit' => array('islandora_bibliography_form_remove_citation_submit')
         )
-      ),
-      'export' => array(
-        '#type' => 'submit',
-        '#value' => t('Export Selected'),
-      ),
-      'remove' => array(
-        '#type' => 'submit',
-        '#value' => t('Remove Selected'),
-      ),
-    )
-  );
+      );
+    }
+    return array(
+      'fieldset' => array(
+        '#type' => 'fieldset',
+        '#title' => t('My Citations'),
+        '#description' => t('<p>Here you can remove or export citations from your bibliography.</p>'),
+        'table' => $table,
+        'style' => array(
+          '#type' => 'select',
+          '#options' => array(
+            'apa.csl' => 'APA',
+            'annotated.csl' => 'Annotated',
+            'nih.csl' => 'NIH',
+            'nlm.csl' => 'NLM',
+          )
+        ),
+        'export' => array(
+          '#type' => 'submit',
+          '#value' => t('Export Selected'),
+        ),
+        'remove' => array(
+          '#type' => 'submit',
+          '#value' => t('Remove Selected'),
+        ),
+      )
+    );
+  }
 }
 
 function islandora_bibliography_form_remove_citation_submit(array $form, array &$form_state) {
