@@ -299,6 +299,15 @@ class CiteProcItem {
   }
 
   /**
+   * Merges a raw repersentation of a CiteProcItem with this, overriding an previously set values.
+   * 
+   * @param array $raw 
+   */
+  public function set($raw) {
+    $this->data = array_merge($this->data, $raw);
+  }
+
+  /**
    * Gets the JSON repersentation of this object.
    *
    * @return string
@@ -307,6 +316,11 @@ class CiteProcItem {
   public function toJSON() {
     $data = $this->data;
     $data['id'] = $this->id;
+    foreach ($data as $key => $value) {
+      if (empty($value)) {
+        unset($data[$key]);
+      }
+    }
     return $data;
   }
 

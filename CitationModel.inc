@@ -49,7 +49,8 @@ class CitationModel extends AbstractModel {
    * Adds all of the required javascript/css/etc that this model needs to be shown.
    */
   public function addRequiredResources() {
-    $this->getCitation(); // Loads some Javascript...
+    $style = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
+    $this->getCitation($style); // Loads some Javascript...
   }
 
   /**
@@ -66,17 +67,19 @@ class CitationModel extends AbstractModel {
    * 
    * @return string
    */
-  public function getCitation() {
-    module_load_include('inc', 'ir_citation', 'ir_citation.api');
-    $module_path = drupal_get_path('module', 'scholar');
-    $citation_file = $module_path . '/citations/apa.csl';
-    $csl = new DOMDocument();
-    $csl->load($citation_file);
-    $citation_api = new IslandoraCitationAPI();
-    $html = $citation_api->getCitationHTMLFromPIDAndCSL($csl->saveXML(), array($this->pid));
-    $citation_api->addENUS();
-    $citation_api->loadCiteprocJavascript();
-    return $html;
+  public function getCitation($style_filename) {
+    if (isset($this->item->datastreams['MODS'])) {
+      $mods = $this->item->get_datastream_dissemination('MODS');
+      $mods = trim($mods);
+      if (!empty($mods)) {
+        $doc = new DOMDocument();
+        $doc->loadXML($mods);
+        $style = citeproc_style($style_filename);
+        $bibliography = citeproc_bibliography_from_mods($doc);
+        return $bibliography->render($style);
+      }
+    }
+    return '';
   }
 
 }
@@ -88,5 +91,6 @@ class CitationModel extends AbstractModel {
  */
 function template_preprocess_scholar_overview_panel_citation(array &$variables) {
   $model = new CitationModel($variables['pid']);
-  $variables['citation'] = $model->getCitation();
+  $style = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
+  $variables['citation'] = $model->getCitation($style);
 }
