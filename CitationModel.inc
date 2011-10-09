@@ -50,6 +50,7 @@ class CitationModel extends AbstractModel {
    */
   public function addRequiredResources() {
     module_load_include('inc', 'citeproc', 'CiteProc');
+    drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Record.css');
     CiteProc::addResources(); // Includes javascript and other fun things.
   }
 
@@ -81,6 +82,7 @@ class CitationModel extends AbstractModel {
     }
     return '';
   }
+
 }
 
 /**
@@ -89,7 +91,18 @@ class CitationModel extends AbstractModel {
  * @param array $variables 
  */
 function template_preprocess_scholar_overview_panel_citation(array &$variables) {
-  $model = new CitationModel($variables['pid']);
+  $pid = $variables['pid'];
+  $item = new Fedora_Item($pid);
+  $model = new CitationModel($pid);
   $style = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
   $variables['citation'] = $model->getCitation($style);
+  if (isset($item->datastreams['MODS'])) {
+    $mods = $item->get_datastream_dissemination('MODS');
+    $mods = trim($mods);
+    if (!empty($mods)) {
+      $mods = new SimpleXMLElement($mods);
+      $mods->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
+      $variables['abstract'] = implode('<br/>', $mods->xpath('/mods:mods/mods:abstract'));
+    }
+  }
 }
