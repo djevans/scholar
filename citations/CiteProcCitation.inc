@@ -73,9 +73,12 @@ class CiteProcCitation {
    *      suffix: a string to print after this cite item.
    */
   public function addItem(CiteProcItem $item, array $config = array()) {
+    module_load_include('inc', 'citations', 'CiteProc');
     $item_id = $item->getID();
     $data = array('id' => $item_id);
     $this->items[] = array_merge($data, $config);
+    $citeproc = CiteProc::getInstance();
+    $citeproc->addItem($item);
   }
 
   /**
@@ -83,9 +86,7 @@ class CiteProcCitation {
    */
   public function toJSON() {
     return array(
-      'citationItems' => array(
-        $this->items
-      ),
+      'citationItems' => $this->items,
       'properties' => array(
         'noteIndex' => 0
       )

@@ -69,13 +69,6 @@ class CiteProc {
   );
 
   /**
-   * An array of all the items that have been added.
-   * 
-   * @var array
-   */
-  private $items;
-
-  /**
    * Gets the singleton instance of this class.
    * 
    * @staticvar CiteProc $instance
@@ -95,8 +88,15 @@ class CiteProc {
    * Includes the default locale.
    */
   private function __construct() {
-    $this->addLocale(self::$DEFAULT_LOCALE);
     $this->items = array();
+    $this->addLocale(self::$DEFAULT_LOCALE);
+    $module_path = drupal_get_path('module', 'citations');
+    // Required for a javascript error, note the type of the script.
+    drupal_set_html_head("<script type='text/javascript; e4x=1' src='/$module_path/lib/citeproc-js/xmle4x.js'></script>"); 
+    drupal_add_js($module_path . '/lib/citeproc-js/xmldom.js');
+    drupal_add_js($module_path . '/lib/citeproc-js/citeproc.js');
+    drupal_add_js($module_path . '/js/loadsys.js');
+    drupal_add_js($module_path . '/js/runcites.js');
   }
 
   /**
@@ -142,15 +142,10 @@ class CiteProc {
    *   The item to register.
    */
   public function addItem(CiteProcItem $item) {
-    if (array_search($this->items[$item->getID()])) {
-      drupal_set_message('CiteProcItem %id, has already been added to the page.', array('%id' => $item->id));
-    }
-    else {
-      list($id, $json) = $item->toJSON();
-      $this->items[] = $id;
-      $data = array('item' => array($id => $json));
-      $this->storeInSettings($data);
-    }
+    $id = $item->getID();
+    $json = $item->toJSON();
+    $data = array('item' => array($id => $json));
+    $this->storeInSettings($data);
   }
 
   /**

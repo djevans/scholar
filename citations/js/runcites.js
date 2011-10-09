@@ -12,7 +12,7 @@ Drupal.behaviors.citeproc = function (context){
   var style = sys.retrieveStyle(bibliography.style);
   var citeproc = new CSL.Engine(sys, style);
   var abbreviations = bibliography.abbreviation;
-  if(abbreviations !== undefined) {
+  if(abbreviations !== null) {
     citeproc.setAbbreviations(abbreviations);
   }
   appendCitations(citeproc, bibliography.items);

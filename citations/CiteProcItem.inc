@@ -245,7 +245,8 @@ class CiteProcItem {
         'static-ordering'
       );
       $this->filterFields($name, $fields);
-      $this->data[$field][] = $name;
+      $this->data[$field] = isset($this->data[$field]) ? $this->data[$field] : array(); // Initalize.
+      $this->data[$field] = array_merge($this->data[$field], $name);
     }
   }
 
@@ -266,7 +267,8 @@ class CiteProcItem {
         'circa'
       );
       $this->filterFields($date, $fields);
-      $this->data[$field][] = $date;
+      $this->data[$field] = isset($this->data[$field]) ? $this->data[$field] : array(); // Initalize.
+      $this->data[$field] = array_merge($this->data[$field], $date);
     }
   }
 
@@ -305,7 +307,7 @@ class CiteProcItem {
   public function toJSON() {
     $data = $this->data;
     $data['id'] = $this->id;
-    return array($this->id, drupal_json($data));
+    return $data;
   }
 
 }

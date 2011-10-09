@@ -20,7 +20,7 @@ var citeproc_sys = function(){
  *   Identifier for the citaiton data
  */
 citeproc_sys.prototype.retrieveItem = function(id){
-  return jQuery.parseJSON(Drupal.settings.citeproc.item[id]);
+  return Drupal.settings.citeproc.item[id];
 };
 
 /**
@@ -29,11 +29,7 @@ citeproc_sys.prototype.retrieveItem = function(id){
  *   Identifier for the localization data
  */
 citeproc_sys.prototype.retrieveLocale = function(lang){
-  /*drupal made me do it, Drupal makes sure to preserve a string sent to settings as 
-	 * it exists in PHP so we have to re-eval to get the intended value much like jQuery.parseJSON()
-	 * is doing in the other sys functions*/
-  var locale = eval("'"+Drupal.settings.citeproc.locale[lang]+"'");
-  return locale;
+  return Drupal.settings.citeproc.locale[lang];
 };
 
 /**
@@ -44,7 +40,7 @@ citeproc_sys.prototype.retrieveLocale = function(lang){
  *   Indicates which sub-section of abbreviation data to retrieve
  */
 citeproc_sys.prototype.getAbbreviations = function(name, vartype){
-  return jQuery.parseJSON(Drupal.settings.citeproc.abbreviation[name][vartype]);
+  return Drupal.settings.citeproc.abbreviation[name][vartype];
 };
 
 /**

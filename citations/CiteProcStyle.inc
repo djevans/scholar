@@ -31,8 +31,11 @@ class CiteProcStyle {
    * Create a CiteProcStyle instance.
    */
   public function __construct(DOMDocument $style) {
+    module_load_include('inc', 'citations', 'CiteProc');
     $this->id = spl_object_hash($this);
     $this->data = $style->saveXML();
+    $citeproc = CiteProc::getInstance();
+    $citeproc->addStyle($this);
   }
 
   /**
