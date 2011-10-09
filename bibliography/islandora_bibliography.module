@@ -8,15 +8,15 @@
 
 /**
  * The menu entries for this module.
- * 
+ *
  * @return $menu_entries
  *   An arrray of the items to be added to the drupal menu
  */
 function islandora_bibliography_menu() {
   $items = array();
   $items['bibliography'] = array(
-    'title' => t('My Bibliography'),
-    'description' => t('Here you can remove or export citations from your bibliography.'),
+    'title' => 'My Bibliography',
+    'description' => 'Here you can remove or export citations from your bibliography.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('islandora_bibliography_form'),
     'access arguments' => array('access content'),
@@ -40,15 +40,15 @@ function islandora_bibliography_theme() {
 
 /**
  * This form is called from the menu callback for the 'My Bibliography' page.
- * 
+ *
  * From here the user can add/remove and export citations.
- * 
+ *
  * @global string $base_path
  *   The base path of the site.
- * 
+ *
  * @param array $form_state
  *   The drupal form state.
- * 
+ *
  * @return array
  *   The drupal form.
  */
@@ -136,24 +136,24 @@ function islandora_bibliography_form(array &$form_state) {
 
 /**
  * Removes one citation from the bibliography.
- * 
+ *
  * @param array $form
  *   The drupal form.
- * @param array $form_state 
+ * @param array $form_state
  *   The drupal form state.
  */
 function islandora_bibliography_form_remove_citation_submit(array $form, array &$form_state) {
   $pid = $form_state['clicked_button']['#pid'];
   islandora_bibliography_remove_citation($pid);
-  drupal_set_message('Removed Citation');
+  drupal_set_message(t('Removed Citation'));
 }
 
 /**
  * Exports or Removes the selected citations from the bibliography.
- * 
+ *
  * @param array $form
  *   The drupal form.
- * @param array $form_state 
+ * @param array $form_state
  *   The drupal form state.
  */
 function islandora_bibliography_form_submit(array $form, array &$form_state) {
@@ -166,12 +166,12 @@ function islandora_bibliography_form_submit(array $form, array &$form_state) {
 
 /**
  * Export the users selections.
- * 
+ *
  * Helper function for islandora_bibliography_form_submit().
- * 
+ *
  * @param array $selections
  *   The users selections, the keys are pids and the values indicated if it was selected.
- * @param string $style 
+ * @param string $style
  *   The name of the style file to use.
  */
 function _islandora_bibliography_form_export_selections(array $selections, $style) {
@@ -201,10 +201,10 @@ function _islandora_bibliography_form_export_selections(array $selections, $styl
 
 /**
  * Remove the users selections from the bibliography.
- * 
+ *
  * Helper function for islandora_bibliography_form_submit().
- * 
- * @param array $selections 
+ *
+ * @param array $selections
  *   The users selections, the keys are pids and the values indicated if it was selected.
  */
 function _islandora_bibliography_form_remove_selections(array $selections) {
@@ -220,10 +220,10 @@ function _islandora_bibliography_form_remove_selections(array $selections) {
 
 /**
  * Theme's a form table for this module.
- * 
+ *
  * @param array $element
  *   A Drupal Form Element.
- * 
+ *
  * @return sting
  *   HTML that renders a table of settings for datastreams.
  */
@@ -250,13 +250,13 @@ function theme_islandora_bibliography_form_table(array $element) {
 
 /**
  * Gets the the current user id if non is provided.
- * 
+ *
  * @global object $user
  *   The drupal user object.
- * 
- * @param int $uid 
+ *
+ * @param int $uid
  *   A drupal user id.
- * 
+ *
  * @return int
  *   A drupal user id.
  */
@@ -268,11 +268,11 @@ function _islandora_bibliography_get_uid($uid = NULL) {
 
 /**
  * Checks if the given user is anonymous.
- * 
- * @param int $uid 
+ *
+ * @param int $uid
  *   A drupal user id.
- * 
- * @return boolean 
+ *
+ * @return boolean
  *   TRUE if the user identified by $uid is anonymous, FALSE otherwise.
  */
 function _islandora_bibliography_is_user_anonymous($uid) {
@@ -281,12 +281,12 @@ function _islandora_bibliography_is_user_anonymous($uid) {
 
 /**
  * An internal function not mean to be called from outside this module.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
  * @param int $uid
  *   The user who is storing the $pid.
- *   
+ *
  * @return boolean
  *   TRUE if successfully stored in the database, FALSE otherwise.
  */
@@ -299,7 +299,7 @@ function _islandora_bibliography_store_pid_in_database($pid, $uid) {
 
 /**
  * Stores the PID in the Session.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
  */
@@ -311,20 +311,20 @@ function _islandora_bibliography_store_pid_in_session($pid) {
 
 /**
  * An internal function not mean to be called from outside this module.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
- * 
+ *
  * @param int $uid
  *   The user who is removing the $pid.
  */
 function _islandora_bibliography_remove_pid_from_database($pid, $uid) {
-  
+
 }
 
 /**
  * Stores the PID in the Session.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
  */
@@ -334,12 +334,12 @@ function _islandora_bibliography_remove_pid_from_session($pid) {
 
 /**
  * An internal function not mean to be called from outside this module.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
  * @param int $uid
  *   The user who is has stored the $pid.
- *   
+ *
  * @return boolean
  *   TRUE if the $pid is stored in the database, FALSE otherwise.
  */
@@ -350,7 +350,7 @@ function _islandora_bibliography_is_pid_in_database($pid, $uid) {
 
 /**
  * Stores the PID in the Session.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
  */
@@ -363,12 +363,12 @@ function _islandora_bibliography_is_pid_in_session($pid) {
 
 /**
  * An internal function not mean to be called from outside this module.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
  * @param int $uid
  *   The user who is has stored the $pid.
- *   
+ *
  * @return boolean
  *   TRUE if the $pid is stored in the database, FALSE otherwise.
  */
@@ -383,7 +383,7 @@ function _islandora_bibliography_get_citations_from_database($uid) {
 
 /**
  * Gets the stored citations from the $_SESSION.
- * 
+ *
  * @return array
  */
 function _islandora_bibliography_get_citations_from_session() {
@@ -393,10 +393,10 @@ function _islandora_bibliography_get_citations_from_session() {
 
 /**
  * Stores the given citation.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
- * 
+ *
  * @return boolean
  *   TRUE if successful, FALSE otherwise.
  */
@@ -409,12 +409,12 @@ function islandora_bibliography_store_citation($pid, $uid = NULL) {
 
 /**
  * Checks to see if the given citation is stored by the given user.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
  * @param int $uid
  *   The user to check.
- * 
+ *
  * @return boolean
  *   TRUE if the citation is stored, FALSE otherwise.
  */
@@ -427,7 +427,7 @@ function islandora_bibliography_is_citation_stored($pid, $uid = NULL) {
 
 /**
  * Removes the given citation.
- * 
+ *
  * @param string $pid
  *   The citations object's pid.
  * @param int $uid
@@ -442,7 +442,7 @@ function islandora_bibliography_remove_citation($pid, $uid = NULL) {
 
 /**
  * Gets all stored citation for the given user.
- * 
+ *
  * @param int $uid
  *   The user whose citations this function will retrieve.
  */
