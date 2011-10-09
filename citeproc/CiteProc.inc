@@ -83,6 +83,24 @@ class CiteProc {
   }
 
   /**
+   * Includes all the required files for this to function.
+   * 
+   */
+  public static function addResources() {
+    static $loaded = FALSE;
+    if ($loaded === FALSE) {
+      $module_path = drupal_get_path('module', 'citeproc');
+      // Required for a javascript error, note the type of the script.
+      drupal_set_html_head("<script type='text/javascript; e4x=1' src='/$module_path/lib/citeproc-js/xmle4x.js'></script>");
+      drupal_add_js($module_path . '/lib/citeproc-js/xmldom.js');
+      drupal_add_js($module_path . '/lib/citeproc-js/citeproc.js');
+      drupal_add_js($module_path . '/js/loadsys.js');
+      drupal_add_js($module_path . '/js/runcites.js');
+      $loaded = TRUE;
+    }
+  }
+
+  /**
    * Creates a CiteProc instance.
    *
    * Includes the default locale.
@@ -90,13 +108,7 @@ class CiteProc {
   private function __construct() {
     $this->items = array();
     $this->addLocale(self::$DEFAULT_LOCALE);
-    $module_path = drupal_get_path('module', 'citeproc');
-    // Required for a javascript error, note the type of the script.
-    drupal_set_html_head("<script type='text/javascript; e4x=1' src='/$module_path/lib/citeproc-js/xmle4x.js'></script>");
-    drupal_add_js($module_path . '/lib/citeproc-js/xmldom.js');
-    drupal_add_js($module_path . '/lib/citeproc-js/citeproc.js');
-    drupal_add_js($module_path . '/js/loadsys.js');
-    drupal_add_js($module_path . '/js/runcites.js');
+    self::addResources();
   }
 
   /**

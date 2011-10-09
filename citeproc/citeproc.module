@@ -46,22 +46,6 @@ function citations_test() {
   $item->setVariable('type', 'book');
   $citation = new CiteProcCitation();
   $citation->addItem($item);
-  $style = new CiteProcStyle($doc);
-  $item = new CiteProcItem();
-  $item->setVariable('title', 'Boundaries of Dissent: Protest and State Power in the Media Age');
-  $item->addName('author', array(
-    'family' => 'D\'Arcus',
-    'given' => 'Bruce',
-    'static-ordering' => false
-  ));
-  $item->setVariable('note', 'The apostrophe in Bruce\'s name appears in proper typeset form.');
-  $item->setVariable('publisher', 'Routledge');
-  $item->setVariable('publisher-place', 'New York');
-  $item->setDate('issued', array(
-    'date-parts' => array(2006)
-  ));
-  $item->setVariable('type', 'book');
-  $citation->addItem($item);
   $bibliography = new CiteProcBibliography();
   $bibliography->addCitation($citation);
   $pre = $citation->render($style);
