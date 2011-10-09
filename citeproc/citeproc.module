@@ -9,7 +9,7 @@
 /**
  * Tempory Menu for rendering some test junk.
  */
-function citations_menu() {
+function citeproc_menu() {
   $items = array();
   $items['test/citations'] = array(
     'title' => 'Citations Test',
@@ -25,8 +25,8 @@ function citations_menu() {
  * test function to be removed.
  */
 function citations_test() {
-  module_load_include('inc', 'citations', 'CiteProcBibliography');
-  $filename = drupal_get_path('module', 'citations') . '/data/apa.csl';
+  module_load_include('inc', 'citeproc', 'CiteProcBibliography');
+  $filename = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
   $doc = new DOMDocument();
   $doc->load($filename);
   $style = new CiteProcStyle($doc);

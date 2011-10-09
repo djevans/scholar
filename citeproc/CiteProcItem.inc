@@ -4,7 +4,7 @@
  * @file
  *
  * Defines a class that models citeproc-js Items.
- * 
+ *
  * http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#data-input
  */
 
@@ -16,14 +16,14 @@ class CiteProcItem {
 
   /**
    * A unique identifier for this object.
-   * 
+   *
    * @var hash
    */
   private $id;
 
   /**
    * Valid name CSL variable fields.
-   * 
+   *
    * @var array
    */
   static $NAMES = array(
@@ -43,7 +43,7 @@ class CiteProcItem {
 
   /**
    * Valid date CSL variable fields.
-   * 
+   *
    * @var array
    */
   static $DATES = array(
@@ -57,7 +57,7 @@ class CiteProcItem {
 
   /**
    * Valid number CSL variable fields.
-   * 
+   *
    * @var array
    */
   static $NUMBERS = array(
@@ -70,7 +70,7 @@ class CiteProcItem {
 
   /**
    * Valid simple CSL variable fields.
-   * 
+   *
    * @var array
    */
   static $VARIABLES = array(
@@ -116,7 +116,7 @@ class CiteProcItem {
     // For legislation and patents; scope of geographic relevance for a document.
     "jurisdiction",
     "keyword",
-    // a description to locate an item within some larger container or 
+    // a description to locate an item within some larger container or
     // collection; a volume or issue number is a kind of locator, for example.
     "locator",
     // medium description (DVD, CD, etc.)
@@ -183,7 +183,7 @@ class CiteProcItem {
 
   /**
    * Gets this objects identifier.
-   * 
+   *
    * @return hash
    *   This objects ID.
    */
@@ -193,12 +193,12 @@ class CiteProcItem {
 
   /**
    * Filters an array down to the provided fields.
-   * 
+   *
    * @param array $array
    *   The array to filter.
-   * @param array $fields 
+   * @param array $fields
    *   The fields to keep.
-   * 
+   *
    * @return array
    *   The filtered array.
    */
@@ -213,8 +213,8 @@ class CiteProcItem {
 
   /**
    * Adds a name type CSL variable field.
-   * 
-   * @param string $field 
+   *
+   * @param string $field
    *   One of the self::$NAMES,
    * @param array $name
    *   An array that conforms to the following layout.
@@ -229,7 +229,7 @@ class CiteProcItem {
    *      'non-dropping-particle' => string,
    *      'static-ordering' => if specificed it should be the integer value 1
    *    )
-   * 
+   *
    */
   public function addName($field, array $name) {
     if (array_search($field, self::$NAMES) !== FALSE) {
@@ -252,10 +252,10 @@ class CiteProcItem {
 
   /**
    * Sets a date type CSL variable field.
-   * 
+   *
    * @todo finish documenting
-   * 
-   * @param string $field 
+   *
+   * @param string $field
    *   One of the self::$NAMES,
    */
   public function setDate($field, array $date) {
@@ -274,8 +274,8 @@ class CiteProcItem {
 
   /**
    * Sets a number type CSL variable field.
-   * 
-   * @param string $field 
+   *
+   * @param string $field
    *   One of the self::$NAMES,
    */
   public function setNumber($field, $number) {
@@ -286,10 +286,10 @@ class CiteProcItem {
 
   /**
    * Sets a simple CSL variable field.
-   * 
+   *
    * @param string $field
    *   A simple CSL variable field.
-   * @param string $value 
+   * @param string $value
    *   The value for the given field.
    */
   public function setVariable($field, $value) {
@@ -300,7 +300,7 @@ class CiteProcItem {
 
   /**
    * Gets the JSON repersentation of this object.
-   * 
+   *
    * @return string
    *   The JSON repersentation of this object.
    */

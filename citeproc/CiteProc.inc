@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * Citation Class this is used to register various objects required to render citations. This class is not mean for 
+ * Citation Class this is used to register various objects required to render citations. This class is not mean for
  * general users of this module, it will be used internally by the classes defined within this module.
  */
 
@@ -70,9 +70,9 @@ class CiteProc {
 
   /**
    * Gets the singleton instance of this class.
-   * 
+   *
    * @staticvar CiteProc $instance
-   * @return CiteProc 
+   * @return CiteProc
    */
   public static function getInstance() {
     static $instance = NULL;
@@ -83,16 +83,16 @@ class CiteProc {
   }
 
   /**
-   * Creates a CiteProc instance. 
-   * 
+   * Creates a CiteProc instance.
+   *
    * Includes the default locale.
    */
   private function __construct() {
     $this->items = array();
     $this->addLocale(self::$DEFAULT_LOCALE);
-    $module_path = drupal_get_path('module', 'citations');
+    $module_path = drupal_get_path('module', 'citeproc');
     // Required for a javascript error, note the type of the script.
-    drupal_set_html_head("<script type='text/javascript; e4x=1' src='/$module_path/lib/citeproc-js/xmle4x.js'></script>"); 
+    drupal_set_html_head("<script type='text/javascript; e4x=1' src='/$module_path/lib/citeproc-js/xmle4x.js'></script>");
     drupal_add_js($module_path . '/lib/citeproc-js/xmldom.js');
     drupal_add_js($module_path . '/lib/citeproc-js/citeproc.js');
     drupal_add_js($module_path . '/js/loadsys.js');
@@ -101,8 +101,8 @@ class CiteProc {
 
   /**
    * Stores data required by citeproc-js in the drupal settings object.
-   * 
-   * @param array $data 
+   *
+   * @param array $data
    *   The data to store in the drupal settings object.
    */
   private function storeInSettings(array $data) {
@@ -111,34 +111,29 @@ class CiteProc {
 
   /**
    * Registers a CiteProcAbbreviation with the citeproc-js api.
-   * 
-   * Note after adding a CiteProcAbbreviation, subsequent changes to the 
+   *
+   * Note after adding a CiteProcAbbreviation, subsequent changes to the
    * CiteProcAbbreviation will have no affect on citeproc-js.
-   * 
-   * @param CiteProcAbbreviation $abbreviation 
+   *
+   * @param CiteProcAbbreviation $abbreviation
    *   The abbreviation to register.
    */
   public function addAbbreviation(CiteProcAbbreviation $abbreviation) {
-    if (array_search($this->abbreviations[$abbreviation->id])) {
-      drupal_set_message('CiteProcItem %id, has already been added to the page.', array('%id' => $item->id));
-    }
-    else {
-      $data = array(
-        'abbreviation' => array(
-          $item->id => $item->toJSON()
-        )
-      );
-      $this->storeInSettings($data);
-    }
+    $data = array(
+      'abbreviation' => array(
+        $item->id => $item->toJSON()
+      )
+    );
+    $this->storeInSettings($data);
   }
 
   /**
    * Registers a CiteProcItem with the citeproc-js api.
-   * 
-   * Note after adding a CiteProcItem, subsequent changes to the CiteProcItem 
+   *
+   * Note after adding a CiteProcItem, subsequent changes to the CiteProcItem
    * will have no on citeproc-js.
-   * 
-   * @param CiteProcItem $item 
+   *
+   * @param CiteProcItem $item
    *   The item to register.
    */
   public function addItem(CiteProcItem $item) {
@@ -150,7 +145,7 @@ class CiteProc {
 
   /**
    * Adds an existing local.
-   * 
+   *
    * @param string $name
    *   A $key in this objects self::$LOCALES array.
    * @return boolean
@@ -159,7 +154,7 @@ class CiteProc {
   public function addLocale($name) {
     if (isset(self::$LOCALES[$name])) {
       $locale = new DOMDocument();
-      $filename = drupal_get_path('module', 'citations') . self::LOCALE_DIRECTORY . self::$LOCALES[$name];
+      $filename = drupal_get_path('module', 'citeproc') . self::LOCALE_DIRECTORY . self::$LOCALES[$name];
       $locale->load($filename);
       $this->addCustomLocale($name, $locale);
       return TRUE;
@@ -169,7 +164,7 @@ class CiteProc {
 
   /**
    * Adds a custom locale.
-   * 
+   *
    * @param string $name
    *   The name of the locale, used to identify it uniquely.
    * @param DOMDocument $locale
@@ -186,7 +181,7 @@ class CiteProc {
 
   /**
    * Adds a CSL style, which can be used to format citaions.
-   * 
+   *
    * @param string $name
    *   The name of the style.
    * @param DOMDocument $style

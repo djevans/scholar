@@ -1,5 +1,5 @@
-This module is meant to fully encapsulate the functionality of the citeproc-js library but for use within Drupal. At the 
-moment it does not really support in-text citations or footnotes, only bibliographies.
+This module is meant to fully encapsulate the functionality of the citeproc-js library but for use within Drupal. At the
+moment it does not fully support citeproc-js.
 
 Useful Links.
 
@@ -15,6 +15,6 @@ http://citationstyles.org/
 
 Notes:
 
-The styles repository is currently housed at zotero.org. Note that styles in the Zotero styles repository are currently 
-at CSL version 0.8.1. Use the tools provided by the CSL project to convert CSL 0.8.1 styles to the version 1.0 
+The styles repository is currently housed at zotero.org. Note that styles in the Zotero styles repository are currently
+at CSL version 0.8.1. Use the tools provided by the CSL project to convert CSL 0.8.1 styles to the version 1.0
 syntax supported by this processor.
