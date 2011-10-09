@@ -97,6 +97,7 @@ function islandora_bibliography_form(array &$form_state) {
         '#description' => t('<p>Here you can remove or export citations from your bibliography.</p>'),
         'table' => $table,
         'style' => array(
+          '#title' => t('Export Citation Style Format'),
           '#type' => 'select',
           '#options' => array(
             'apa.csl' => 'APA',
