@@ -183,6 +183,7 @@ function islandora_bibliography_form_submit(array $form, array &$form_state) {
 function _islandora_bibliography_form_export_selections(array $selections, $style) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   module_load_include('inc', 'citeproc', 'CiteProcBibliography');
+  drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/export.css');
   $style_filename = drupal_get_path('module', 'citeproc') . '/data/' . $style;
   $style = citeproc_style($style_filename);
   $bibliography = new CiteProcBibliography($style);
