@@ -8,3 +8,7 @@
 div.form-item { 
     display: inline-block;
 }
+
+.scholar_search_item {
+  margin: 1em;
+}
