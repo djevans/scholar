@@ -34,7 +34,7 @@ class CiteProcCitation {
    * Create a CiteProcCitation instance.
    */
   public function __construct() {
-    $this->id = spl_object_hash($this);
+    $this->id = uniqid();
     $this->items = array();
   }
 
@@ -42,7 +42,7 @@ class CiteProcCitation {
    * Clone this CiteProcCitation.
    */
   public function __clone() {
-    $this->id = spl_object_hash($this); // Preserve uniqueness.
+    $this->id = uniqid(); // Preserve uniqueness.
   }
 
   /**

@@ -32,7 +32,7 @@ class CiteProcStyle {
    */
   public function __construct(DOMDocument $style) {
     module_load_include('inc', 'citeproc', 'CiteProc');
-    $this->id = spl_object_hash($this);
+    $this->id = uniqid();
     $this->data = $style->saveXML();
     $citeproc = CiteProc::getInstance();
     $citeproc->addStyle($this);

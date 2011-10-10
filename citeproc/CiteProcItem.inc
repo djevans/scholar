@@ -170,7 +170,7 @@ class CiteProcItem {
    * Create a CiteProcItem.
    */
   public function __construct() {
-    $this->id = spl_object_hash($this);
+    $this->id = uniqid();
     $this->data = array();
   }
 
@@ -178,7 +178,7 @@ class CiteProcItem {
    * Clone this CiteProcItem.
    */
   public function __clone() {
-    $this->id = spl_object_hash($this); // Preserve uniqueness.
+    $this->id = uniqid(); // Preserve uniqueness.
   }
 
   /**

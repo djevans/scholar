@@ -52,7 +52,7 @@ class CiteProcBibliography {
    *   Any abbreviations we wan't to apply.
    */
   public function __construct(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL) {
-    $this->id = spl_object_hash($this);
+    $this->id = uniqid();
     $this->style = $style;
     $this->abbreviation = $abbreviation;
     $this->citations = array();

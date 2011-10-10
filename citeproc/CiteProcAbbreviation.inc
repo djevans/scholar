@@ -95,14 +95,14 @@ class CiteProcAbbreviation {
    * Creates a CiteProcAbbreviation instance.
    */
   public function __construct() {
-    $this->id = spl_object_hash($this);
+    $this->id = uniqid();
   }
 
   /**
    * Clone this CiteProcAbbreviation instance.
    */
   public function __clone() {
-    $this->id = spl_object_hash($this); // Preserve uniqueness.
+    $this->id = uniqid(); // Preserve uniqueness.
   }
 
   /**
