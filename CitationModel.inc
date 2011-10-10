@@ -77,10 +77,10 @@ class CitationModel extends AbstractModel {
         $doc->loadXML($mods);
         $style = citeproc_style($style_filename);
         $bibliography = citeproc_bibliography_from_mods($style, $doc);
-        return $bibliography->render();
+        return array($bibliography->getID(), $bibliography->render());
       }
     }
-    return '';
+    return array(NULL, '');
   }
 
 }
@@ -103,7 +103,9 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
   );
   foreach ($styles as $file => $name) {
     $style = drupal_get_path('module', 'citeproc') . '/data/' . $file;
-    $variables['citation'][] = $model->getCitation($style);
+    list($id, $html) = $model->getCitation($style);
+    $variables['citation'][] = $html ;
+    $variables['styles'][$id] = $name;
   }
   // Abstract
   if (isset($item->datastreams['MODS'])) {

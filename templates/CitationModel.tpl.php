@@ -4,7 +4,9 @@
       <?php print t('Citation:') ?>
     </h3> 
     <select id="style" class="form-select" onchange="jQuery('.citeproc-bibliography').attr('id', this.value); Drupal.attachBehaviors();">
-      <option value="idgoeshere"> APA</option>
+      <?php foreach ($styles as $id => $name) : ?>
+        <option value="<?php print $id ?>"><?php print $name ?></option>
+      <?php endforeach; ?>
     </select>
     <?php print print_r($citation[0], TRUE); ?>
     <?php print drupal_get_form('islandora_bibliography_citation_form', $pid); ?>
