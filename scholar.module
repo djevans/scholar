@@ -12,8 +12,7 @@ module_load_include('inc', 'scholar', 'IrClass');
 /**
  * Constants Permission/Menu/Theme
  */
-define('PERM_SCHOLAR_VIEW_RESEARCH', 'view scholarly research');
-define('PERM_SCHOLAR_ADD_RESEARCH', 'add scholarly research');
+define('PERM_SCHOLAR_VIEW_RESEARCH', 'view fedora collection');
 define('MENU_SCHOLAR_HOME', 'ir');
 define('MENU_SCHOLAR_SEARCH', 'ir/search/%/%/%');
 define('MENU_SCHOLAR_BROWSE_USER', 'ir/user/%');
@@ -85,7 +84,7 @@ function scholar_menu() {
  *   An array of valid permissions for the IR module.
  */
 function scholar_perm() {
-  return array(PERM_SCHOLAR_VIEW_RESEARCH, PERM_SCHOLAR_ADD_RESEARCH);
+  return array(PERM_SCHOLAR_VIEW_RESEARCH);
 }
 
 /**
