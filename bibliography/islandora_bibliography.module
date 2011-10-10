@@ -22,6 +22,12 @@ function islandora_bibliography_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
   );
+  $items['bibliography/citation'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_bibliography_citation_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
   return $items;
 }
 
@@ -55,7 +61,7 @@ function islandora_bibliography_theme() {
 function islandora_bibliography_form(array &$form_state) {
   global $base_path;
   // Assume these pids came from the database.
-  $pids = array('ir:1465', 'ir:1466', 'ir:1467');
+  $pids = islandora_bibliography_get_citations();
   if (empty($pids)) {
     drupal_set_message(t('You have no citations in your bibliography.'));
     return array(
@@ -161,7 +167,7 @@ function islandora_bibliography_form_submit(array $form, array &$form_state) {
   $selections = $form_state['values']['table']['selections'];
   ($action == 'export') ?
           _islandora_bibliography_form_export_selections($selections, $form_state['values']['style']) :
-          _islandora_bibliography_form_remove_selections();
+          _islandora_bibliography_form_remove_selections($selections);
 }
 
 /**
@@ -249,6 +255,58 @@ function theme_islandora_bibliography_form_table(array $element) {
 }
 
 /**
+ * Renders the form for adding/removing an item from the bibliography.
+ * 
+ * @param array $form_state
+ *   The drupal form state.
+ * @param string $pid 
+ *   The fedora object's pid.
+ *  
+ * @return array
+ *   The drupal form.
+ */
+function islandora_bibliography_citation_form(array &$form_state, $pid = NULL) {
+  $pid = isset($pid) ? $pid : $form_state['post']['pid'];
+  $stored = isset($form_state['post']['stored']) ? $form_state['post']['stored'] : islandora_bibliography_is_citation_stored($pid);
+  return array(
+    '#action' => '/bibliography/citation',
+    'pid' => array(
+      '#type' => 'hidden',
+      '#value' => $pid
+    ),
+    'stored' => array(
+      '#type' => 'hidden',
+      '#value' => $stored
+    ),
+    'action' => array(
+      '#type' => 'submit',
+      '#value' => $stored ? t('Remove from Bibliography') : t('Add to Bibliography'),
+      '#action' => $stored ? 'remove' : 'add',
+      '#pid' => $pid,
+      '#redirect' => 'fedora/repository/' . $pid,
+    )
+  );
+}
+
+/**
+ * Adds/Removes a Citation from the bibliography.
+ * 
+ * @param array $form
+ *   The drupal form.
+ * @param array $form_state 
+ *   The drupal form state.
+ */
+function islandora_bibliography_citation_form_submit(array $form, array &$form_state) {
+  $action = $form_state['clicked_button']['#action'];
+  $pid = $form_state['clicked_button']['#pid'];
+  ($action == 'add') ?
+          islandora_bibliography_store_citation($pid) :
+          islandora_bibliography_remove_citation($pid);
+  $redirect = $form_state['clicked_button']['#redirect'];
+  drupal_goto($redirect);
+}
+
+/**
  * Gets the the current user id if non is provided.
  *
  * @global object $user
@@ -292,9 +350,9 @@ function _islandora_bibliography_is_user_anonymous($uid) {
  */
 function _islandora_bibliography_store_pid_in_database($pid, $uid) {
   $record = new stdClass();
-  $record->uid = $uid;
+  $record->uid = (int) $uid;
   $record->pid = $pid;
-  return drupal_write_record('islandora_bibliography', $object) !== FALSE;
+  return drupal_write_record('islandora_bibliography', $record) !== FALSE;
 }
 
 /**
@@ -319,7 +377,7 @@ function _islandora_bibliography_store_pid_in_session($pid) {
  *   The user who is removing the $pid.
  */
 function _islandora_bibliography_remove_pid_from_database($pid, $uid) {
-
+  db_query('DELETE FROM {islandora_bibliography} WHERE pid = "%s" AND uid = "%d"', $pid, $uid);
 }
 
 /**
@@ -344,7 +402,7 @@ function _islandora_bibliography_remove_pid_from_session($pid) {
  *   TRUE if the $pid is stored in the database, FALSE otherwise.
  */
 function _islandora_bibliography_is_pid_in_database($pid, $uid) {
-  $query = db_query('SELECT count(id) FROM {islandora_bibliography} WHERE pid = "%s" AND uid = "%d"', $pid);
+  $query = db_query('SELECT count(id) FROM {islandora_bibliography} WHERE pid = "%s" AND uid = "%d"', $pid, $uid);
   return (db_result($query) > 0) ? TRUE : FALSE;
 }
 
