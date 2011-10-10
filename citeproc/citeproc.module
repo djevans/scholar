@@ -6,52 +6,6 @@
  * Implements hooks and callbacks for this module.
  */
 
-/**
- * Tempory Menu for rendering some test junk.
- */
-function citeproc_menu() {
-  $items = array();
-  $items['test/citations'] = array(
-    'title' => 'Citations Test',
-    'description' => 'Test Citations Functionality',
-    'page callback' => 'citations_test',
-    'access arguments' => array('access content'),
-    'type' => MENU_NORMAL_ITEM
-  );
-  return $items;
-}
-
-/**
- * test function to be removed.
- */
-function citations_test() {
-  module_load_include('inc', 'citeproc', 'CiteProcBibliography');
-  $filename = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
-  $doc = new DOMDocument();
-  $doc->load($filename);
-  $style = new CiteProcStyle($doc);
-  $item = new CiteProcItem();
-  $item->setVariable('title', 'Boundaries of Dissent: Protest and State Power in the Media Age');
-  $item->addName('author', array(
-    'family' => 'D\'Arcus',
-    'given' => 'Bruce',
-    'static-ordering' => false
-  ));
-  $item->setVariable('note', 'The apostrophe in Bruce\'s name appears in proper typeset form.');
-  $item->setVariable('publisher', 'Routledge');
-  $item->setVariable('publisher-place', 'New York');
-  $item->setDate('issued', array(
-    'date-parts' => array(2006)
-  ));
-  $item->setVariable('type', 'book');
-  $citation = new CiteProcCitation();
-  $citation->addItem($item);
-  $bibliography = new CiteProcBibliography($style);
-  $bibliography->addCitation($citation);
-  $pre = $citation->render($style);
-  return $pre . '<br/>' . $bibliography->render(); // Gets html for the bibliography
-}
-
 function citeproc_item_from_mods(DOMDocument $mods) {
   module_load_include('inc', 'citeproc', 'CiteProcItem');
   module_load_include('php', 'citeproc', 'generators/converter');
