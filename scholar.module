@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  *
@@ -103,6 +101,7 @@ function scholar_theme() {
     ),
     THEME_SCHOLAR_SEARCH => array(
       'template' => 'templates/Search',
+      'arguments' => array('query' => NULL, 'fq' => NULL, 'dismax' => NULL)
     ),
     THEME_SCHOLAR_BROWSE_USER => array(
       'template' => 'templates/BrowseName',
@@ -170,6 +169,25 @@ function template_preprocess_ir_record(array &$variables) {
  */
 function template_preprocess_ir_search(array &$variables) {
   drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
+  $variables['search_results'] = islandora_solr_search($variables['query'], $variables['fq'], $variables['dismax']);
+}
+
+/**
+ * Hook for Solr display results.
+ * 
+ * @return array
+ */
+function scholar_islandora_solr_primary_display() {
+  return array(
+    'scholar' => array(
+      'name' => t('Citations'),
+      'module' => 'scholar',
+      'file' => 'IslandoraSolrResultsCitation.inc',
+      'class' => "IslandoraSolrResultsCitation",
+      'function' => "displayResults",
+      'description' => t("A results are rendered as APA style citations."),
+    )
+  );
 }
 
 /**
@@ -197,25 +215,14 @@ function scholar_home() {
 function scholar_search($field, $order, $value) {
   module_load_include('inc', 'scholar', 'SearchForm');
   module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrQueryProcessor');
-  //$url = variable_get('islandora_solr_search_block_url', 'http://localhost:8080/solr');
-  //$components = parse_url($url);
-  $query = $value;
-  $fq = NULL;
-  $dismax = NULL;
-  try {
-    var_dump($components);
-    $solr = new IslandoraSolrQueryProcessor();
-    $results = $solr->buildAndExecuteQuery($query, $fq, $dismax); // XML
-    if (empty($results)) {
-      throw new Exception(t('solr index. Is the solr search block configured properly?'));
-    }
-  } catch (Exception $e) {
-    unset($results);
-    drupal_set_message(t('Error searching ') . $e->getMessage(), 'error');
-  }
-  if (isset($results))
-    var_dump($results);
-  return theme(THEME_SCHOLAR_SEARCH);
+  $fields = array(
+    'title' => 'dc.title',
+    'author' => 'dc.contributor',
+    'text' => 'Text'
+  );
+  $field = $fields[$field]; // Remap Field to query friendly one.
+  $query = $field . ':' . $value;
+  return theme(THEME_SCHOLAR_SEARCH, $query);
 }
 
 /**
