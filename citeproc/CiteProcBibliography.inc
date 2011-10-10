@@ -29,12 +29,32 @@ class CiteProcBibliography {
    * @var array
    */
   private $citations;
+  
+  /**
+   * The style CSL to apply to this bibliography.
+   *
+   * @var CiteProcStyle
+   */
+  private $style;
+  /**
+   * The abbreviations to apply to this bibliography.
+   * 
+   * @var CiteProcAbbreviation 
+   */
+  private $abbreviation;
 
   /**
    * Create a CiteProcBibliography instance.
+   * 
+   * @param CiteProcStyle $style
+   *   The CSL style to render with. Must be CSL version 1.0.
+   * @param CiteProcAbbreviation $abbreviation
+   *   Any abbreviations we wan't to apply.
    */
-  public function __construct() {
+  public function __construct(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL) {
     $this->id = spl_object_hash($this);
+    $this->style = $style;
+    $this->abbreviation = $abbreviation;
     $this->citations = array();
   }
 
@@ -67,21 +87,16 @@ class CiteProcBibliography {
   }
 
   /**
-   * Creates an array of data that will be converted to JSON and used to render the bibliography.
-   *
-   * @param CiteProcStyle $style
-   *   The CSL style to render with. Must be CSL version 1.0.
-   * @param CiteProcAbbreviation $abbreviation
-   *   Any abbreviations we wan't to apply.
-   *
+   * Gets the JSON repersentation for this object.
+   * 
    * @return array
    *   Data that will be converted to JSON and used to render the bibliography.
    */
-  private function createRenderData(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL) {
+  public function toJSON() {
     $data = array(
       'id' => $this->id,
-      'style' => $style->getID(),
-      'abbreviation' => isset($abbreviation) ? $abbreviation->getID() : NULL,
+      'style' => $this->style->getID(),
+      'abbreviation' => isset($this->abbreviation) ? $this->abbreviation->getID() : NULL,
       'items' => array()
     );
     foreach ($this->citations as $id => $citation) {
@@ -102,11 +117,10 @@ class CiteProcBibliography {
    * @return string
    *   An html string where the in-text citation will be rendered into.
    */
-  public function render(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL) {
+  public function render() {
     module_load_include('inc', 'citeproc', 'CiteProc');
-    $data = $this->createRenderData($style, $abbreviation);
     $citeproc = CiteProc::getInstance();
-    $citeproc->addBibliography($data);
+    $citeproc->addBibliography($this);
     return '<div id="' . $this->id . '" class="citeproc-bibliography">[Page generation failure.  The bibliography processor requires a browser with Javascript enabled.]</div>';
   }
 

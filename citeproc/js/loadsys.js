@@ -57,6 +57,6 @@ citeproc_sys.prototype.retrieveStyle = function(id) {
  * This function is not used by citeproc-js, but instead is used by the runcites.js to the required info 
  * to render the bibliography.
  */
-citeproc_sys.prototype.retrieveBibliography = function() {
+citeproc_sys.prototype.retrieveBibliographies = function() {
   return Drupal.settings.citeproc.bibliography;
 };

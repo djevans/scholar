@@ -76,8 +76,8 @@ class CitationModel extends AbstractModel {
         $doc = new DOMDocument();
         $doc->loadXML($mods);
         $style = citeproc_style($style_filename);
-        $bibliography = citeproc_bibliography_from_mods($doc);
-        return $bibliography->render($style);
+        $bibliography = citeproc_bibliography_from_mods($style, $doc);
+        return $bibliography->render();
       }
     }
     return '';
@@ -94,8 +94,18 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
   $pid = $variables['pid'];
   $item = new Fedora_Item($pid);
   $model = new CitationModel($pid);
-  $style = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
-  $variables['citation'] = $model->getCitation($style);
+  // Citations
+  $styles = array(
+    'apa.csl' => 'APA',
+    'annotated.csl' => 'Annotated',
+    'nih.csl' => 'NIH',
+    'nlm.csl' => 'NLM',
+  );
+  foreach ($styles as $file => $name) {
+    $style = drupal_get_path('module', 'citeproc') . '/data/' . $file;
+    $variables['citation'][] = $model->getCitation($style);
+  }
+  // Abstract
   if (isset($item->datastreams['MODS'])) {
     $mods = $item->get_datastream_dissemination('MODS');
     $mods = trim($mods);

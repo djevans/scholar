@@ -46,10 +46,10 @@ function citations_test() {
   $item->setVariable('type', 'book');
   $citation = new CiteProcCitation();
   $citation->addItem($item);
-  $bibliography = new CiteProcBibliography();
+  $bibliography = new CiteProcBibliography($style);
   $bibliography->addCitation($citation);
   $pre = $citation->render($style);
-  return $pre . '<br/>' . $bibliography->render($style); // Gets html for the bibliography
+  return $pre . '<br/>' . $bibliography->render(); // Gets html for the bibliography
 }
 
 function citeproc_item_from_mods(DOMDocument $mods) {
@@ -69,10 +69,10 @@ function citeproc_citation_from_mods(DOMDocument $mods) {
   return $citation;
 }
 
-function citeproc_bibliography_from_mods(DOMDocument $mods) {
+function citeproc_bibliography_from_mods(CiteProcStyle $style, DOMDocument $mods) {
   module_load_include('inc', 'citeproc', 'CiteProcBibliography');
   $citation = citeproc_citation_from_mods($mods);
-  $bibliography = new CiteProcBibliography();
+  $bibliography = new CiteProcBibliography($style);
   $bibliography->addCitation($citation);
   return $bibliography;
 }

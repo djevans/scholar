@@ -207,9 +207,11 @@ class CiteProc {
   /**
    * This function is used by the CiteProcBibliography, and shouldn't be used by any other class.
    */
-  public function addBibliography($data) {
+  public function addBibliography(CiteProcBibliography $bibliography) {
     // Only one supported for the moment.
-    $data = array('bibliography' => $data);
+    $id = $bibliography->getID();
+    $json = $bibliography->toJSON();
+    $data = array('bibliography' => array($id => $json));
     $this->storeInSettings($data);
   }
 

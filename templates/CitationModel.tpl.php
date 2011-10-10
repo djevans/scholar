@@ -3,10 +3,10 @@
     <h3 style="display:inline">
       <?php print t('Citation:') ?>
     </h3> 
-    <select class="form-select" onchange="">
-      <option value="0">APA</option>
+    <select id="style" class="form-select" onchange="jQuery('.citeproc-bibliography').attr('id', this.value); Drupal.attachBehaviors();">
+      <option value="idgoeshere"> APA</option>
     </select>
-    <?php print print_r($citation, TRUE); ?>
+    <?php print print_r($citation[0], TRUE); ?>
     <?php print drupal_get_form('islandora_bibliography_citation_form', $pid); ?>
   </div>
   <?php if (!empty($abstract)): ?>
