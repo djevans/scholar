@@ -96,6 +96,7 @@ class CiteProc {
       drupal_add_js($module_path . '/lib/citeproc-js/citeproc.js');
       drupal_add_js($module_path . '/js/loadsys.js');
       drupal_add_js($module_path . '/js/runcites.js');
+      drupal_add_css($module_path . '/css/citeproc.css');
       $loaded = TRUE;
     }
   }
