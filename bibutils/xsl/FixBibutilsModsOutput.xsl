@@ -10,7 +10,7 @@
     xmlns:mods="http://www.loc.gov/mods/v3">
     <xsl:output omit-xml-declaration="yes" indent="yes" method="xml"/>
     <xsl:strip-space elements="*"/>
-    <xsl:template match="/ | @* | node()">
+    <xsl:template match="/mods:modsCollection/mods:mods | @* | node()[local-name() != 'modsCollection']">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
         </xsl:copy>

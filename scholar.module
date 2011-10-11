@@ -522,26 +522,55 @@ function scholar_bulk_ingest_form_submit(array &$form, array &$form_state) {
   $content_model_pid = ContentModel::getPidFromIdentifier($form_state['values']['content_model_pid']);
   $mime_type = $_FILES['files']['type']['file'];
   $tmp_filename = $_FILES['files']['tmp_name']['file'];
-  $documents = $mime_type == 'text/xml' ?
-      bibutils_endnote_xml_file_to_mods_documents($tmp_filename) :
-      bibutils_ris_file_to_mods_documents($tmp_filename);
-  /**
-   * We need to convert the DOMDocuments to strings because DOMDocuments don't support serialization.
-   */
-  $temp_file_dir = file_directory_temp();
-  foreach ($documents as $key => $document) {
-    $temp_file_path = file_create_filename("datastream.xml", $temp_file_dir);
-    $document->save($temp_file_path);
-    unset($documents[$key]);
-    $operations[] = array('scholar_batch_ingest_mods_document', array($temp_file_path, $collection_pid, $content_model_pid));
+  if ($mime_type == 'text/xml') {
+    $documents = split_endnote_records_into_mulitiple_documents($tmp_filename);
+    $temp_file_dir = file_directory_temp();
+    foreach ($documents as $key => $document) {
+      $temp_file_path = file_create_filename("datastream.xml", $temp_file_dir);
+      $document->save($temp_file_path);
+      unset($documents[$key]);
+      $operations[] = array('scholar_batch_ingest_endnote_document', array($temp_file_path, $collection_pid, $content_model_pid));
+    }
+    unset($documents);
   }
-  unset($documents);
+  else {
+    $documents = bibutils_ris_file_to_mods_documents($tmp_filename);
+    $temp_file_dir = file_directory_temp();
+    foreach ($documents as $key => $document) {
+      $temp_file_path = file_create_filename("datastream.xml", $temp_file_dir);
+      $document->save($temp_file_path);
+      unset($documents[$key]);
+      $operations[] = array('scholar_batch_ingest_mods_document', array($temp_file_path, $collection_pid, $content_model_pid));
+    }
+    unset($documents);
+  }
   $batch = array(
     'title' => t('Ingesting Files'),
     'operations' => $operations,
   );
   batch_set($batch);
   unset($form_state['storage']); // Return to the viewer.  
+}
+
+/**
+ * 
+ */
+function scholar_batch_ingest_endnote_document($tmp_file_name, $collection_pid, $content_model_pid) {
+  module_load_include('inc', 'islandora_content_model_forms', 'FOXML');
+  module_load_include('inc', 'fedora_repository', 'CollectionPolicy');
+  $collection_policy = CollectionPolicy::loadFromCollection($collection_pid);
+  if ($collection_policy !== FALSE) {
+    $document = bibutils_endnote_xml_file_to_mods_document($tmp_file_name);
+    $label = scholar_batch_ingest_mods_guess_title($document); // Find a best guess solution... to pull from the mods.  
+    $pid = $collection_policy->getNextPid('ISLANDORACM');
+    $dsid = 'MODS';
+    $relationship = $collection_policy->getRelationship();
+    $ingest_file_location = array('ENDNOTE' => $tmp_file_name);
+    $transform = drupal_get_path('module', 'scholar') . '/xsl/mods_to_dc.xsl';
+    $state = 'A';
+    $foxml = new FOXML($label, $pid, $dsid, $content_model_pid, $collection_pid, $relationship, $ingest_file_location, $document, $transform, $state);
+    $foxml->ingest();
+  }
 }
 
 /**

@@ -59,6 +59,31 @@ function _bibutils_convert_to_mods_document($command) {
 }
 
 /**
+ * Generates a DOMDocument for each <record> element within the given EndNoteXML document.
+ * 
+ * @param string $filename
+ *   A Valid EndNoteXML Document, filename.
+ * 
+ * @return DOMDocument[]
+ *   An array of DOMDocuments that repersent each <record> record within the <records>
+ */
+function split_endnote_records_into_mulitiple_documents($filename) {
+  $endnote = new DOMDocument();
+  $endnote->load($filename);
+  $xpath = new DOMXPath($endnote);
+  $results = $xpath->query('/xml/records/record');
+  $documents = array();
+  $count = $results->length;
+  for ($i = 0; $i < $count; $i++) {
+    $doc = new DOMDocument();
+    $child = $results->item($i);
+    $doc->loadXML('<xml><records>' . $endnote->saveXML($child) . '</records></xml>');
+    $documents[] = $doc;
+  }
+  return $documents;
+}
+
+/**
  * An internal function that is not meant to be used outside of this file.
  * 
  * Generates a DOMDocument for each <mods> element within the given MODS document.
