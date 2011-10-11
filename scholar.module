@@ -561,15 +561,17 @@ function scholar_batch_ingest_endnote_document($tmp_file_name, $collection_pid, 
   $collection_policy = CollectionPolicy::loadFromCollection($collection_pid);
   if ($collection_policy !== FALSE) {
     $document = bibutils_endnote_xml_file_to_mods_document($tmp_file_name);
-    $label = scholar_batch_ingest_mods_guess_title($document); // Find a best guess solution... to pull from the mods.  
-    $pid = $collection_policy->getNextPid('ISLANDORACM');
-    $dsid = 'MODS';
-    $relationship = $collection_policy->getRelationship();
-    $ingest_file_location = array('ENDNOTE' => $tmp_file_name);
-    $transform = drupal_get_path('module', 'scholar') . '/xsl/mods_to_dc.xsl';
-    $state = 'A';
-    $foxml = new FOXML($label, $pid, $dsid, $content_model_pid, $collection_pid, $relationship, $ingest_file_location, $document, $transform, $state);
-    $foxml->ingest();
+    if($document) {
+      $label = scholar_batch_ingest_mods_guess_title($document); // Find a best guess solution... to pull from the mods.  
+      $pid = $collection_policy->getNextPid('ISLANDORACM');
+      $dsid = 'MODS';
+      $relationship = $collection_policy->getRelationship();
+      $ingest_file_location = array('ENDNOTE' => $tmp_file_name);
+      $transform = drupal_get_path('module', 'scholar') . '/xsl/mods_to_dc.xsl';
+      $state = 'A';
+      $foxml = new FOXML($label, $pid, $dsid, $content_model_pid, $collection_pid, $relationship, $ingest_file_location, $document, $transform, $state);
+      $foxml->ingest();
+    }
   }
 }
 
