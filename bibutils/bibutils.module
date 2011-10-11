@@ -48,13 +48,13 @@ function _bibutils_convert_to_mods_document($command) {
     $transform->load($transform_filename);
     $doc = new DOMDocument();
     $doc->loadXML($output);
-    $xslt = new XSLTProcessor();
-    $xslt->importStyleSheet($transform);
-    return $xslt->transformToDoc($doc->documentElement);
+    if (isset($doc->documentElement)) {
+      $xslt = new XSLTProcessor();
+      $xslt->importStyleSheet($transform);
+      return $xslt->transformToDoc($doc->documentElement);
+    }
   }
-  else {
-    drupal_set_message(t('Could not convert %filename, to MODS.', array('%filename' => $filename)), 'error');
-  }
+  drupal_set_message(t('Could not convert %filename, to MODS.', array('%filename' => $filename)), 'error');
   return FALSE;
 }
 
