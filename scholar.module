@@ -368,14 +368,23 @@ function validation_for_refworks(array $form, array &$form_state) {
  *   The Drupal form state.
  */
 function scholar_form_content_model_viewer_ingest_metadata_form_alter(array &$form, array &$form_state) {
-  if ($form_state['storage']['step'] == 1) {
-    $bulk_ingest = scholar_bulk_ingest_form($form_state, $form['collection_pid']['#value']);
-    // Move the next button within the field set to make it clearer.
-    $form['indicator']['submit'] = $form['submit'];
-    unset($form['submit']);
-    array_unshift($form, $bulk_ingest);
-    $form['#attributes'] = array('enctype' => 'multipart/form-data'); // Allow the uploading of files.
-    $form['#validate'] = array('scholar_edit_metadata_form_validate');
+  if ($form_state['storage']['step'] == 1 && isset($form['indicator'])) {
+    $models = array('ir:citationCModel/ISLANDORACM');
+    $show_bulk_ingest = FALSE;
+    foreach ($form['indicator']['models']['#options'] as $model => $label) {
+      if (array_search($model, $models) !== FALSE) {
+        $show_bulk_ingest = TRUE;
+      }
+    }
+    if ($show_bulk_ingest) {
+      $bulk_ingest = scholar_bulk_ingest_form($form_state, $form['collection_pid']['#value']);
+      // Move the next button within the field set to make it clearer.
+      $form['indicator']['submit'] = $form['submit'];
+      unset($form['submit']);
+      array_unshift($form, $bulk_ingest);
+      $form['#attributes'] = array('enctype' => 'multipart/form-data'); // Allow the uploading of files.
+      $form['#validate'] = array('scholar_edit_metadata_form_validate');
+    }
   }
 }
 

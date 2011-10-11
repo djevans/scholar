@@ -49,6 +49,7 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
    * @param Apache_Solr_Object $results
    */
   function printResults($results) {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     if (empty($results)) {
       return "no results";
     }
@@ -58,7 +59,11 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $style_filename = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
     $style = citeproc_style($style_filename);
     foreach ($results->response->docs as $doc) {
-      $output .= theme(THEME_SCHOLAR_SEARCH_ITEM, $doc->PID, $style);
+      $pid = $doc->PID;
+      $item = new Fedora_Item($pid);
+      if ($item->exists() && isset($item->datastreams['MODS'])) {
+        $output .= theme(THEME_SCHOLAR_SEARCH_ITEM, $pid, $style);
+      }
     }
     return $output;
   }
