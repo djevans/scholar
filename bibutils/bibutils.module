@@ -70,7 +70,6 @@ function _bibutils_convert_to_mods_document($command) {
  *   An array of DOMDocuments that repersent each <mods> record within the <modsCollection>
  */
 function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
-  echo 'enter _split_mods_collection_into_mulitiple_documents ' . memory_get_usage(TRUE) . '</br>';
   $xpath = new DOMXPath($mods);
   $xpath->registerNamespace('mods', 'http://www.loc.gov/mods/v3');
   $results = $xpath->query('/mods:modsCollection/mods:mods');
@@ -83,7 +82,6 @@ function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
     $doc->loadXML($mods->saveXML($child));
     $documents[] = $doc;
   }
-  echo 'exit _split_mods_collection_into_mulitiple_documents ' . memory_get_usage(TRUE) . '</br>';
   return $documents;
 }
 
@@ -97,10 +95,8 @@ function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
  *   The generated MODS document, FALSE if the function failed.
  */
 function bibutils_endnote_xml_file_to_mods_document($filename) {
-  echo 'enter bibutils_endnote_xml_file_to_mods_document ' . memory_get_usage(TRUE) . '</br>';
-  $command = 'endx2xml ' . $filename . ' 2>&- | modsclean 2>&-';
+  $command = 'endx2xml ' . $filename . ' 2>&-';
   $document = _bibutils_convert_to_mods_document($command);
-  echo 'exit bibutils_endnote_xml_file_to_mods_document ' . memory_get_usage(TRUE) . '</br>';
   return $document;
 }
 
@@ -114,7 +110,7 @@ function bibutils_endnote_xml_file_to_mods_document($filename) {
  *   The generated MODS document, FALSE if the function failed.
  */
 function bibutils_ris_file_to_mods_document($filename) {
-  $command = 'ris2xml ' . $filename . ' 2>&- | modsclean 2>&-';
+  $command = 'ris2xml ' . $filename . ' 2>&-';
   return _bibutils_convert_to_mods_document($command);
 }
 
@@ -131,13 +127,11 @@ function bibutils_ris_file_to_mods_document($filename) {
  *   An array of generated MODS documents, FALSE if the function failed.
  */
 function bibutils_endnote_xml_file_to_mods_documents($filename) {
-  echo 'enter bibutils_endnote_xml_file_to_mods_documents ' . memory_get_usage(TRUE) . '</br>';
   $mods = bibutils_endnote_xml_file_to_mods_document($filename);
   $documents = ($mods !== FALSE) ?
       _split_mods_collection_into_mulitiple_documents($mods) :
       FALSE;
   unset($mods);
-  echo 'exit bibutils_endnote_xml_file_to_mods_documents ' . memory_get_usage(TRUE) . '</br>';
   return $documents;
 }
 
