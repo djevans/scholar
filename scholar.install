@@ -71,6 +71,7 @@ function scholar_delete_fedora_object($pid) {
  * Implementation of Enable Hook.
  */
 function scholar_install() {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   global $base_url;
   $path = $base_url . '/' . drupal_get_path('module', 'scholar');
   scholar_add_required_namespaces();
