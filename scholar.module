@@ -566,7 +566,7 @@ function scholar_batch_ingest_endnote_document($tmp_file_name, $collection_pid, 
       $pid = $collection_policy->getNextPid('ISLANDORACM');
       $dsid = 'MODS';
       $relationship = $collection_policy->getRelationship();
-      $ingest_file_location = NULL;//array('ENDNOTE' => $tmp_file_name);
+      $ingest_file_location = array('ENDNOTE' => $tmp_file_name);
       $transform = drupal_get_path('module', 'scholar') . '/xsl/mods_to_dc.xsl';
       $state = 'A';
       $foxml = new FOXML($label, $pid, $dsid, $content_model_pid, $collection_pid, $relationship, $ingest_file_location, $document, $transform, $state);
