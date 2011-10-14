@@ -58,8 +58,12 @@ function scholar_search_form_submit(array $form, array &$form_state) {
   $field = $form_state['values']['field'];
   $sort = ($form_state['values']['sort'] != '') ? $form_state['values']['sort'] : 'relevance';
   $search = $form_state['values']['search'];
-  $url = preg_replace('/%/', $field, MENU_SCHOLAR_SEARCH, 1);
-  $url = preg_replace('/%/', $sort, $url, 1);
-  $url = preg_replace('/%/', $search, $url, 1);
-  $form_state['redirect'] = $url;
+  $fields = array(
+    'title' => 'dc.title',
+    'author' => 'dc.contributor',
+    'text' => 'text'
+  );
+  $field = $fields[$field]; // Remap Field to query friendly one.
+  $query = $field . ':' . $search; 
+  $form_state['redirect'] = 'islandora/solr/search/' . $query . '/';
 }

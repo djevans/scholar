@@ -20,13 +20,16 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
    * @param string $output 
    */
   function displayResults(IslandoraSolrQueryProcessor $query_processor, $title = "Search Results", $output = '') {
+    module_load_include('inc', 'scholar', 'SearchForm');
+    drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
     $solr_result = $query_processor->solrResult;
     $total = (int) $solr_result->response->numFound;
     $end = min(($query_processor->solrLimit + $query_processor->solrStart), $total);
+    $output = drupal_get_form('scholar_search_form');
     // Check for empty resultset
     if ($total === 0) {
-      $output = "<h2>Search Results</h2>";
-      $output .= "<div>Sorry, but your search returned no results.</div>";
+      //$output = "<h2>Search Results</h2>";
+      //$output .= "<div>Sorry, but your search returned no results.</div>";
       return $output;
     }
     // Initialize drupal-style pager

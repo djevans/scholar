@@ -561,7 +561,7 @@ function scholar_batch_ingest_endnote_document($tmp_file_name, $collection_pid, 
   $collection_policy = CollectionPolicy::loadFromCollection($collection_pid);
   if ($collection_policy !== FALSE) {
     $document = bibutils_endnote_xml_file_to_mods_document($tmp_file_name);
-    if($document) {
+    if ($document) {
       $label = scholar_batch_ingest_mods_guess_title($document); // Find a best guess solution... to pull from the mods.  
       $pid = $collection_policy->getNextPid('ISLANDORACM');
       $dsid = 'MODS';
