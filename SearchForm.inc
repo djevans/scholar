@@ -64,6 +64,6 @@ function scholar_search_form_submit(array $form, array &$form_state) {
     'text' => 'text'
   );
   $field = $fields[$field]; // Remap Field to query friendly one.
-  $query = $field . ':' . $search; 
+  $query = !empty($search) ? $field . ':' . $search : '*'; 
   $form_state['redirect'] = 'islandora/solr/search/' . $query . '/';
 }
