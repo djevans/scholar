@@ -28,7 +28,7 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $output = drupal_get_form('scholar_search_form');
     // Check for empty resultset
     if ($total === 0) {
-      $output = "<h2>Search Results</h2>";
+      $output .= "<h2>Search Results</h2>";
       $output .= "<div>Sorry, but your search returned no results.</div>";
       return $output;
     }
