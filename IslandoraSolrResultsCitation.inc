@@ -22,23 +22,19 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
   function displayResults(IslandoraSolrQueryProcessor $query_processor, $title = "Search Results", $output = '') {
     module_load_include('inc', 'scholar', 'SearchForm');
     drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
-    $solr_result = $query_processor->solrResult;
-    $total = (int) $solr_result->response->numFound;
-    $end = min(($query_processor->solrLimit + $query_processor->solrStart), $total);
+    $total = (int) $query_processor->solrResult->response->numFound;
     $output = '<h4>Advanced Search</h4>';
     $output .= drupal_get_form('scholar_search_form');
-// Check for empty resultset
+
     if ($total === 0) {
       $output .= "<h2>Search Results</h2>";
       $output .= "<div>Sorry, but your search returned no results.</div>";
       return $output;
     }
-// Initialize drupal-style pager
     islandora_solr_search_pager_init($total, $query_processor->solrLimit);
-    //$output .= '<h2>' . $title . '</h2>';
-    //$output .= '<div id="islandora_solr_result_count">(' . ($query_processor->solrStart + 1) . ' - ' . $end . ' of ' . $total . ')</div>';
+
     $output .= '<div class="content">';
-    $output .= drupal_get_form('scholar_search_results_form', $query_processor->solrResult); //$this->printResults($query_processor->solrResult);
+    $output .= drupal_get_form('scholar_search_results_form', $query_processor); //$this->printResults($query_processor->solrResult);
 // Render Drupal pager (bottom of search results)
     $output .= theme('pager', null, $query_processor->solrLimit, 0, null, 5);
     $output .= "</div>"; // class = "content"
@@ -96,10 +92,15 @@ function template_preprocess_scholar_search_item(array &$variables) {
   }
 }
 
-function scholar_search_results_form(array &$form_state, Apache_Solr_Response $results) {
+function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProcessor $query_processor) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $results = $query_processor->solrResult;
+  $total = (int) $results->response->numFound;
+  $start = (int) $query_processor->solrStart + 1;
+  $end = min(($query_processor->solrLimit + $query_processor->solrStart), $total);
+  $title = t('Search Results (%start - %end of %total)', array('%start' => $start, '%end' => $end, '%total' => $total));
   $table = array(
-    '#header' => array(theme('table_select_header_cell'), t('Search Results')),
+    '#header' => array(theme('table_select_header_cell'), $title),
     '#theme' => 'scholar_search_results_table',
     '#tree' => TRUE,
   );
