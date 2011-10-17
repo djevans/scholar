@@ -90,8 +90,7 @@ function template_preprocess_scholar_search_item(array &$variables) {
 }
 
 function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProcessor $query_processor) {
-  if(isset($_SESSION['bibliography']['export']['file'])) {
-    
+  if (isset($_SESSION['bibliography']['export']['file'])) {
     $path = MENU_BIBLIOGRAPHY_EXPORT;
     drupal_set_html_head("<meta http-equiv='refresh' content='0;url=/$path'/>");
   }
@@ -189,6 +188,18 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
   );
 }
 
+/**
+ * Check to see if some thing has been selected.
+ */
+function scholar_search_results_form_validate(array $form, array &$form_state) {
+  
+}
+
+/**
+ *
+ * @param array $form_state
+ * @return type 
+ */
 function _scholar_search_get_all_pids_from_query(array &$form_state) {
   $query_processor = $form_state['storage']['query'];
   $previous_limit = $query_processor->solrLimit;
@@ -209,17 +220,20 @@ function scholar_search_results_form_save_to_bibliography(array $form, array &$f
   $action = $form_state['clicked_button']['#save'];
   if ($action == 'all') {
     $pids = _scholar_search_get_all_pids_from_query($form_state);
-    foreach ($pids as $pid) {
-      islandora_bibliography_store_citation($pid);
-    }
   }
   else {
-    $selections = $form_state['values']['table']['selections'];
-    $selections = array_filter($selections);
-    foreach ($selections as $pid => $selected) {
-      islandora_bibliography_store_citation($pid);
+    $pids = $form_state['values']['table']['selections'];
+    $pids = array_filter($pids);
+    $pids = array_keys($pids);
+  }
+  $count = 0;
+  foreach ($pids as $pid) {
+    if (islandora_bibliography_store_citation($pid)) {
+      $count++;
     }
   }
+  $form_state['storage'] = NULL;
+  drupal_set_message(t('Added %num Citation(s)', array('%num' => $count)));
 }
 
 function scholar_search_results_form_export(array $form, array &$form_state) {

@@ -585,9 +585,14 @@ function islandora_bibliography_export_citations(array $pids, $style, $file_form
  */
 function islandora_bibliography_store_citation($pid, $uid = NULL) {
   $uid = _islandora_bibliography_get_uid($uid);
-  return (_islandora_bibliography_is_user_anonymous($uid)) ?
-      _islandora_bibliography_store_pid_in_session($pid) :
-      _islandora_bibliography_store_pid_in_database($pid, $uid);
+  if (islandora_bibliography_is_citation_stored($pid, $uid)) {
+    return FALSE;
+  }
+  else {
+    return (_islandora_bibliography_is_user_anonymous($uid)) ?
+        _islandora_bibliography_store_pid_in_session($pid) :
+        _islandora_bibliography_store_pid_in_database($pid, $uid);
+  }
 }
 
 /**
