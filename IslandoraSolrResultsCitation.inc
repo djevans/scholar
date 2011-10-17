@@ -90,6 +90,11 @@ function template_preprocess_scholar_search_item(array &$variables) {
 }
 
 function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProcessor $query_processor) {
+  if(isset($_SESSION['bibliography']['export']['file'])) {
+    
+    $path = MENU_BIBLIOGRAPHY_EXPORT;
+    drupal_set_html_head("<meta http-equiv='refresh' content='0;url=/$path'/>");
+  }
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $results = $query_processor->solrResult;
   $total = (int) $results->response->numFound;

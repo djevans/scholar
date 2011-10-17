@@ -60,27 +60,31 @@ function islandora_bibliography_theme() {
  * Export many citations in a particular format and redirect the user to another page.
  */
 function islandora_bibliography_export() {
-  global $base_url;
   $filename = isset($_SESSION['bibliography']['export']['file']) ? $_SESSION['bibliography']['export']['file'] : NULL;
   $redirect = isset($_SESSION['bibliography']['export']['redirect']) ? $_SESSION['bibliography']['export']['redirect'] : NULL;
-  if ($filename && $redirect) {
-    $url = $base_url . '/' . $redirect;
+  if (file_exists($filename)) {
     $file_size = filesize($filename);
     header("Content-type: application/x-Research-Info-Systems");
     header("Content-length: $file_size");
     header("Content-Disposition: attachment; filename=\"results.ris\"");
     header("Cache-control: private");
-    header("Location: $url");
-    $file = fopen($filename, 'rb');
-    if ($file) {
-      while (!feof($file) and (connection_status() == 0)) {
-        echo(fread($file, 1024 * 2));
-        flush();
-      }
-      fclose($file);
+    $curl_handle = curl_init();
+    if ($curl_handle !== FALSE) {
+      global $base_url;
+      $url = $base_url . '/' . $filename;
+      curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, FALSE);
+      curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, FALSE);
+      curl_setopt($curl_handle, CURLOPT_FAILONERROR, 1); // Fail on errors
+      curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, 1); // allow redirects
+      curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/4.0 pp(compatible; MSIE 5.01; Windows NT 5.0)");
+      curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 0); // return into a variable
+      curl_setopt($curl_handle, CURLOPT_URL, $url);
     }
+    curl_exec($curl_handle);
+    curl_close($curl_handle);
+    unset($_SESSION['bibliography']['export']);
   }
-  drupal_goto($redirect);
+  //drupal_goto($redirect);
 }
 
 /**
@@ -532,7 +536,6 @@ function _islandora_bibliography_convert_mods_to_ris($filename, $redirect, array
 function _islandora_bibliography_export_citations($successful, array $results, array $operations) {
   $_SESSION['bibliography']['export']['file'] = $results['file'];
   $_SESSION['bibliography']['export']['redirect'] = $results['redirect'];
-  drupal_goto(MENU_BIBLIOGRAPHY_EXPORT);
 }
 
 /**
