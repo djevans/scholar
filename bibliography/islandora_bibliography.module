@@ -82,9 +82,8 @@ function islandora_bibliography_export() {
     }
     curl_exec($curl_handle);
     curl_close($curl_handle);
-    unset($_SESSION['bibliography']['export']);
   }
-  //drupal_goto($redirect);
+  unset($_SESSION['bibliography']['export']);
 }
 
 /**
