@@ -104,7 +104,7 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
   foreach ($styles as $file => $name) {
     $style = drupal_get_path('module', 'citeproc') . '/data/' . $file;
     list($id, $html) = $model->getCitation($style);
-    $variables['citation'][] = $html ;
+    $variables['citation'][] = $html;
     $variables['styles'][$id] = $name;
   }
   // Abstract

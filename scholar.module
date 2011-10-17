@@ -393,6 +393,32 @@ function scholar_form_content_model_viewer_ingest_metadata_form_alter(array &$fo
   }
 }
 
+function scholar_form_content_model_viewer_edit_metadata_form_alter(array &$form, array &$form_state) {
+  if ($form_state['storage']['step'] == 2) {
+    $pid = $form['pid']['#value'];
+    $item = new Fedora_Item($pid);
+    if ($item->exists() && isset($item->datastreams['MODS'])) {
+      $mods = $item->get_datastream_dissemination('MODS');
+      $mods = trim($mods);
+      if (!empty($mods)) {
+        $doc = new DOMDocument();
+        $doc->loadXML($mods);
+        $style = citeproc_style(drupal_get_path('module', 'citeproc') . '/data/apa.csl');
+        $bibliography = citeproc_bibliography_from_mods($style, $doc);
+      }
+    }
+    $title = array(
+      '#prefix' => '<h3>',
+      '#value' => $form_state['values']['forms'],
+      '#suffix' => '</h3>'
+    );
+    $citation = array('#value' => $bibliography->render());
+    array_unshift($form, $citation);
+    array_unshift($form, $title);
+    $form['#attributes'] = array('enctype' => 'multipart/form-data'); // Allow the uploading of files.
+  }
+}
+
 /**
  * Performs a bulk ingestion.
  * 

@@ -195,7 +195,7 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
  * Check to see if some thing has been selected.
  */
 function scholar_search_results_form_validate(array $form, array &$form_state) {
-  
+  // @todo prevent submission with more then.
 }
 
 /**
