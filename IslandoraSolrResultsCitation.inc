@@ -184,6 +184,9 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
       '#value' => t('Save Selected'),
       '#submit' => array('scholar_search_results_form_save_to_bibliography')
     ),
+    'pager' => array(
+      '#value' => theme('pager', null, $query_processor->solrLimit, 0, null, 5)
+    ),
     'table' => $table,
   );
 }
