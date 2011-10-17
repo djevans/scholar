@@ -25,19 +25,16 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $total = (int) $query_processor->solrResult->response->numFound;
     $output = '<h4>Advanced Search</h4>';
     $output .= drupal_get_form('scholar_search_form');
-
     if ($total === 0) {
       $output .= "<h2>Search Results</h2>";
       $output .= "<div>Sorry, but your search returned no results.</div>";
       return $output;
     }
     islandora_solr_search_pager_init($total, $query_processor->solrLimit);
-
     $output .= '<div class="content">';
-    $output .= drupal_get_form('scholar_search_results_form', $query_processor); //$this->printResults($query_processor->solrResult);
-// Render Drupal pager (bottom of search results)
+    $output .= drupal_get_form('scholar_search_results_form', $query_processor);
     $output .= theme('pager', null, $query_processor->solrLimit, 0, null, 5);
-    $output .= "</div>"; // class = "content"
+    $output .= "</div>";
     return $output;
   }
 
@@ -104,8 +101,6 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
     '#theme' => 'scholar_search_results_table',
     '#tree' => TRUE,
   );
-  $record_start = $results->response->start;
-  $limit_results = variable_get('islandora_solr_search_limit_result_fields', 0);
   $style_filename = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
   $style = citeproc_style($style_filename);
   $pids = array();
@@ -127,25 +122,7 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
     '#type' => 'checkboxes',
     '#options' => $checkboxes,
   );
-  /**
-   * Export
-   *   -Selected
-   *   -All
-   * 
-   * Export to File (only no rendering on screen)
-   *   -File Format (RIS, PDF, RTF)
-   *
-   * Citation Style (Only shows for PDF RTF) ?
-   *   - APA, NIH, NLM, Annotated
-   * 
-   *  -- Export to File-----------
-   *  |
-   *  | File Format [RIS]   Citation Style [APA]  "Selected Results" "All Results"
-   * 
-   * Save to Bibliography
-   *   -Selected
-   *   -All
-   */
+  $form_state['storage']['query'] = $query_processor;
   return array(
     'export' => array(
       '#value' => t('Export To File'),
@@ -175,12 +152,16 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
     'export all' => array(
       '#type' => 'submit',
       '#action' => 'export',
+      '#export' => 'all',
       '#value' => t('Export All Results'),
+      '#submit' => array('scholar_search_results_form_export')
     ),
     'export selected' => array(
       '#type' => 'submit',
       '#action' => 'export',
+      '#export' => 'selected',
       '#value' => t('Export Selected'),
+      '#submit' => array('scholar_search_results_form_export')
     ),
     'save' => array(
       '#value' => t('Save to Bibliography'),
@@ -189,40 +170,45 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
     ),
     'save all' => array(
       '#type' => 'submit',
-      '#action' => 'export',
+      '#save' => 'all',
       '#value' => t('Save All Results'),
+      '#submit' => array('scholar_search_results_form_save_to_bibliography')
     ),
     'save selected' => array(
       '#type' => 'submit',
-      '#action' => 'export',
+      '#save' => 'selected',
       '#value' => t('Save Selected'),
+      '#submit' => array('scholar_search_results_form_save_to_bibliography')
     ),
     'table' => $table,
   );
-  return array(
-    'table' => $table
-  );
-  /* module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    if (empty($results)) {
-    return "no results";
-    }
-    $output = '';
-    $record_start = $results->response->start;
-    $limit_results = variable_get('islandora_solr_search_limit_result_fields', 0);
-    $style_filename = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
-    $style = citeproc_style($style_filename);
-    foreach ($results->response->docs as $doc) {
-    $pid = $doc->PID;
-    $item = new Fedora_Item($pid);
-    if ($item->exists() && isset($item->datastreams['MODS'])) {
-    $output .= theme(THEME_SCHOLAR_SEARCH_ITEM, $pid, $style);
-    }
-    }
-    return $output;
-   */
 }
 
-function scholar_search_results_form_submit(array &$form_state, Apache_Solr_Response $results) {
+function scholar_search_results_form_save_to_bibliography(array $form, array &$form_state) {
+  $action = $form_state['clicked_button']['#save'];
+  if ($action == 'all') {
+    $query_processor = $form_state['storage']['query'];
+    $previous_limit = $query_processor->solrLimit;
+    $query_processor->solrLimit = 10000;
+    $query_processor->solrParams['fl'] = 'PID';
+    $query_processor->executeQuery();
+    unset($query_processor->solrParams['fl']);
+    $query_processor->solrLimit = $previous_limit;
+    $results = $query_processor->solrResult;
+    foreach ($results->response->docs as $doc) {
+      islandora_bibliography_store_citation($doc->PID);
+    }
+  }
+  else {
+    $selections = $form_state['values']['table']['selections'];
+    $selections = array_filter($selections);
+    foreach ($selections as $pid => $selected) {
+      islandora_bibliography_store_citation($pid);
+    }
+  }
+}
+
+function scholar_search_results_form_export(array $form, array &$form_state) {
   
 }
 
