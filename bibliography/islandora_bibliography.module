@@ -5,6 +5,13 @@
  *
  * Implements hooks and callbacks for this module.
  */
+/**
+ * Constants Permission/Menu/Theme
+ */
+define('MENU_BIBLIOGRAPHY_HOME', 'bibliography');
+define('MENU_BIBLIOGRAPHY_CITATION', 'bibliography/citation');
+define('MENU_BIBLIOGRAPHY_EXPORT', 'bibliography/export');
+define('THEME_BIBLIOGRAPHY_FORM_TABLE', 'islandora_bibliography_form_table');
 
 /**
  * The menu entries for this module.
@@ -14,7 +21,7 @@
  */
 function islandora_bibliography_menu() {
   $items = array();
-  $items['bibliography'] = array(
+  $items[MENU_BIBLIOGRAPHY_HOME] = array(
     'title' => 'My Bibliography',
     'description' => 'Here you can remove or export citations from your bibliography.',
     'page callback' => 'drupal_get_form',
@@ -22,9 +29,14 @@ function islandora_bibliography_menu() {
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['bibliography/citation'] = array(
+  $items[MENU_BIBLIOGRAPHY_CITATION] = array(
     'page callback' => 'drupal_get_form',
     'page arguments' => array('islandora_bibliography_citation_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items[MENU_BIBLIOGRAPHY_EXPORT] = array(
+    'page callback' => 'islandora_bibliography_export',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
   );
@@ -38,10 +50,37 @@ function islandora_bibliography_menu() {
  */
 function islandora_bibliography_theme() {
   return array(
-    'islandora_bibliography_form_table' => array(
+    THEME_BIBLIOGRAPHY_FORM_TABLE => array(
       'arguments' => array('element' => NULL)
     )
   );
+}
+
+/**
+ * Export many citations in a particular format and redirect the user to another page.
+ */
+function islandora_bibliography_export() {
+  global $base_url;
+  $filename = isset($_SESSION['bibliography']['export']['file']) ? $_SESSION['bibliography']['export']['file'] : NULL;
+  $redirect = isset($_SESSION['bibliography']['export']['redirect']) ? $_SESSION['bibliography']['export']['redirect'] : NULL;
+  if ($filename && $redirect) {
+    $url = $base_url . '/' . $redirect;
+    $file_size = filesize($filename);
+    header("Content-type: application/x-Research-Info-Systems");
+    header("Content-length: $file_size");
+    header("Content-Disposition: attachment; filename=\"results.ris\"");
+    header("Cache-control: private");
+    header("Location: $url");
+    $file = fopen($filename, 'rb');
+    if ($file) {
+      while (!feof($file) and (connection_status() == 0)) {
+        echo(fread($file, 1024 * 2));
+        flush();
+      }
+      fclose($file);
+    }
+  }
+  drupal_goto($redirect);
 }
 
 /**
@@ -60,7 +99,7 @@ function islandora_bibliography_theme() {
  */
 function islandora_bibliography_form(array &$form_state) {
   global $base_path;
-  // Assume these pids came from the database.
+// Assume these pids came from the database.
   $pids = islandora_bibliography_get_citations();
   if (empty($pids)) {
     drupal_set_message(t('You have no citations in your bibliography.'));
@@ -77,7 +116,7 @@ function islandora_bibliography_form(array &$form_state) {
     $checkboxes = array_fill_keys($pids, '');
     $table = array(
       '#header' => array(theme('table_select_header_cell'), t('Title'), t('Author(s)'), ''),
-      '#theme' => 'islandora_bibliography_form_table',
+      '#theme' => THEME_BIBLIOGRAPHY_FORM_TABLE,
       '#tree' => TRUE,
       'selections' => array(
         '#type' => 'checkboxes',
@@ -448,6 +487,88 @@ function _islandora_bibliography_get_citations_from_database($uid) {
 function _islandora_bibliography_get_citations_from_session() {
   $_SESSION['islandora_bibliography'] = isset($_SESSION['islandora_bibliography']) ? $_SESSION['islandora_bibliography'] : array();
   return $_SESSION['islandora_bibliography'];
+}
+
+/**
+ *
+ * @param array $pids
+ * @param array $context 
+ */
+function _islandora_bibliography_batch_combine_mods($filename, $pid, array &$context) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $mods = new DOMDocument();
+  $mods->load($filename);
+  $item = new Fedora_Item($pid);
+  if ($item->exists() && isset($item->datastreams['MODS'])) {
+    $datastream = $item->get_datastream_dissemination('MODS');
+    $datastream = trim($datastream);
+    if (!empty($mods)) {
+      $doc = new DOMDocument();
+      $doc->loadXML($datastream);
+      $node = $mods->importNode($doc->documentElement, TRUE);
+      $mods->documentElement->appendChild($node);
+      $mods->save($filename);
+    }
+  }
+}
+
+/**
+ * 
+ * @param array $pids
+ * @param string $redirect
+ * @param array $context 
+ */
+function _islandora_bibliography_convert_mods_to_ris($filename, $redirect, array &$context) {
+  $context['results']['file'] = bibutils_mods_file_to_ris_document($filename);
+  $context['results']['redirect'] = $redirect;
+}
+
+/**
+ *
+ * @param boolean $successful
+ * @param array $results
+ * @param array $operations 
+ */
+function _islandora_bibliography_export_citations($successful, array $results, array $operations) {
+  $_SESSION['bibliography']['export']['file'] = $results['file'];
+  $_SESSION['bibliography']['export']['redirect'] = $results['redirect'];
+  drupal_goto(MENU_BIBLIOGRAPHY_EXPORT);
+}
+
+/**
+ *
+ * @param array $pids
+ * @param type $style
+ * @param string $file_format 
+ *   Either pdf, rtf, ris, if null display to screen.
+ */
+function islandora_bibliography_export_citations(array $pids, $style, $file_format = NULL) {
+  $operations = array();
+  switch ($file_format) {
+    case 'RIS':
+      $temp_file_dir = file_directory_temp();
+      $temp_file = file_create_filename("mods.xml", $temp_file_dir);
+      $mods = new DOMDocument();
+      $mods->loadXML('<modsCollection xmlns="http://www.loc.gov/mods/v3" />');
+      $mods->save($temp_file);
+      foreach ($pids as $pid) {
+        $operations[] = array('_islandora_bibliography_batch_combine_mods', array($temp_file, $pid));
+      }
+      $operations[] = array('_islandora_bibliography_convert_mods_to_ris', array($temp_file, $_GET['q']));
+      break;
+    case 'RTF':
+      break;
+    case 'PDF':
+      break;
+  }
+  if (count($operations) > 0) {
+    $batch = array(
+      'title' => t('Exporting File'),
+      'operations' => $operations,
+      'finished' => '_islandora_bibliography_export_citations'
+    );
+    batch_set($batch);
+  }
 }
 
 /**

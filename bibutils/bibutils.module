@@ -178,3 +178,27 @@ function bibutils_ris_file_to_mods_documents($filename) {
       _split_mods_collection_into_mulitiple_documents($mods) :
       FALSE;
 }
+
+/**
+ * Converts a MODS document to a RIS document.
+ * 
+ * @param string $filename
+ *   The filename of the MODS document.
+ * @return DOMDocument
+ *   The
+ */
+function bibutils_mods_file_to_ris_document($filename) {
+  $command = 'xml2ris ' . $filename . ' 2>&-';
+  list($return_value, $output) = _bibutils_execute_command($command);
+  $successful = $return_value === 0;
+  if ($successful && !empty($output)) { // Successfully executed the command.
+    $temp_file_dir = file_directory_temp();
+    $temp_file_name = file_create_filename("ris.ris", $temp_file_dir);
+    $file = fopen($temp_file_name, 'w');
+    fwrite($file, $output);
+    fclose($handle);
+    return $temp_file_name;
+  }
+  drupal_set_message(t('Could not convert to RIS. %command', array('%command' => $command)), 'error');
+  return FALSE;
+}

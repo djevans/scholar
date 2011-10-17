@@ -48,7 +48,7 @@ function command_exists($name) {
  */
 function bibutils_requirements($phase) {
   $requriements = array();
-  $commands = array('ris2xml', 'endx2xml', 'modsclean');
+  $commands = array('ris2xml', 'endx2xml', 'xml2ris');
   foreach ($commands as $command) {
     $title = t('%command in $PATH', array('%command' => $command));
     if (command_exists($command)) { // Exists on $PATH

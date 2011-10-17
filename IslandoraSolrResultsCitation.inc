@@ -184,19 +184,28 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
   );
 }
 
+function _scholar_search_get_all_pids_from_query(array &$form_state) {
+  $query_processor = $form_state['storage']['query'];
+  $previous_limit = $query_processor->solrLimit;
+  $query_processor->solrLimit = 100000;
+  $query_processor->solrParams['fl'] = 'PID';
+  $query_processor->executeQuery();
+  unset($query_processor->solrParams['fl']);
+  $query_processor->solrLimit = $previous_limit;
+  $results = $query_processor->solrResult;
+  $pids = array();
+  foreach ($results->response->docs as $doc) {
+    $pids[] = $doc->PID;
+  }
+  return $pids;
+}
+
 function scholar_search_results_form_save_to_bibliography(array $form, array &$form_state) {
   $action = $form_state['clicked_button']['#save'];
   if ($action == 'all') {
-    $query_processor = $form_state['storage']['query'];
-    $previous_limit = $query_processor->solrLimit;
-    $query_processor->solrLimit = 10000;
-    $query_processor->solrParams['fl'] = 'PID';
-    $query_processor->executeQuery();
-    unset($query_processor->solrParams['fl']);
-    $query_processor->solrLimit = $previous_limit;
-    $results = $query_processor->solrResult;
-    foreach ($results->response->docs as $doc) {
-      islandora_bibliography_store_citation($doc->PID);
+    $pids = _scholar_search_get_all_pids_from_query($form_state);
+    foreach ($pids as $pid) {
+      islandora_bibliography_store_citation($pid);
     }
   }
   else {
@@ -209,7 +218,17 @@ function scholar_search_results_form_save_to_bibliography(array $form, array &$f
 }
 
 function scholar_search_results_form_export(array $form, array &$form_state) {
-  
+  $action = $form_state['clicked_button']['#export'];
+  $form_state['redirect'] = $_GET['q'];
+  if ($action == 'all') {
+    $pids = _scholar_search_get_all_pids_from_query($form_state);
+    islandora_bibliography_export_citations($pids, NULL, 'RIS');
+  }
+  else {
+    $selections = array_filter($form_state['values']['table']['selections']);
+    $pids = array_keys($selections);
+    islandora_bibliography_export_citations($pids, NULL, 'RIS');
+  }
 }
 
 /**
