@@ -196,7 +196,7 @@ function bibutils_mods_file_to_ris_document($filename) {
     $temp_file_name = file_create_filename("ris.ris", $temp_file_dir);
     $file = fopen($temp_file_name, 'w');
     fwrite($file, $output);
-    fclose($handle);
+    fclose($file);
     return $temp_file_name;
   }
   drupal_set_message(t('Could not convert to RIS. %command', array('%command' => $command)), 'error');
