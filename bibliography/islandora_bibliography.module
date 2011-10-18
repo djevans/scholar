@@ -622,8 +622,10 @@ function islandora_bibliography_export_citations(array $pids, $style, $file_form
       $operations[] = array('_islandora_bibliography_convert_mods_to_ris', array($temp_file, $_GET['q']));
       break;
     case 'RTF':
+      
       break;
     case 'PDF':
+      
       break;
   }
   if (count($operations) > 0) {
