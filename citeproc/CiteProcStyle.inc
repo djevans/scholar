@@ -11,7 +11,7 @@
 /**
  * Models a Style
  */
-class CiteProcStyle {
+class CiteProcJSStyle {
 
   /**
    * Uniquely identifies this object
@@ -34,7 +34,7 @@ class CiteProcStyle {
     module_load_include('inc', 'citeproc', 'CiteProc');
     $this->id = uniqid();
     $this->data = $style->saveXML();
-    $citeproc = CiteProc::getInstance();
+    $citeproc = CiteProcJS::getInstance();
     $citeproc->addStyle($this);
   }
 

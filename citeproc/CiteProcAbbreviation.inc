@@ -10,7 +10,7 @@
  * Models a citeproc-js abbreviation data structure. This must be registered with the CiteProc singleton to be included
  * on the rendered page.
  */
-class CiteProcAbbreviation {
+class CiteProcJSAbbreviation {
 
   /**
    * A unique identifier for this object.

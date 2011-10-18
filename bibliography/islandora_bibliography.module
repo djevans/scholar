@@ -291,7 +291,7 @@ function _islandora_bibliography_form_preview_selections(array $selections, $sty
   drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/export.css');
   $style_filename = drupal_get_path('module', 'citeproc') . '/data/' . $style;
   $style = citeproc_style($style_filename);
-  $bibliography = new CiteProcBibliography($style);
+  $bibliography = new CiteProcJSBibliography($style);
   $selections = array_filter($selections);
   foreach ($selections as $pid => $selected) {
     $item = new Fedora_Item($pid);

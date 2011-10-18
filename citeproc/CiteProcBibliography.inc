@@ -14,7 +14,7 @@ module_load_include('inc', 'citeproc', 'CiteProcAbbreviation');
 /**
  * Models a Citation.
  */
-class CiteProcBibliography {
+class CiteProcJSBibliography {
 
   /**
    * Uniquely identifies this object
@@ -51,7 +51,7 @@ class CiteProcBibliography {
    * @param CiteProcAbbreviation $abbreviation
    *   Any abbreviations we wan't to apply.
    */
-  public function __construct(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL) {
+  public function __construct(CiteProcJSStyle $style, CiteProcJSAbbreviation $abbreviation = NULL) {
     $this->id = uniqid();
     $this->style = $style;
     $this->abbreviation = $abbreviation;
@@ -81,7 +81,7 @@ class CiteProcBibliography {
    * @param CiteProcCitation $citation
    *   The item to add to this citation.
    */
-  public function addCitation(CiteProcCitation $citation) {
+  public function addCitation(CiteProcJSCitation $citation) {
     $citation_id = $citation->getID();
     $this->citations[$citation_id] = $citation;
   }
@@ -119,7 +119,7 @@ class CiteProcBibliography {
    */
   public function render() {
     module_load_include('inc', 'citeproc', 'CiteProc');
-    $citeproc = CiteProc::getInstance();
+    $citeproc = CiteProcJS::getInstance();
     $citeproc->addBibliography($this);
     return '<div id="' . $this->id . '" class="citeproc-bibliography">[Page generation failure.  The bibliography processor requires a browser with Javascript enabled.]</div>';
   }

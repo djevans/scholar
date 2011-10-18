@@ -10,7 +10,7 @@
 /**
  * Singleton, for storing the data and citation items.
  */
-class CiteProc {
+class CiteProcJS {
 
   /**
    * The default locale. This local is always loaded.
@@ -77,7 +77,7 @@ class CiteProc {
   public static function getInstance() {
     static $instance = NULL;
     if ($instance === NULL) {
-      $instance = new CiteProc();
+      $instance = new CiteProcJS();
     }
     return $instance;
   }
@@ -131,7 +131,7 @@ class CiteProc {
    * @param CiteProcAbbreviation $abbreviation
    *   The abbreviation to register.
    */
-  public function addAbbreviation(CiteProcAbbreviation $abbreviation) {
+  public function addAbbreviation(CiteProcJSAbbreviation $abbreviation) {
     $data = array(
       'abbreviation' => array(
         $item->id => $item->toJSON()
@@ -149,7 +149,7 @@ class CiteProc {
    * @param CiteProcItem $item
    *   The item to register.
    */
-  public function addItem(CiteProcItem $item) {
+  public function addItem(CiteProcJSItem $item) {
     $id = $item->getID();
     $json = $item->toJSON();
     $data = array('item' => array($id => $json));
@@ -200,7 +200,7 @@ class CiteProc {
    * @param DOMDocument $style
    *   The CSL style definition. Must be CSL version 1.0.
    */
-  public function addStyle(CiteProcStyle $style) {
+  public function addStyle(CiteProcJSStyle $style) {
     $data = array('style' => array($style->getID() => $style->toJSON()));
     $this->storeInSettings($data);
   }
@@ -208,7 +208,7 @@ class CiteProc {
   /**
    * This function is used by the CiteProcBibliography, and shouldn't be used by any other class.
    */
-  public function addBibliography(CiteProcBibliography $bibliography) {
+  public function addBibliography(CiteProcJSBibliography $bibliography) {
     // Only one supported for the moment.
     $id = $bibliography->getID();
     $json = $bibliography->toJSON();

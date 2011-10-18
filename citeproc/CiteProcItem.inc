@@ -12,7 +12,7 @@
  * Models a citeproc-js item data structure. This must be registered with the CiteProc singleton to be included
  * on the rendered page.
  */
-class CiteProcItem {
+class CiteProcJSItem {
 
   /**
    * A unique identifier for this object.

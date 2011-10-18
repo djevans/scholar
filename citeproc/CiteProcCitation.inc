@@ -14,7 +14,7 @@ module_load_include('inc', 'citeproc', 'CiteProcAbbreviation');
 /**
  * Models a Citation.
  */
-class CiteProcCitation {
+class CiteProcJSCitation {
 
   /**
    * Uniquely identifies this object
@@ -72,12 +72,12 @@ class CiteProcCitation {
    *      prefix: a string to print before this cite item;
    *      suffix: a string to print after this cite item.
    */
-  public function addItem(CiteProcItem $item, array $config = array()) {
+  public function addItem(CiteProcJSItem $item, array $config = array()) {
     module_load_include('inc', 'citeproc', 'CiteProc');
     $item_id = $item->getID();
     $data = array('id' => $item_id);
     $this->items[] = array_merge($data, $config);
-    $citeproc = CiteProc::getInstance();
+    $citeproc = CiteProcJS::getInstance();
     $citeproc->addItem($item);
   }
 
@@ -109,7 +109,7 @@ class CiteProcCitation {
    * @return string
    *   An html string where the in-text citation will be rendered into.
    */
-  public function render(CiteProcStyle $style, CiteProcAbbreviation $abbreviation = NULL, $note_index = 0) {
+  public function render(CiteProcJSStyle $style, CiteProcJSAbbreviation $abbreviation = NULL, $note_index = 0) {
     /**
      * @todo Create render object determine how to deal with the difference of interfaces
      * This will only get populated if CiteProcBibliography::render() gets called.
