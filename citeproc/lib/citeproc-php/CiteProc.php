@@ -328,9 +328,18 @@ class csl_format extends csl_rendering_element {
     }
 
     if (!empty($this->format) || !empty($this->span_class)) {
+      /**
+       * Nigelb edits.
+       */
       $style = (!empty($this->format)) ? 'style="' . $this->format . '" ' : '';
-      $class = (!empty($this->span_class)) ? 'class="' . $this->span_class . '"' : '';
-      $text = '<span ' . $class . $style . '>' . $text . '</span>';
+      $class = (!empty($this->span_class)) ? 'class="' . $this->span_class . '"' : ''; 
+      //$text = '<span ' . $class . $style . '>' . $text . '</span>';
+      //var_dump($this->format);
+      switch($this->format) {
+        case 'font-style: italic;':
+          $text = '<i>' . $text . '</i>';
+          break;
+      }
     }
     $div_class = $div_style = '';
     if (!empty($this->div_class)) {
@@ -340,7 +349,11 @@ class csl_format extends csl_rendering_element {
        $div_style =  'style="text-indent: 0px; padding-left: 45px;"';
     }
     if ($div_class || $div_style) {
-      return '<div ' . $div_class . $div_style . '>' . $prefix . $text . $suffix . '</div>';
+      /**
+       * Nigelb edits.
+       */
+      return $prefix . $text . $suffix;
+      //return '<div ' . $div_class . $div_style . '>' . $prefix . $text . $suffix . '</div>';
     }
 
     return $prefix . $text . $suffix;
@@ -1277,7 +1290,7 @@ class csl_bibliography  extends csl_format {
   function render($data, $mode = NULL) {
     $text = $this->layout->render($data, 'bibliography');
     if ($this->{'hanging-indent'} == 'true') {
-      $text = '<div style="  text-indent: -25px; padding-left: 25px;">' . $text . '</div>';
+      //$text = '<div style="  text-indent: -25px; padding-left: 25px;">' . $text . '</div>';
     }
     $text = str_replace('?.', '?', str_replace('..', '.', $text));
     return $this->format($text);

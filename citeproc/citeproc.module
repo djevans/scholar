@@ -23,7 +23,7 @@ function citeproc_citation_from_mods(DOMDocument $mods) {
   return $citation;
 }
 
-function citeproc_bibliography_from_mods(CiteProcJSStyle $style, DOMDocument $mods) {
+function citeproc_bibliography_from_mods(CiteProcJStyle $style, DOMDocument $mods) {
   module_load_include('inc', 'citeproc', 'CiteProcBibliography');
   $citation = citeproc_citation_from_mods($mods);
   $bibliography = new CiteProcJSBibliography($style);

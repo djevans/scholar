@@ -5,6 +5,7 @@ dependencies[] = content_model_viewer
 dependencies[] = citeproc
 dependencies[] = islandora_bibliography
 dependencies[] = bibutils
+dependencies[] = biblio
 description = Shows a list of items in a fedora collection, specific to scholarly publications
 package = Fedora Repository
 version = 6.x-$Format:%h$-dev
