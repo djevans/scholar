@@ -49,9 +49,9 @@ class CitationModel extends AbstractModel {
    * Adds all of the required javascript/css/etc that this model needs to be shown.
    */
   public function addRequiredResources() {
-    module_load_include('inc', 'citeproc', 'CiteProc');
+    module_load_include('inc', 'citeproc', 'CiteProcJS');
     drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Record.css');
-    CiteProc::addResources(); // Includes javascript and other fun things.
+    CiteProcJS::addResources(); // Includes javascript and other fun things.
   }
 
   /**

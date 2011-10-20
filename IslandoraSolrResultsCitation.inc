@@ -53,8 +53,9 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $output = '';
     $record_start = $results->response->start;
     $limit_results = variable_get('islandora_solr_search_limit_result_fields', 0);
-    $style_filename = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
-    $style = citeproc_style($style_filename);
+    module_load_include('inc', 'csl', 'CSL');
+    $styles = CSL::GetNames();
+    $style = citeproc_style('APA');
     foreach ($results->response->docs as $doc) {
       $pid = $doc->PID;
       $item = new Fedora_Item($pid);
@@ -105,8 +106,10 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
     '#theme' => 'scholar_search_results_table',
     '#tree' => TRUE,
   );
-  $style_filename = drupal_get_path('module', 'citeproc') . '/data/apa.csl';
-  $style = citeproc_style($style_filename);
+  
+  module_load_include('inc', 'csl', 'CSL');
+  $styles = CSL::GetNames();
+  $style = citeproc_style('APA');//array_shift($styles));
   $pids = array();
   foreach ($results->response->docs as $doc) {
     $pid = $doc->PID;
@@ -220,6 +223,7 @@ function _scholar_search_get_all_pids_from_query(array &$form_state) {
 }
 
 function scholar_search_results_form_save_to_bibliography(array $form, array &$form_state) {
+  module_load_include('inc', 'islandora_bibliography', 'Bibliography');
   $action = $form_state['clicked_button']['#save'];
   if ($action == 'all') {
     $pids = _scholar_search_get_all_pids_from_query($form_state);
@@ -229,12 +233,7 @@ function scholar_search_results_form_save_to_bibliography(array $form, array &$f
     $pids = array_filter($pids);
     $pids = array_keys($pids);
   }
-  $count = 0;
-  foreach ($pids as $pid) {
-    if (islandora_bibliography_store_citation($pid)) {
-      $count++;
-    }
-  }
+  $count = Bibliography::AddCitations($pids);
   $form_state['storage'] = NULL;
   drupal_set_message(t('Added %num Citation(s)', array('%num' => $count)));
 }
