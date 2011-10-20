@@ -31,7 +31,7 @@ class CiteProcJSStyle {
    * Create a CiteProcStyle instance.
    */
   public function __construct(DOMDocument $style) {
-    module_load_include('inc', 'citeproc', 'CiteProc');
+    module_load_include('inc', 'citeproc', 'CiteProcJS');
     $this->id = uniqid();
     $this->data = $style->saveXML();
     $citeproc = CiteProcJS::getInstance();

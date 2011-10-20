@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://purl.org/net/xbiblio/csl" xmlns:cs="http://purl.org/net/xbiblio/csl">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:simpleType name="cs-names">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="author"/>
+      <xs:enumeration value="collection-editor">
+        <xs:annotation>
+          <xs:documentation>use for series editor</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="composer"/>
+      <xs:enumeration value="container-author">
+        <xs:annotation>
+          <xs:documentation>use for book author when citing a book chapter</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="editor"/>
+      <xs:enumeration value="editorial-director"/>
+      <xs:enumeration value="interviewer"/>
+      <xs:enumeration value="original-author"/>
+      <xs:enumeration value="recipient"/>
+      <xs:enumeration value="translator"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="cs-dates">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="accessed"/>
+      <xs:enumeration value="container"/>
+      <xs:enumeration value="event-date"/>
+      <xs:enumeration value="issued"/>
+      <xs:enumeration value="original-date"/>
+      <xs:enumeration value="submitted"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="cs-numbers">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="edition"/>
+      <xs:enumeration value="issue"/>
+      <xs:enumeration value="number"/>
+      <xs:enumeration value="number-of-volumes"/>
+      <xs:enumeration value="volume"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="cs-variables">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="abstract">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="annote">
+        <xs:annotation>
+          <xs:documentation>notes made by a reader about the content of the resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="archive">
+        <xs:annotation>
+          <xs:documentation>the name of the archive</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="archive_location">
+        <xs:annotation>
+          <xs:documentation>the location within an archival collection (for example, box and folder)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="archive-place">
+        <xs:annotation>
+          <xs:documentation>the place of the archive</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="authority">
+        <xs:annotation>
+          <xs:documentation>issuing authority (for patents) or judicial authority (such as court
+for legal cases)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="call-number">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="chapter-number">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="citation-number">
+        <xs:annotation>
+          <xs:documentation>the number used for the in-text citation mark in numeric styles</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="citation-label">
+        <xs:annotation>
+          <xs:documentation>the label used for the in-text citation mark in label styles</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="collection-number">
+        <xs:annotation>
+          <xs:documentation>collection number; for example, series number</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="collection-title">
+        <xs:annotation>
+          <xs:documentation>the tertiary title for the cited item; for example, a series title</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="container-title">
+        <xs:annotation>
+          <xs:documentation>the secondary title for the cited item (book title for book chapters,
+journal title for articles, etc.).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DOI">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="edition">
+        <xs:annotation>
+          <xs:documentation>an edition description</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="event">
+        <xs:annotation>
+          <xs:documentation>the name or title of a related event such as a conference or hearing</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="event-place">
+        <xs:annotation>
+          <xs:documentation>the location or place for the related event</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="first-reference-note-number">
+        <xs:annotation>
+          <xs:documentation>The number of a preceding note containing the first reference to this
+item. Relevant only for note-based styles, and null for first references.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="genre">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ISBN">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="issue">
+        <xs:annotation>
+          <xs:documentation>the issue number for the container publication</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="jurisdiction">
+        <xs:annotation>
+          <xs:documentation>For legislation and patents; scope of geographic relevance for a document.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="keyword">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="locator">
+        <xs:annotation>
+          <xs:documentation>a description to locate an item within some larger container or 
+collection; a volume or issue number is a kind of locator, for example.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="medium">
+        <xs:annotation>
+          <xs:documentation>medium description (DVD, CD, etc.)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="note">
+        <xs:annotation>
+          <xs:documentation>a short inline note, often used to refer to additional details of the resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="number">
+        <xs:annotation>
+          <xs:documentation>a document number; useful for reports and such</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="number-of-pages">
+        <xs:annotation>
+          <xs:documentation>refers to the number of pages in a book or other document</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="number-of-volumes">
+        <xs:annotation>
+          <xs:documentation>refers to the number of items in multi-volume books and such</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="original-publisher">
+        <xs:annotation>
+          <xs:documentation>the name of the original publisher</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="original-publisher-place">
+        <xs:annotation>
+          <xs:documentation>the place of the original publisher</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="original-title">
+        <xs:annotation>
+          <xs:documentation>title of a related original version; often useful in cases of translation</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="page">
+        <xs:annotation>
+          <xs:documentation>the range of pages an item covers in a containing item</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="page-first">
+        <xs:annotation>
+          <xs:documentation>the first page of an item within a containing item</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="publisher">
+        <xs:annotation>
+          <xs:documentation>the name of the publisher</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="publisher-place">
+        <xs:annotation>
+          <xs:documentation>the place of the publisher</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="references">
+        <xs:annotation>
+          <xs:documentation>for related referenced resources; used for legal case histories, but
+may be relevant for other contexts.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="section">
+        <xs:annotation>
+          <xs:documentation>a section description (for newspapers, etc.)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="status">
+        <xs:annotation>
+          <xs:documentation>the (typically publication) status of an item; for example "forthcoming"</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="title">
+        <xs:annotation>
+          <xs:documentation>the primary title for the cited item</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="URL">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="version">
+        <xs:annotation>
+          <xs:documentation/>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="volume">
+        <xs:annotation>
+          <xs:documentation>volume number for the container periodical</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="year-suffix">
+        <xs:annotation>
+          <xs:documentation>The year suffix for author-date styles; e.g. the 'a' in '1999a'.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

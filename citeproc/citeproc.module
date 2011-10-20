@@ -7,7 +7,7 @@
  */
 
 function citeproc_item_from_mods(DOMDocument $mods) {
-  module_load_include('inc', 'citeproc', 'CiteProcItem');
+  module_load_include('inc', 'citeproc', 'CiteProcJSItem');
   module_load_include('php', 'citeproc', 'generators/converter');
   $item = new CiteProcJSItem();
   $raw = convert_mods_to_citeproc_jsons($mods->saveXML());
@@ -16,15 +16,15 @@ function citeproc_item_from_mods(DOMDocument $mods) {
 }
 
 function citeproc_citation_from_mods(DOMDocument $mods) {
-  module_load_include('inc', 'citeproc', 'CiteProcCitation');
+  module_load_include('inc', 'citeproc', 'CiteProcJSCitation');
   $item = citeproc_item_from_mods($mods);
   $citation = new CiteProcJSCitation();
   $citation->addItem($item);
   return $citation;
 }
 
-function citeproc_bibliography_from_mods(CiteProcJStyle $style, DOMDocument $mods) {
-  module_load_include('inc', 'citeproc', 'CiteProcBibliography');
+function citeproc_bibliography_from_mods(CiteProcJSStyle $style, DOMDocument $mods) {
+  module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
   $citation = citeproc_citation_from_mods($mods);
   $bibliography = new CiteProcJSBibliography($style);
   $bibliography->addCitation($citation);
@@ -32,7 +32,7 @@ function citeproc_bibliography_from_mods(CiteProcJStyle $style, DOMDocument $mod
 }
 
 function citeproc_style($filename) {
-  module_load_include('inc', 'citeproc', 'CiteProcStyle');
+  module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
   $doc = new DOMDocument();
   $doc->load($filename);
   return new CiteProcJSStyle($doc);

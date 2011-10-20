@@ -60,15 +60,17 @@ function islandora_bibliography_theme() {
  * Export many citations in a particular format and redirect the user to another page.
  */
 function islandora_bibliography_export() {
-  $filename = isset($_SESSION['bibliography']['export']['filename']) ? $_SESSION['bibliography']['export']['filename'] : NULL;
-  $mime_type = isset($_SESSION['bibliography']['export']['mime_type']) ? $_SESSION['bibliography']['export']['mime_type'] : NULL;
-  $download_filename = isset($_SESSION['bibliography']['export']['download_filename']) ? $_SESSION['bibliography']['export']['download_filename'] : $filename;
-  $redirect = isset($_SESSION['bibliography']['export']['redirect']) ? $_SESSION['bibliography']['export']['redirect'] : NULL;
+  $export = isset($_SESSION['bibliography']['export']) ? $_SESSION['bibliography']['export'] : NULL;
+  $filename = isset($export['filename']) ? $export['filename'] : NULL;
+  $mime_type = isset($export['mime_type']) ? $export['mime_type'] : NULL;
+  $download_filename = isset($export['download_filename']) ? $export['download_filename'] : $filename;
+  $redirect = isset($export['redirect']) ? $export['redirect'] : NULL;
+  unset($_SESSION['bibliography']['export']);
   if (file_exists($filename)) {
     $file_size = filesize($filename);
     header("Content-type: $mime_type");
     header("Content-length: $file_size");
-    header("Content-Disposition: attachment; filename=\"$download_filename");
+    header("Content-Disposition: attachment; filename=\"$download_filename\"");
     header("Cache-control: private");
     $curl_handle = curl_init();
     if ($curl_handle !== FALSE) {
@@ -85,7 +87,10 @@ function islandora_bibliography_export() {
     curl_exec($curl_handle);
     curl_close($curl_handle);
   }
-  unset($_SESSION['bibliography']['export']);
+  else {
+    drupal_goto($redirect);
+    exit();
+  }
 }
 
 /**
@@ -105,7 +110,7 @@ function islandora_bibliography_export() {
 function islandora_bibliography_form(array &$form_state) {
   global $base_path;
   drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/bibliography.css');
-  if (isset($_SESSION['bibliography']['export']['file'])) {
+  if (isset($_SESSION['bibliography']['export'])) {
     $path = MENU_BIBLIOGRAPHY_EXPORT;
     drupal_set_html_head("<meta http-equiv='refresh' content='0;url=/$path'/>");
   }
@@ -173,7 +178,7 @@ function islandora_bibliography_form(array &$form_state) {
           '#type' => 'select',
           '#options' => array(
             'apa.csl' => 'APA',
-            'annotated.csl' => 'Annotated',
+            'annotated.csl' => 'Annotated (NLM style with abstract)',
             'nih.csl' => 'NIH',
             'nlm.csl' => 'NLM',
           )
@@ -208,7 +213,7 @@ function islandora_bibliography_form(array &$form_state) {
           '#type' => 'select',
           '#options' => array(
             'apa.csl' => 'APA',
-            'annotated.csl' => 'Annotated',
+            'annotated.csl' => 'Annotated (NLM style with abstract)',
             'nih.csl' => 'NIH',
             'nlm.csl' => 'NLM',
           )
@@ -272,9 +277,7 @@ function islandora_bibliography_form_remove(array $form, array &$form_state) {
 function islandora_bibliography_form_export(array $form, array &$form_state) {
   $selections = array_filter($form_state['values']['table']['selections']);
   $pids = array_keys($selections);
-  $style_filename = drupal_get_path('module', 'citeproc') . '/data/' . $form_state['values']['style'];
-  $style = citeproc_style($style_filename);
-  islandora_bibliography_export_citations($pids, NULL, $form_state['values']['format']);
+  islandora_bibliography_export_citations($pids, $form_state['values']['style'], $form_state['values']['format']);
 }
 
 /**
@@ -289,7 +292,7 @@ function islandora_bibliography_form_export(array $form, array &$form_state) {
  */
 function _islandora_bibliography_form_preview_selections(array $selections, $style) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  module_load_include('inc', 'citeproc', 'CiteProcBibliography');
+  module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
   drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/export.css');
   $style_filename = drupal_get_path('module', 'citeproc') . '/data/' . $style;
   $style = citeproc_style($style_filename);
@@ -586,8 +589,8 @@ function _islandora_bibliography_batch_combine_mods($filename, $pid, array &$con
  * @param string $redirect
  * @param array $context 
  */
-function _islandora_bibliography_convert_mods_to_ris($filename, $redirect, array &$context) {
-  $context['results']['file'] = bibutils_mods_file_to_ris_document($filename);
+function _islandora_bibliography_convert_mods_to_ris($filename, array &$context) {
+  $context['results']['filename'] = bibutils_mods_file_to_ris_document($filename);
   $context['results']['mime_type'] = 'application/x-Research-Info-Systems';
   $context['results']['download_filename'] = 'export.ris';
 }
@@ -607,12 +610,13 @@ function _islandora_bibliography_redirect($redirect, array &$context) {
  */
 function _islandora_bibliography_batch_convert_mods_to_json($pid, array &$context) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  module_load_include('php', 'citeproc', 'generators/converter');
   $item = new Fedora_Item($pid);
   if ($item->exists() && isset($item->datastreams['MODS'])) {
     $mods = $item->get_datastream_dissemination('MODS');
     $mods = trim($mods);
     if (!empty($mods)) {
-      $context['sandbox']['data'][] = convert_mods_to_citeproc_jsons($mods);
+      $context['results']['data'][] = convert_mods_to_citeproc_jsons($mods);
     }
   }
 }
@@ -622,30 +626,36 @@ function _islandora_bibliography_convert_json_to_rtf($style, array &$context) {
   module_load_include('php', 'CiteProc', 'lib/citeproc-php/CiteProc');
   /* Style */
   $csl = new DomDocument();
-  $csl->load(drupal_get_path('module', 'CiteProc') . '/data/apa.csl');
+  $csl->load(drupal_get_path('module', 'CiteProc') . '/data/' . $style);
   /* Citations */
   $citeproc = new citeproc($csl->saveXML());
-  $text = $citeproc->render($context['sandbox']['data'], 'bibliography');
   $rtf = new rtf();
-  $rtf->addText($text);
+  foreach ($context['results']['data'] as $citation) {
+    $citation = (object) $citation;
+    $citation = json_decode(json_encode($citation)); // HACKKKKK!
+    $text = $citeproc->render($citation, 'bibliography');
+    $rtf->addText($text . '<br>');
+  }
   /* File */
   $temp_file_dir = file_directory_temp();
-  $temp_file = file_create_filename("export.rtf", $temp_file_dir);
-  $file = fopen($temp_file, 'w');
-  if ($file) {
-    fwrite($file, $rtf->getDocument());
+  $temp_file_name = file_create_filename("export.rtf", $temp_file_dir);
+  $file = fopen($temp_file_name, 'w');
+  if ($file !== FALSE) {
+    $document = $rtf->getDocument();
+    fwrite($file, $document);
     fclose($file);
   }
   /* Batch Values */
-  $context['results']['filename'] = $temp_file;
+  $context['results']['filename'] = $temp_file_name;
   $context['results']['download_filename'] = 'export.rtf';
   $context['results']['mime_type'] = 'application/rtf';
 }
 
 function _islandora_bibliography_convert_rtf_to_pdf(array &$context) {
-  $filename = $context['results']['filename'];
+  $output = array();
   $return_value = FALSE;
-  exec('soffice --headless -convert-to pdf ' . $filename, NULL, $return_value);
+  $filename = $context['results']['filename'];
+  exec('soffice.bin --headless -convert-to pdf ' . $filename, $output, $return_value);
   $filename = preg_replace('/\.rtf$/', '.pdf', $context['results']['filename']);
   $context['results']['filename'] = $filename;
   $context['results']['download_filename'] = 'export.pdf';
@@ -659,7 +669,9 @@ function _islandora_bibliography_convert_rtf_to_pdf(array &$context) {
  * @param array $operations 
  */
 function _islandora_bibliography_export_citations($successful, array $results, array $operations) {
-  $_SESSION['bibliography']['export']['file'] = $results['file'];
+  $_SESSION['bibliography']['export']['filename'] = $results['filename'];
+  $_SESSION['bibliography']['export']['download_filename'] = $results['download_filename'];
+  $_SESSION['bibliography']['export']['mime_type'] = $results['mime_type'];
   $_SESSION['bibliography']['export']['redirect'] = $results['redirect'];
 }
 
@@ -689,15 +701,15 @@ function islandora_bibliography_export_citations(array $pids, $style, $file_form
       foreach ($pids as $pid) {
         $operations[] = array('_islandora_bibliography_batch_convert_mods_to_json', array($pid));
       }
-      $operations[] = array('_islandora_bibliography_convert_json_to_rtf');
+      $operations[] = array('_islandora_bibliography_convert_json_to_rtf', array($style));
       $operations[] = array('_islandora_bibliography_redirect', array($_GET['q']));
       break;
     case 'PDF':
       foreach ($pids as $pid) {
-        $operations[] = array('_islandora_bibliography_batch_convert_mods_to_json', array($temp_file, $pid));
+        $operations[] = array('_islandora_bibliography_batch_convert_mods_to_json', array($pid));
       }
-      $operations[] = array('_islandora_bibliography_convert_json_to_rtf');
-      $operations[] = array('_islandora_bibliography_convert_rtf_to_pdf');
+      $operations[] = array('_islandora_bibliography_convert_json_to_rtf', array($style));
+      $operations[] = array('_islandora_bibliography_convert_rtf_to_pdf', array());
       $operations[] = array('_islandora_bibliography_redirect', array($_GET['q']));
       break;
   }

@@ -7,9 +7,9 @@
  *
  * http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#data-input
  */
-module_load_include('inc', 'citeproc', 'CiteProcCitation');
-module_load_include('inc', 'citeproc', 'CiteProcStyle');
-module_load_include('inc', 'citeproc', 'CiteProcAbbreviation');
+module_load_include('inc', 'citeproc', 'CiteProcJSCitation');
+module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
+module_load_include('inc', 'citeproc', 'CiteProcJSAbbreviation');
 
 /**
  * Models a Citation.
@@ -118,7 +118,7 @@ class CiteProcJSBibliography {
    *   An html string where the in-text citation will be rendered into.
    */
   public function render() {
-    module_load_include('inc', 'citeproc', 'CiteProc');
+    module_load_include('inc', 'citeproc', 'CiteProcJS');
     $citeproc = CiteProcJS::getInstance();
     $citeproc->addBibliography($this);
     return '<div id="' . $this->id . '" class="citeproc-bibliography">[Page generation failure.  The bibliography processor requires a browser with Javascript enabled.]</div>';

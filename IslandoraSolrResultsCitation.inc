@@ -148,7 +148,7 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
       '#type' => 'select',
       '#options' => array(
         'apa.csl' => 'APA',
-        'annotated.csl' => 'Annotated',
+        'annotated.csl' => 'Annotated (NLM style with abstract)',
         'nih.csl' => 'NIH',
         'nlm.csl' => 'NLM',
       )

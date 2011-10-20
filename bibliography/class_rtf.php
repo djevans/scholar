@@ -204,10 +204,10 @@ class rtf {
 		// Parse the text into RTF
 		$this->buffer .= $this->parseDocument();
 		$this->buffer .= "}";
-
-		header("Content-Type: text/enriched\n");
-		header("Content-Disposition: attachment; filename=rtf.rtf");
-		echo $this->buffer;
+    // Nigelb edit
+		//header("Content-Type: text/enriched\n");
+		//header("Content-Disposition: attachment; filename=rtf.rtf");
+		return $this->buffer;
 	}
 
 	// Header

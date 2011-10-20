@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/XML/1998/namespace" xmlns:cs="http://purl.org/net/xbiblio/csl">
+  <xs:import namespace="http://purl.org/net/xbiblio/csl" schemaLocation="csl.xsd"/>
+  <xs:attributeGroup name="lang">
+    <xs:attribute name="lang" use="required" form="qualified" type="xs:language"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="lang1">
+    <xs:attribute name="lang" use="required" form="qualified" type="xs:language">
+      <xs:annotation>
+        <xs:documentation>Specifies the locale of the locale file.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="lang2">
+    <xs:attribute name="lang" use="required" form="qualified" type="xs:language">
+      <xs:annotation>
+        <xs:documentation>Specifies the locale to override. A cs:locale element without the
+xml:lang attribute can also be used: it overrides the content of
+all locales, but is in turn overridden by cs:locale elements with
+the xml:lang attribute.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>

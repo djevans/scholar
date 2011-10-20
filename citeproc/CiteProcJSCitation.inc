@@ -7,9 +7,9 @@
  *
  * http://gsl-nagoya-u.net/http/pub/citeproc-doc.html#data-input
  */
-module_load_include('inc', 'citeproc', 'CiteProcItem');
-module_load_include('inc', 'citeproc', 'CiteProcStyle');
-module_load_include('inc', 'citeproc', 'CiteProcAbbreviation');
+module_load_include('inc', 'citeproc', 'CiteProcJSItem');
+module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
+module_load_include('inc', 'citeproc', 'CiteProcJSAbbreviation');
 
 /**
  * Models a Citation.
@@ -73,7 +73,7 @@ class CiteProcJSCitation {
    *      suffix: a string to print after this cite item.
    */
   public function addItem(CiteProcJSItem $item, array $config = array()) {
-    module_load_include('inc', 'citeproc', 'CiteProc');
+    module_load_include('inc', 'citeproc', 'CiteProcJS');
     $item_id = $item->getID();
     $data = array('id' => $item_id);
     $this->items[] = array_merge($data, $config);
