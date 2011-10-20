@@ -106,10 +106,10 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
     '#theme' => 'scholar_search_results_table',
     '#tree' => TRUE,
   );
-  
+
   module_load_include('inc', 'csl', 'CSL');
   $styles = CSL::GetNames();
-  $style = citeproc_style('APA');//array_shift($styles));
+  $style = citeproc_style('APA'); //array_shift($styles));
   $pids = array();
   foreach ($results->response->docs as $doc) {
     $pid = $doc->PID;
@@ -149,12 +149,7 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
     'style' => array(
       //'#title' => t('Citation Style'),
       '#type' => 'select',
-      '#options' => array(
-        'apa.csl' => 'APA',
-        'annotated.csl' => 'Annotated (NLM style with abstract)',
-        'nih.csl' => 'NIH',
-        'nlm.csl' => 'NLM',
-      )
+      '#options' => $styles
     ),
     'export all' => array(
       '#type' => 'submit',
@@ -240,16 +235,17 @@ function scholar_search_results_form_save_to_bibliography(array $form, array &$f
 
 function scholar_search_results_form_export(array $form, array &$form_state) {
   $action = $form_state['clicked_button']['#export'];
-  $form_state['redirect'] = $_GET['q'];
   if ($action == 'all') {
     $pids = _scholar_search_get_all_pids_from_query($form_state);
-    islandora_bibliography_export_citations($pids, NULL, 'RIS');
   }
   else {
     $selections = array_filter($form_state['values']['table']['selections']);
     $pids = array_keys($selections);
-    islandora_bibliography_export_citations($pids, NULL, 'RIS');
   }
+  module_load_include('inc', 'citation_exporter', 'batch');
+  citation_exporter_batch_export($pids, $form_state['values']['style'], $form_state['values']['format']);
+  $form_state['redirect'] = $_GET['q'];
+  unset($form_state['storage']);
 }
 
 /**

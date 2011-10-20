@@ -16,6 +16,7 @@
  *   The operations required to generate a RIS file from the given citations.
  */
 function citation_exporter_batch_get_ris_operations(array $pids) {
+  $operations = array();
   $temp_file_dir = file_directory_temp();
   $temp_file = file_create_filename("mods.xml", $temp_file_dir);
   $mods = new DOMDocument();
@@ -26,6 +27,7 @@ function citation_exporter_batch_get_ris_operations(array $pids) {
   }
   $operations[] = array('citation_exporter_batch_convert_mods_to_ris', array($temp_file));
   $operations[] = array('citation_exporter_batch_redirect', array($_GET['q']));
+  return $operations;
 }
 
 /**

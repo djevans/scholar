@@ -23,7 +23,7 @@ function citation_exporter_batch_export(array $pids, $style, $file_format) {
   switch ($file_format) {
     case 'RIS':
       module_load_include('inc', 'citation_exporter', 'BatchExportRIS');
-      $operations = citation_exporter_batch_get_ris_operations();
+      $operations = citation_exporter_batch_get_ris_operations($pids);
       break;
     case 'RTF':
       module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
