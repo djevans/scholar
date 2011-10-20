@@ -42,8 +42,14 @@ function citation_exporter_batch_convert_rtf_to_pdf(array &$context) {
   $return_value = FALSE;
   $filename = $context['results']['filename'];
   exec('soffice.bin --headless -convert-to pdf ' . $filename, $output, $return_value);
-  $filename = preg_replace('/\.rtf$/', '.pdf', $context['results']['filename']);
-  $context['results']['filename'] = $filename;
-  $context['results']['download_filename'] = 'export.pdf';
-  $context['results']['mime_type'] = 'application/pdf';
+  if ($return_value === 0) {
+    $filename = preg_replace('/\.rtf$/', '.pdf', $context['results']['filename']);
+    $context['results']['filename'] = $filename;
+    $context['results']['download_filename'] = 'export.pdf';
+    $context['results']['mime_type'] = 'application/pdf';
+  }
+  else {
+    $context['success'] = FALSE;
+    $context['finished'] = 1;
+  }
 }

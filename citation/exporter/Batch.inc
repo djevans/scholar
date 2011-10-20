@@ -31,7 +31,7 @@ function citation_exporter_batch_export(array $pids, $style, $file_format) {
       $operations = citation_exporter_batch_get_rtf_operations($pids, $style);
       break;
     case 'PDF':
-      $operations = citation_exporter_batch_get_pdf_operations();
+      $operations = citation_exporter_batch_get_pdf_operations($pids, $style);
       break;
   }
   if (count($operations) > 0) {
@@ -65,5 +65,7 @@ function citation_exporter_batch_redirect($redirect, array &$context) {
  */
 function citation_exporter_batch_finished($successful, array $results, array $operations) {
   module_load_include('inc', 'citation_exporter', 'CitationExporter');
-  CitationExporter::PrepareToExport($results['filename'], $results['mime_type'], $results['download_filename'], $results['redirect']);
+  if ($successful) {
+    CitationExporter::PrepareToExport($results['filename'], $results['mime_type'], $results['download_filename'], $results['redirect']);
+  }
 }
