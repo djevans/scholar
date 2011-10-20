@@ -162,6 +162,8 @@ function islandora_bibliography_form(array &$form_state) {
         )
       );
     }
+    module_load_include('inc', 'csl', 'CSL');
+    $styles = CSL::GetNames();
     return array(
       'fieldset' => array(
         '#type' => 'fieldset',
@@ -176,12 +178,7 @@ function islandora_bibliography_form(array &$form_state) {
         'preview_style' => array(
           '#title' => t('Style'),
           '#type' => 'select',
-          '#options' => array(
-            'apa.csl' => 'APA',
-            'annotated.csl' => 'Annotated (NLM style with abstract)',
-            'nih.csl' => 'NIH',
-            'nlm.csl' => 'NLM',
-          )
+          '#options' => $styles
         ),
         'preview' => array(
           '#type' => 'submit',
@@ -211,12 +208,7 @@ function islandora_bibliography_form(array &$form_state) {
         'style' => array(
           '#title' => t('Style'),
           '#type' => 'select',
-          '#options' => array(
-            'apa.csl' => 'APA',
-            'annotated.csl' => 'Annotated (NLM style with abstract)',
-            'nih.csl' => 'NIH',
-            'nlm.csl' => 'NLM',
-          )
+          '#options' => $styles
         ),
         'export' => array(
           '#type' => 'submit',
@@ -294,7 +286,6 @@ function _islandora_bibliography_form_preview_selections(array $selections, $sty
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
   drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/export.css');
-  $style_filename = drupal_get_path('module', 'citeproc') . '/data/' . $style;
   $style = citeproc_style($style_filename);
   $bibliography = new CiteProcJSBibliography($style);
   $selections = array_filter($selections);

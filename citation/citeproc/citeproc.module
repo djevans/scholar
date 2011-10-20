@@ -31,9 +31,12 @@ function citeproc_bibliography_from_mods(CiteProcJSStyle $style, DOMDocument $mo
   return $bibliography;
 }
 
-function citeproc_style($filename) {
+function citeproc_style($style) {
+  module_load_include('inc', 'csl', 'CSL');
   module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
-  $doc = new DOMDocument();
-  $doc->load($filename);
-  return new CiteProcJSStyle($doc);
+  $doc = CSL::Get($style);
+  if($doc) {
+    return new CiteProcJSStyle($doc);
+  }
+  return FALSE;
 }

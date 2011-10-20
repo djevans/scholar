@@ -31,8 +31,8 @@ function csl_menu() {
 /**
  * Implements hook_perm().
  */
-function scholar_perm() {
-  return array(PERM_SCHOLAR_VIEW_RESEARCH);
+function csl_perm() {
+  return array(PERM_CSL_MANAGE);
 }
 
 /**

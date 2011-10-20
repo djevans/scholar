@@ -68,14 +68,14 @@ class CitationModel extends AbstractModel {
    * 
    * @return string
    */
-  public function getCitation($style_filename) {
+  public function getCitation($style_name) {
     if (isset($this->item->datastreams['MODS'])) {
       $mods = $this->item->get_datastream_dissemination('MODS');
       $mods = trim($mods);
       if (!empty($mods)) {
         $doc = new DOMDocument();
         $doc->loadXML($mods);
-        $style = citeproc_style($style_filename);
+        $style = citeproc_style($style_name);
         $bibliography = citeproc_bibliography_from_mods($style, $doc);
         return array($bibliography->getID(), $bibliography->render());
       }
@@ -101,9 +101,10 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
     'nih.csl' => 'NIH',
     'nlm.csl' => 'NLM',
   );
-  foreach ($styles as $file => $name) {
-    $style = drupal_get_path('module', 'citeproc') . '/data/' . $file;
-    list($id, $html) = $model->getCitation($style);
+  module_load_include('inc', 'csl', 'CSL');
+  $styles = CSL::GetNames();
+  foreach ($styles as $name) {
+    list($id, $html) = $model->getCitation($name);
     $variables['citation'][] = $html;
     $variables['styles'][$id] = $name;
   }
