@@ -21,12 +21,9 @@
  *   The drupal form.
  */
 function islandora_bibliography_form(array &$form_state) {
+  citation_exporter_include_download_redirect();
   global $base_path;
   drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/bibliography.css');
-  if (isset($_SESSION['bibliography']['export'])) {
-    $path = MENU_BIBLIOGRAPHY_EXPORT;
-    drupal_set_html_head("<meta http-equiv='refresh' content='0;url=/$path'/>");
-  }
   module_load_include('inc', 'islandora_bibliography', 'Bibliography');
   $pids = Bibliography::GetCitations();
   if (empty($pids)) {
@@ -185,9 +182,10 @@ function islandora_bibliography_form_remove(array $form, array &$form_state) {
  * @param array $form_state
  */
 function islandora_bibliography_form_export(array $form, array &$form_state) {
+  module_load_include('inc', 'citation_exporter', 'Batch');
   $selections = array_filter($form_state['values']['table']['selections']);
   $pids = array_keys($selections);
-  islandora_bibliography_export_citations($pids, $form_state['values']['style'], $form_state['values']['format']);
+  citation_exporter_batch_export($pids, $form_state['values']['style'], $form_state['values']['format']);
 }
 
 /**
