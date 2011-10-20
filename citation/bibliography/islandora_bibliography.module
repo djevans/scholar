@@ -259,9 +259,9 @@ function islandora_bibliography_form_preview(array $form, array &$form_state) {
 
 /**
  * Removes the selected citations from the bibliography.
- * 
+ *
  * @param array $form
- * @param array $form_state 
+ * @param array $form_state
  */
 function islandora_bibliography_form_remove(array $form, array &$form_state) {
   $selections = $form_state['values']['table']['selections'];
@@ -270,9 +270,9 @@ function islandora_bibliography_form_remove(array $form, array &$form_state) {
 
 /**
  * Exports the selected pids to file.
- * 
+ *
  * @param array $form
- * @param array $form_state 
+ * @param array $form_state
  */
 function islandora_bibliography_form_export(array $form, array &$form_state) {
   $selections = array_filter($form_state['values']['table']['selections']);
@@ -367,12 +367,12 @@ function theme_islandora_bibliography_form_table(array $element) {
 
 /**
  * Renders the form for adding/removing an item from the bibliography.
- * 
+ *
  * @param array $form_state
  *   The drupal form state.
- * @param string $pid 
+ * @param string $pid
  *   The fedora object's pid.
- *  
+ *
  * @return array
  *   The drupal form.
  */
@@ -401,10 +401,10 @@ function islandora_bibliography_citation_form(array &$form_state, $pid = NULL) {
 
 /**
  * Adds/Removes a Citation from the bibliography.
- * 
+ *
  * @param array $form
  *   The drupal form.
- * @param array $form_state 
+ * @param array $form_state
  *   The drupal form state.
  */
 function islandora_bibliography_citation_form_submit(array $form, array &$form_state) {
@@ -563,7 +563,7 @@ function _islandora_bibliography_get_citations_from_session() {
 /**
  *
  * @param array $pids
- * @param array $context 
+ * @param array $context
  */
 function _islandora_bibliography_batch_combine_mods($filename, $pid, array &$context) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
@@ -584,10 +584,10 @@ function _islandora_bibliography_batch_combine_mods($filename, $pid, array &$con
 }
 
 /**
- * 
+ *
  * @param array $pids
  * @param string $redirect
- * @param array $context 
+ * @param array $context
  */
 function _islandora_bibliography_convert_mods_to_ris($filename, array &$context) {
   $context['results']['filename'] = bibutils_mods_file_to_ris_document($filename);
@@ -598,7 +598,7 @@ function _islandora_bibliography_convert_mods_to_ris($filename, array &$context)
 /**
  *
  * @param type $redirect
- * @param array $context 
+ * @param array $context
  */
 function _islandora_bibliography_redirect($redirect, array &$context) {
   $context['results']['redirect'] = $redirect;
@@ -606,7 +606,7 @@ function _islandora_bibliography_redirect($redirect, array &$context) {
 
 /**
  *
- * @param type $pid 
+ * @param type $pid
  */
 function _islandora_bibliography_batch_convert_mods_to_json($pid, array &$context) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
@@ -634,7 +634,7 @@ function _islandora_bibliography_convert_json_to_rtf($style, array &$context) {
     $citation = (object) $citation;
     $citation = json_decode(json_encode($citation)); // HACKKKKK!
     $text = $citeproc->render($citation, 'bibliography');
-    $rtf->addText($text . '<br>');
+    $rtf->addText($text . '<br/>');
   }
   /* File */
   $temp_file_dir = file_directory_temp();
@@ -666,7 +666,7 @@ function _islandora_bibliography_convert_rtf_to_pdf(array &$context) {
  *
  * @param boolean $successful
  * @param array $results
- * @param array $operations 
+ * @param array $operations
  */
 function _islandora_bibliography_export_citations($successful, array $results, array $operations) {
   $_SESSION['bibliography']['export']['filename'] = $results['filename'];
@@ -679,7 +679,7 @@ function _islandora_bibliography_export_citations($successful, array $results, a
  *
  * @param array $pids
  * @param type $style
- * @param string $file_format 
+ * @param string $file_format
  *   Either pdf, rtf, ris, if null display to screen.
  */
 function islandora_bibliography_export_citations(array $pids, $style, $file_format = NULL) {
