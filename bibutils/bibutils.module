@@ -7,6 +7,9 @@
  *
  * Implements hooks and callbacks for this module.
  */
+/**
+ *  @todo Move global functions into their own files.
+ */
 
 /**
  * An internal function that is not meant to be used outside of this file.
