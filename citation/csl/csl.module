@@ -5,21 +5,45 @@
  *
  * Implements hooks and callbacks for this module.
  */
+/**
+ * Constants Permission/Menu/Theme
+ */
+define('PERM_MANAGE_CSL', 'view fedora collection');
+define('MENU_CSL_MANAGE', 'admin/content/csl');
+define('THEME_CSL_MANAGE_TABLE', 'csl_manage_table');
 
 /**
  * Implements hook_menu(). 
  */
 function csl_menu() {
   $items = array();
-  $items['admin/content/csl'] = array(
+  $items[MENU_CSL_MANAGE] = array(
     'title' => 'CSL Styles',
     'description' => 'list/add/remove the installed CSL 1.0 Styles.',
     'page callback' => 'drupal_get_form',
     'page arguments' => 'csl_manage',
-    'access arguments' => array(PERM_ADMIN_FORM_ASSOCIATION), // Use something fedora specific.
+    'access arguments' => array(PERM_MANAGE_CSL), // Use something fedora specific.
     'type' => MENU_NORMAL_ITEM,
   );
   return $items;
+}
+
+/**
+ * Implements hook_perm().
+ */
+function scholar_perm() {
+  return array(PERM_SCHOLAR_VIEW_RESEARCH);
+}
+
+/**
+ * Implements hook_theme().
+ */
+function csl_theme() {
+  return array(
+    THEME_CSL_MANAGE_TABLE => array(
+      'arguments' => array('element' => NULL)
+    )
+  );
 }
 
 /**
@@ -28,5 +52,42 @@ function csl_menu() {
  * @param array $form_state
  */
 function csl_manage(array &$form_state) {
-  return array();
+  $table = array(
+    '#header' => array(t('Style Name'), 'Delete'),
+    '#theme' => THEME_CSL_MANAGE_TABLE,
+    '#tree' => TRUE,
+  );
+  return array(
+    'table' => $table
+  );
+}
+
+/**
+ * Theme a form table for this module.
+ *
+ * @param array $element
+ *   A Drupal Form Element.
+ *
+ * @return sting
+ *   HTML that renders a table.
+ */
+function theme_csl_manage_table(array $element) {
+  $rows = array();
+  foreach (element_children($element['rows']) as $child) {
+    $setting = $element['rows'][$child];
+    $pid = $setting['#pid'];
+    $fields = array(
+      drupal_render($element['selections'][$pid]) // First field is a checkbox
+    );
+    foreach (element_children($setting) as $property) {
+      $field = $setting[$property];
+      $fields[] = drupal_render($field);
+    }
+    $rows[] = array(
+      'data' => $fields,
+      'class' => isset($setting['#attributes']['class']) ? $setting['#attributes']['class'] : NULL
+    );
+  }
+  $attributes = isset($element['#id']) ? array('id' => $element['#id']) : NULL;
+  return '<div class="scholar-search-results">' . theme_table($element['#header'], $rows, $attributes) . '</div>';
 }
