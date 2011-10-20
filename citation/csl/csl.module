@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ *
+ * Implements hooks and callbacks for this module.
+ */
+
+/**
+ * Implements hook_menu(). 
+ */
+function csl_menu() {
+  $items = array();
+  $items['admin/content/csl'] = array(
+    'title' => 'CSL Styles',
+    'description' => 'list/add/remove the installed CSL 1.0 Styles.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => 'csl_manage',
+    'access arguments' => array(PERM_ADMIN_FORM_ASSOCIATION), // Use something fedora specific.
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * A form to list/add/remove the installed CSL 1.0 Styles
+ * 
+ * @param array $form_state
+ */
+function csl_manage(array &$form_state) {
+  return array();
+}
