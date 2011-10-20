@@ -8,12 +8,12 @@
 /**
  * Constants Permission/Menu/Theme
  */
-define('PERM_MANAGE_CSL', 'view fedora collection');
+define('PERM_CSL_MANAGE', 'Manage CSL Citations');
 define('MENU_CSL_MANAGE', 'admin/content/csl');
 define('THEME_CSL_MANAGE_TABLE', 'csl_manage_table');
 
 /**
- * Implements hook_menu(). 
+ * Implements hook_menu().
  */
 function csl_menu() {
   $items = array();
@@ -21,8 +21,8 @@ function csl_menu() {
     'title' => 'CSL Styles',
     'description' => 'list/add/remove the installed CSL 1.0 Styles.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => 'csl_manage',
-    'access arguments' => array(PERM_MANAGE_CSL), // Use something fedora specific.
+    'page arguments' => array('csl_manage'),
+    'access arguments' => array(PERM_CSL_MANAGE), // Use something fedora specific.
     'type' => MENU_NORMAL_ITEM,
   );
   return $items;
@@ -48,7 +48,7 @@ function csl_theme() {
 
 /**
  * A form to list/add/remove the installed CSL 1.0 Styles
- * 
+ *
  * @param array $form_state
  */
 function csl_manage(array &$form_state) {

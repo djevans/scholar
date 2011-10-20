@@ -13,10 +13,10 @@ class CSL {
 
   /**
    * Checks to see if the given CSL style is a valid definition.
-   * 
+   *
    * @param DOMDocument $style
    *   A CSL 1.0 style file to check to see if it is valid.
-   * 
+   *
    * @return boolean
    *   TRUE if the given style is valid, FALSE otherwise.
    */
@@ -27,10 +27,10 @@ class CSL {
 
   /**
    * Checks to see if the given CSL style exists in the database.
-   * 
+   *
    * @param string $style_name
    *   The name of the CSL style.
-   * 
+   *
    * @return boolean
    *   TRUE if the given style exists, FALSE otherwise.
    */
@@ -42,7 +42,7 @@ class CSL {
 
   /**
    * Gets a list of all the availible styles.
-   * 
+   *
    * @return array
    *   An array of defined style's names, where both the key and the value are the style's name.
    *   EX. array( 'name' => 'name' );
@@ -58,11 +58,11 @@ class CSL {
 
   /**
    * Gets the CSL style definition identified by name.
-   * 
+   *
    * @param string $style_name
    *   The name of the CSL style.
-   * 
-   * @return DOMDocument 
+   *
+   * @return DOMDocument
    *   The CSL style definition if found, FALSE otherwise.
    */
   public static function Get($style_name) {
@@ -80,14 +80,14 @@ class CSL {
 
   /**
    * Creates a CSL style with the given style name and definition.
-   * 
+   *
    * If the CSL style already exists it will fail.
-   * 
+   *
    * @param string $style_name
    *   The name of the CSL style.
-   * @param DOMDocument $definition 
+   * @param DOMDocument $definition
    *   A CSL style definition.
-   * 
+   *
    * @return boolean
    *  TRUE if successful, otherwise FALSE.
    */
@@ -103,10 +103,10 @@ class CSL {
 
   /**
    * Deletes the style with the given name.
-   * 
-   * @param string $style_name 
+   *
+   * @param string $style_name
    *   The name of the CSL style definition.
-   * 
+   *
    * @return boolean
    *   TRUE if successful FALSE otherwise.
    */

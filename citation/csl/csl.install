@@ -35,7 +35,7 @@ function csl_enable() {
   foreach ($styles as $style_name => $filename) {
     if (!CSL::Exists($style_name)) {
       $definition = new DOMDocument();
-      $definition->load($filename);
+      $definition->load($data_path . $filename);
       CSL::Create($style_name, $definition);
     }
   }
@@ -43,7 +43,7 @@ function csl_enable() {
 
 /**
  * Implementation of hook_schema().
- * 
+ *
  * @return array
  *   The schema definition.
  */
