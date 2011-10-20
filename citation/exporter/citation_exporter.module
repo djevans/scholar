@@ -5,6 +5,8 @@
  *
  * Implements hooks and callbacks for this module.
  */
+module_load_include('inc', 'citation_exporter', 'Batch');
+
 /**
  * Constants
  */
@@ -30,7 +32,7 @@ function citation_exporter_menu() {
  * Menu callback.
  */
 function citation_exporter_export() {
-  module_load_include('inc', 'citation_exporter', 'Export');
+  module_load_include('inc', 'citation_exporter', 'CitationExporter');
   CitationExporter::Export();
 }
 
@@ -38,8 +40,9 @@ function citation_exporter_export() {
  * Includes a meta tag header that will redirect the users browser to download the exported file.
  */
 function citation_exporter_include_download_redirect() {
-  module_load_include('inc', 'citation_exporter', 'Export');
+  module_load_include('inc', 'citation_exporter', 'CitationExporter');
   if (CitationExporter::ReadyToExport()) {
-    drupal_set_html_head('<meta http-equiv="refresh" content="0;url=/' . MENU_CITATION_EXPORTER_EXPORT . '"/>');
+    $path = MENU_CITATION_EXPORTER_EXPORT;
+    drupal_set_html_head("<meta http-equiv='refresh' content='0;url=/$path'/>");
   }
 }

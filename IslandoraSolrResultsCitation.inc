@@ -91,10 +91,7 @@ function template_preprocess_scholar_search_item(array &$variables) {
 }
 
 function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProcessor $query_processor) {
-  if (isset($_SESSION['bibliography']['export']['file'])) {
-    $path = MENU_BIBLIOGRAPHY_EXPORT;
-    drupal_set_html_head("<meta http-equiv='refresh' content='0;url=/$path'/>");
-  }
+  citation_exporter_include_download_redirect();
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $results = $query_processor->solrResult;
   $total = (int) $results->response->numFound;
@@ -242,9 +239,9 @@ function scholar_search_results_form_export(array $form, array &$form_state) {
     $selections = array_filter($form_state['values']['table']['selections']);
     $pids = array_keys($selections);
   }
-  module_load_include('inc', 'citation_exporter', 'batch');
+  module_load_include('inc', 'citation_exporter', 'Batch');
   citation_exporter_batch_export($pids, $form_state['values']['style'], $form_state['values']['format']);
-  $form_state['redirect'] = $_GET['q'];
+  //$form_state['redirect'] = $_GET['q'];
   unset($form_state['storage']);
 }
 

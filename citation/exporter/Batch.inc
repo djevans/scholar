@@ -5,6 +5,9 @@
  *
  * A collection of functions for batch processing files to generate the appropriate file for exporting.
  */
+module_load_include('inc', 'citation_exporter', 'BatchExportRIS');
+module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
+module_load_include('inc', 'citation_exporter', 'BatchExportPDF');
 
 /**
  * Exports a collection of citations to a file.
@@ -22,15 +25,12 @@ function citation_exporter_batch_export(array $pids, $style, $file_format) {
   $operations = array();
   switch ($file_format) {
     case 'RIS':
-      module_load_include('inc', 'citation_exporter', 'BatchExportRIS');
       $operations = citation_exporter_batch_get_ris_operations($pids);
       break;
     case 'RTF':
-      module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
       $operations = citation_exporter_batch_get_rtf_operations($pids, $style);
       break;
     case 'PDF':
-      module_load_include('inc', 'citation_exporter', 'BatchExportPDF');
       $operations = citation_exporter_batch_get_pdf_operations();
       break;
   }
@@ -38,7 +38,7 @@ function citation_exporter_batch_export(array $pids, $style, $file_format) {
     $batch = array(
       'title' => t('Exporting Citations to File'),
       'operations' => $operations,
-      'finished' => 'citation_exporter_batch_finished'
+      'finished' => 'citation_exporter_batch_finished',
     );
     batch_set($batch);
   }
@@ -65,7 +65,5 @@ function citation_exporter_batch_redirect($redirect, array &$context) {
  */
 function citation_exporter_batch_finished($successful, array $results, array $operations) {
   module_load_include('inc', 'citation_exporter', 'CitationExporter');
-  if ($successful) {
-    CitationExporter::PrepareToExport($results['filename'], $results['mime_type'], $results['download_filename'], $results['redirect']);
-  }
+  CitationExporter::PrepareToExport($results['filename'], $results['mime_type'], $results['download_filename'], $results['redirect']);
 }

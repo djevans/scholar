@@ -5,6 +5,7 @@
  *
  * Functions for generating a batch export of citations to a single PDF file.
  */
+module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
 
 /**
  * Get the batch operations required to generate an PDF file.
@@ -17,8 +18,7 @@
  * @return array
  *   The batch operations to create the PDF file.
  */
-function citation_exporter_batch_get_rtf_operations(array $pids, $style) {
-  module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
+function citation_exporter_batch_get_pdf_operations(array $pids, $style) {
   $operations = array();
   foreach ($pids as $pid) {
     $operations[] = array('citation_exporter_batch_convert_mods_to_json', array($pid));
