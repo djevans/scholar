@@ -11,9 +11,6 @@
  *
  * From here the user can add/remove and export citations.
  *
- * @global string $base_path
- *   The base path of the site.
- *
  * @param array $form_state
  *   The drupal form state.
  *
@@ -21,66 +18,22 @@
  *   The drupal form.
  */
 function islandora_bibliography_form(array &$form_state) {
-  citation_exporter_include_download_redirect();
-  global $base_path;
-  drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/bibliography.css');
   module_load_include('inc', 'islandora_bibliography', 'Bibliography');
+  citation_exporter_include_download_redirect();
   $pids = Bibliography::GetCitations();
   if (empty($pids)) {
-    drupal_set_message(t('You have no citations in your bibliography.'));
-    return array(
-      'redirect' => array(
-        '#prefix' => '<p>',
-        '#value' => l(t('Return to the Home Page.'), ''),
-        '#suffix' => '</p>'
-      )
-    );
+    islandora_bibilgraphy_form_empty_page();
   }
   else {
-    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    $checkboxes = array_fill_keys($pids, '');
-    $table = array(
-      '#header' => array(theme('table_select_header_cell'), t('Title'), t('Author(s)'), ''),
-      '#theme' => THEME_BIBLIOGRAPHY_FORM_TABLE,
-      '#tree' => TRUE,
-      'selections' => array(
-        '#type' => 'checkboxes',
-        '#options' => $checkboxes,
-      ),
-    );
-    foreach ($pids as $pid) {
-      $title = $authors = 'Missing';
-      $item = new Fedora_Item($pid);
-      if (isset($item->datastreams['MODS'])) {
-        $mods = $item->get_datastream_dissemination('MODS');
-        $mods = trim($mods);
-        if (!empty($mods)) {
-          $mods = new SimpleXMLElement($mods);
-          $mods->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
-          $title = implode(' ', $mods->xpath('/mods:mods/mods:titleInfo/mods:title'));
-          $authors = implode(' ', $mods->xpath('/mods:mods/mods:name/mods:role[mods:roleTerm = "author"]/../mods:namePart[@type="family"]'));
-        }
-      }
-      $table['rows'][] = array(
-        '#pid' => $pid,
-        'title' => array('#value' => check_plain($pid)),
-        'author' => array('#value' => check_plain($authors)),
-        'remove' => array(
-          '#type' => 'submit',
-          '#value' => t('Remove'),
-          '#pid' => $pid,
-          '#submit' => array('islandora_bibliography_form_remove_citation_submit')
-        )
-      );
-    }
     module_load_include('inc', 'csl', 'CSL');
+    drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/bibliography.css');
     $styles = CSL::GetNames();
     return array(
       'fieldset' => array(
         '#type' => 'fieldset',
         '#title' => t('My Citations'),
         '#description' => t('<p>Here you can remove or export citations from your bibliography.</p>'),
-        'table' => $table,
+        'table' => islandora_bibilgraphy_form_table($pids),
         'preview_title' => array(
           '#value' => t('Preview Citations'),
           '#prefix' => '<h4>',
@@ -134,6 +87,82 @@ function islandora_bibliography_form(array &$form_state) {
 }
 
 /**
+ * The form to render when no citations are in the bibliography.
+ * 
+ * @return array
+ *   The drupal form
+ */
+function islandora_bibilgraphy_form_empty_page() {
+  drupal_set_message(t('You have no citations in your bibliography.'));
+  return array(
+    'redirect' => array(
+      '#prefix' => '<p>',
+      '#value' => l(t('Return to the Home Page.'), ''),
+      '#suffix' => '</p>'
+    )
+  );
+}
+
+/**
+ * Generates the table for the bibliography form.
+ * 
+ * @param array $pids
+ *   A collection of citations within the bibliography.
+ * 
+ * @return array
+ *   The drupal form table definition.
+ */
+function islandora_bibilgraphy_form_table(array $pids) {
+  $table = array(
+    '#header' => array(theme('table_select_header_cell'), t('Title'), t('Author(s)'), ''),
+    '#theme' => THEME_BIBLIOGRAPHY_FORM_TABLE,
+    '#tree' => TRUE,
+    'rows' => array(),
+    'selections' => array(
+      '#type' => 'checkboxes',
+      '#options' => array_fill_keys($pids, ''),
+    ),
+  );
+  $rows = &$table['rows'];
+  foreach ($pids as $pid) {
+    list($title, $authors) = islandora_bibilgraphy_form_get_title_authors($pid);
+    $rows[] = array(
+      '#pid' => $pid,
+      'title' => array('#value' => check_plain($title)),
+      'author' => array('#value' => check_plain($authors)),
+      'remove' => array(
+        '#type' => 'submit',
+        '#value' => t('Remove'),
+        '#pid' => $pid,
+        '#submit' => array('islandora_bibliography_form_remove_citation_submit')
+      )
+    );
+  }
+  return $table;
+}
+
+/**
+ * Get the title and author of a given citation.
+ * 
+ * @param string $pid
+ *   A citations within the bibliography.
+ * 
+ * @return array
+ *   Where the first key is the title and the second is the authors.
+ */
+function islandora_bibilgraphy_form_get_title_authors($pid) {
+  $title = $authors = 'Missing';
+  $mods = islandora_bibilgraphy_form_get_mods($pid);
+  if ($mods) {
+    $mods = simplexml_import_dom($mods);
+    $mods->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
+    $title = implode(' ', $mods->xpath('/mods:mods/mods:titleInfo/mods:title'));
+    $authors = implode(' ', $mods->xpath('/mods:mods/mods:name/mods:role[mods:roleTerm = "author"]/../mods:namePart[@type="family"]'));
+  }
+  return array($title, $authors);
+}
+
+/**
  * Removes one citation from the bibliography.
  *
  * @param array $form
@@ -157,8 +186,24 @@ function islandora_bibliography_form_remove_citation_submit(array $form, array &
  *   The drupal form state.
  */
 function islandora_bibliography_form_preview(array $form, array &$form_state) {
+  module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
+  drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/export.css');
   $selections = $form_state['values']['table']['selections'];
-  _islandora_bibliography_form_preview_selections($selections, $form_state['values']['preview_style']);
+  $style = citeproc_style($form_state['values']['preview_style']);
+  $bibliography = new CiteProcJSBibliography($style);
+  $selections = array_filter($selections);
+  $selections = array_keys($selections);
+  foreach ($selections as $pid) {
+    $mods = islandora_bibilgraphy_form_get_mods($pid);
+    if ($mods) {
+      $citation = citeproc_citation_from_mods($mods);
+      $bibliography->addCitation($citation);
+    }
+  }
+  $output = $bibliography->render();
+  $output .= l(t('Return to the Bibliography.'), 'bibliography');
+  print theme('page', $output, FALSE);
+  exit();
 }
 
 /**
@@ -189,38 +234,29 @@ function islandora_bibliography_form_export(array $form, array &$form_state) {
 }
 
 /**
- * Export the users selections.
+ * Gets the MOD from an object.
  *
- * Helper function for islandora_bibliography_form_submit().
+ * Helper function for getting the MODS metadata.
  *
- * @param array $selections
- *   The users selections, the keys are pids and the values indicated if it was selected.
- * @param string $style
- *   The name of the style file to use.
+ * @param string $pid
+ *   The fedora object to get the MODS from.
+ * 
+ * @return DOMDocument
+ *   An MODS document if found and non-empty, FALSE otherwise.
  */
-function _islandora_bibliography_form_preview_selections(array $selections, $style) {
+function islandora_bibilgraphy_form_get_mods($pid) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
-  drupal_add_css(drupal_get_path('module', 'islandora_bibliography') . '/css/export.css');
-  $style = citeproc_style($style);
-  $bibliography = new CiteProcJSBibliography($style);
-  $selections = array_filter($selections);
-  foreach ($selections as $pid => $selected) {
-    $item = new Fedora_Item($pid);
-    if (isset($item->datastreams['MODS'])) {
-      $mods = trim($item->get_datastream_dissemination('MODS'));
-      if (!empty($mods)) {
-        $doc = new DOMDocument();
-        $doc->loadXML($mods);
-        $citation = citeproc_citation_from_mods($doc);
-        $bibliography->addCitation($citation);
-      }
+  $item = new Fedora_Item($pid);
+  if ($item->exists() && isset($item->datastreams['MODS'])) {
+    $mods = $item->get_datastream_dissemination('MODS');
+    $mods = trim($mods);
+    if (!empty($mods)) {
+      $doc = new DOMDocument();
+      $doc->loadXML($mods);
+      return $doc;
     }
   }
-  $output = $bibliography->render();
-  $output .= l(t('Return to the Bibliography.'), 'bibliography');
-  print theme('page', $output, FALSE);
-  exit();
+  return FALSE;
 }
 
 /**
