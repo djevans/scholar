@@ -91,17 +91,12 @@ class CitationModel extends AbstractModel {
  * @param array $variables 
  */
 function template_preprocess_scholar_overview_panel_citation(array &$variables) {
+  module_load_include('inc', 'csl', 'CSL');
+  module_load_include('inc', 'islandora_bibliography', 'CitationModel');
   $pid = $variables['pid'];
   $item = new Fedora_Item($pid);
   $model = new CitationModel($pid);
   // Citations
-  $styles = array(
-    'apa.csl' => 'APA',
-    'annotated.csl' => 'Annotated (NLM style with abstract)',
-    'nih.csl' => 'NIH',
-    'nlm.csl' => 'NLM',
-  );
-  module_load_include('inc', 'csl', 'CSL');
   $styles = CSL::GetNames();
   foreach ($styles as $name) {
     list($id, $html) = $model->getCitation($name);
