@@ -69,7 +69,7 @@ function citation_exporter_batch_convert_json_to_rtf($style, array &$context) {
     $citation = (object) $citation;
     $citation = json_decode(json_encode($citation)); // HACKKKKK!
     $text = $citeproc->render($citation, 'bibliography');
-    $rtf->addText($text . '<br/>');
+    $rtf->addText($text . '<br/><br/>');
   }
   /* File */
   $temp_file_dir = file_directory_temp();
