@@ -21,6 +21,7 @@ function scholar_search_form(array &$form_state) {
   $text = variable_get(VAR_SCHOLAR_SEARCH_FIELD_TITLE, 'text');
   return array(
     'field' => array(
+      '#title' => t('Field'),
       '#type' => 'select',
       '#options' => array(
         $title => t('Title'),
@@ -29,13 +30,13 @@ function scholar_search_form(array &$form_state) {
       ),
     ),
     'sort' => array(
-//      '#type' => 'select',
-//      '#options' => array(
-//        NULL => 'Order By...',
-//        'relevance' => t('Relevance'),
-//        'date' => t('Date'),
-//      ),
-      '#type' => 'hidden',
+      '#title' => t('Sort By'),
+      '#type' => 'select',
+      '#options' => array(
+        'relevance' => t('Relevance'),
+        'title' => t('Title'),
+        'date' => t('Date'),
+      ),
       '#value' => 'relevance'
     ),
     'search' => array(
@@ -64,6 +65,6 @@ function scholar_search_form_submit(array $form, array &$form_state) {
     'text' => 'text'
   );
   $field = $fields[$field]; // Remap Field to query friendly one.
-  $query = !empty($search) ? $field . ':' . $search : '*'; 
+  $query = !empty($search) ? $field . ':' . $search : '*';
   $form_state['redirect'] = 'islandora/solr/search/' . $query . '/';
 }
