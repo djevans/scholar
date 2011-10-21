@@ -92,7 +92,7 @@ class CitationModel extends AbstractModel {
  */
 function template_preprocess_scholar_overview_panel_citation(array &$variables) {
   module_load_include('inc', 'csl', 'CSL');
-  module_load_include('inc', 'islandora_bibliography', 'CitationModel');
+  module_load_include('inc', 'islandora_bibliography', 'CitationForm');
   $pid = $variables['pid'];
   $item = new Fedora_Item($pid);
   $model = new CitationModel($pid);
