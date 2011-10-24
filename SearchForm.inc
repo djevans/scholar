@@ -42,9 +42,9 @@ function scholar_search_form(array &$form_state) {
   );
   $terms = array(
   );
-  foreach ($form_state['storage']['terms'] as $term) {
-    
-  }
+//  foreach ($form_state['value']['terms'] as $term) {
+//    
+//  }
   return array(
     'terms' => array(
       '#prefix' => '<div class="scholar-search-terms">',
@@ -56,14 +56,14 @@ function scholar_search_form(array &$form_state) {
         'field' => array(
           '#title' => t('Field'),
           '#type' => 'select',
-          '#value' => 'dc.text',
+          //'#value' => 'dc.text',
           '#options' => $search_fields
         ),
         'search' => array(
           '#type' => 'textfield',
         )
       ),
-      1 => array(// Defaults to title
+      /*1 => array(// Defaults to title
         '#prefix' => '<div>',
         '#suffix' => '</div>',
         'field' => array(
@@ -88,7 +88,7 @@ function scholar_search_form(array &$form_state) {
         'search' => array(
           '#type' => 'textfield',
         )
-      ),
+      ),*/
     ),
     'hidden_submit' => array(// Used for when the user presses enter on the search field.
       '#type' => 'submit',
@@ -150,9 +150,9 @@ function scholar_search_form_build_query(array &$form_state) {
     $field = $term['field'];
     $search = $term['search'];
   }
-  $field = $form_state['values']['field'];
-  $search = $form_state['values']['search'];
-  !empty($search) ? $field . ':' . $search : '*'; // Empty return all results. 
+  //$field = $form_state['values']['field'];
+  //$search = $form_state['values']['search'];
+  $query = !empty($search) ? $field . ':' . $search : '*'; // Empty return all results. 
   return $query;
 }
 
