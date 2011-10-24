@@ -24,10 +24,6 @@ define('THEME_SCHOLAR_SEARCH_TABLE', 'scholar_search_results_table');
 define('THEME_SCHOLAR_BROWSE_USER', 'ir_browse_by_name');
 define('THEME_SCHOLAR_BROWSE_DEPARTMENT', 'ir_browse_by_department');
 define('THEME_SCHOLOR_OVERVIEW_PANEL_CITATION', 'scholar_overview_panel_citation');
-define('VAR_SCHOLAR_SEARCH_FIELD_TITLE', 'scholar_search_title_field');
-define('VAR_SCHOLAR_SEARCH_FIELD_AUTHOR', 'scholar_search_author_field');
-define('VAR_SCHOLAR_SEARCH_FIELD_TEXT', 'scholar_search_text_field');
-define('VAR_SCHOLAR_SEARCH_FIELD_USER', 'scholar_search_user_field');
 
 /**
  * Implements Menu Hook. Registers Menus.

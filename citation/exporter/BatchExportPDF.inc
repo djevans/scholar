@@ -19,11 +19,13 @@ module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
  *   The batch operations to create the PDF file.
  */
 function citation_exporter_batch_get_pdf_operations(array $pids, $style) {
+  $temp_file_dir = file_directory_temp();
+  $temp_file = file_create_filename("rtf_export.txt", $temp_file_dir);
   $operations = array();
   foreach ($pids as $pid) {
-    $operations[] = array('citation_exporter_batch_convert_mods_to_json', array($pid));
+    $operations[] = array('citation_exporter_batch_append_citation_to_text_file', array($temp_file, $style, $pid));
   }
-  $operations[] = array('citation_exporter_batch_convert_json_to_rtf', array($style));
+  $operations[] = array('citation_exporter_batch_convert_txt_to_rtf', array($temp_file));
   $operations[] = array('citation_exporter_batch_convert_rtf_to_pdf', array());
   $operations[] = array('citation_exporter_batch_redirect', array($_GET['q']));
   return $operations;

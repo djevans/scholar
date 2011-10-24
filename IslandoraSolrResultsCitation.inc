@@ -22,9 +22,15 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
   function displayResults(IslandoraSolrQueryProcessor $query_processor, $title = "Search Results", $output = '') {
     module_load_include('inc', 'scholar', 'SearchForm');
     drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
+    if (isset($_SESSION['scholar']['search']['sort'])) {
+      $query_processor->solrParams['fl'] = 'PID';
+      $query_processor->solrParams['sort'] = $_SESSION['scholar']['search']['sort'];
+      unset($_SESSION['scholar']['search']['sort']);
+      $query_processor->executeQuery();
+    }
     $total = (int) $query_processor->solrResult->response->numFound;
     $output = '<h4>Advanced Search</h4>';
-    $output .= drupal_get_form('scholar_search_form');
+    $output .= drupal_get_form('scholar_search_form', $query_processor);
     if ($total === 0) {
       $output .= "<h2>Search Results</h2>";
       $output .= "<div>Sorry, but your search returned no results.</div>";
@@ -128,56 +134,59 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
   );
   $form_state['storage']['query'] = $query_processor;
   return array(
-    'export' => array(
-      '#value' => t('Export To File'),
-      '#prefix' => '<h4>',
-      '#suffix' => '</h4>'
-    ),
-    'format' => array(
-      //'#title' => t('File Format'),
-      '#type' => 'select',
-      '#length' => 50,
-      '#options' => array(
-        'RIS' => 'RIS',
-        'RTF' => 'RTF',
-        'PDF' => 'PDF',
-      )
-    ),
-    'style' => array(
-      //'#title' => t('Citation Style'),
-      '#type' => 'select',
-      '#options' => $styles
-    ),
-    'export all' => array(
-      '#type' => 'submit',
-      '#action' => 'export',
-      '#export' => 'all',
-      '#value' => t('Export All Results'),
-      '#submit' => array('scholar_search_results_form_export')
-    ),
-    'export selected' => array(
-      '#type' => 'submit',
-      '#action' => 'export',
-      '#export' => 'selected',
-      '#value' => t('Export Selected'),
-      '#submit' => array('scholar_search_results_form_export')
-    ),
-    'save' => array(
-      '#value' => t('Save to Bibliography'),
-      '#prefix' => '<h4>',
-      '#suffix' => '</h4>'
-    ),
-    'save all' => array(
-      '#type' => 'submit',
-      '#save' => 'all',
-      '#value' => t('Save All Results'),
-      '#submit' => array('scholar_search_results_form_save_to_bibliography')
-    ),
-    'save selected' => array(
-      '#type' => 'submit',
-      '#save' => 'selected',
-      '#value' => t('Save Selected'),
-      '#submit' => array('scholar_search_results_form_save_to_bibliography')
+    'controls' => array(
+      '#type' => 'markup',
+      '#prefix' => '<div class="scholar-export-controls">',
+      '#suffix' => '</div>',
+      'export' => array(
+        '#value' => t('Export To File'),
+        '#prefix' => '<h4>',
+        '#suffix' => '</h4>'
+      ),
+      'format' => array(
+        '#type' => 'select',
+        '#length' => 50,
+        '#options' => array(
+          'RIS' => 'RIS',
+          'RTF' => 'RTF',
+          'PDF' => 'PDF',
+        )
+      ),
+      'style' => array(
+        '#type' => 'select',
+        '#options' => $styles
+      ),
+      'export all' => array(
+        '#type' => 'submit',
+        '#action' => 'export',
+        '#export' => 'all',
+        '#value' => t('Export All Results'),
+        '#submit' => array('scholar_search_results_form_export')
+      ),
+      'export selected' => array(
+        '#type' => 'submit',
+        '#action' => 'export',
+        '#export' => 'selected',
+        '#value' => t('Export Selected'),
+        '#submit' => array('scholar_search_results_form_export')
+      ),
+      'save' => array(
+        '#value' => t('Save to Bibliography'),
+        '#prefix' => '<h4>',
+        '#suffix' => '</h4>'
+      ),
+      'save all' => array(
+        '#type' => 'submit',
+        '#save' => 'all',
+        '#value' => t('Save All Results'),
+        '#submit' => array('scholar_search_results_form_save_to_bibliography')
+      ),
+      'save selected' => array(
+        '#type' => 'submit',
+        '#save' => 'selected',
+        '#value' => t('Save Selected'),
+        '#submit' => array('scholar_search_results_form_save_to_bibliography')
+      ),
     ),
     'pager' => array(
       '#value' => theme('pager', null, $query_processor->solrLimit, 0, null, 5)
@@ -241,7 +250,6 @@ function scholar_search_results_form_export(array $form, array &$form_state) {
   }
   module_load_include('inc', 'citation_exporter', 'Batch');
   citation_exporter_batch_export($pids, $form_state['values']['style'], $form_state['values']['format']);
-  //$form_state['redirect'] = $_GET['q'];
   unset($form_state['storage']);
 }
 

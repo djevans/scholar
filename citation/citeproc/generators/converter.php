@@ -22,7 +22,7 @@
  * @return string
  *   A JSON encoded string, that repersents the Citataion.
  */
-function convert_mods_to_citeproc_jsons(  $mods) {
+function convert_mods_to_citeproc_jsons($mods) {
   /**
    * FROM HERE ON IN, WE'RE DOING XPATH QUERIES AND POPULATING CSL VARIABLES.
    * STARTING WITH TITLE, THEN FOLLOWING IN MOSTLY ALPHABETICAL ORDER.
