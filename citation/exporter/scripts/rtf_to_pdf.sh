@@ -1,3 +1,3 @@
 #!/bin/bash
 clear
-soffice.bin --headless -convert-to pdf $1 -outdir $2
+/opt/libreoffice3.4/program/soffice.bin --headless -convert-to pdf $1 -outdir $2
