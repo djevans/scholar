@@ -22,6 +22,12 @@
  * @return string
  *   A JSON encoded string, that repersents the Citataion.
  */
+function convert_mods_to_citeproc_jsons_escape(&$item, $key) {
+  if (is_string($item)) {
+    $item = htmlentities($item);
+  }
+}
+
 function convert_mods_to_citeproc_jsons($mods) {
   /**
    * FROM HERE ON IN, WE'RE DOING XPATH QUERIES AND POPULATING CSL VARIABLES.

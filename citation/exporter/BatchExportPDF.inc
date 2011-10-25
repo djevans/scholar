@@ -25,8 +25,7 @@ function citation_exporter_batch_get_pdf_operations(array $pids, $style) {
   foreach ($pids as $pid) {
     $operations[] = array('citation_exporter_batch_append_citation_to_text_file', array($temp_file, $style, $pid));
   }
-  $operations[] = array('citation_exporter_batch_convert_txt_to_rtf', array($temp_file));
-  $operations[] = array('citation_exporter_batch_convert_rtf_to_pdf', array());
+  $operations[] = array('citation_exporter_batch_convert_text_to_pdf', array($temp_file));
   $operations[] = array('citation_exporter_batch_redirect', array($_GET['q']));
   return $operations;
 }
@@ -39,21 +38,18 @@ function citation_exporter_batch_get_pdf_operations(array $pids, $style) {
  * @param array $context
  *   The batch context.
  */
-function citation_exporter_batch_convert_rtf_to_pdf(array &$context) {
-  $output = array();
-  $return_value = FALSE;
-  $filename = $context['results']['filename'];
-  $script = drupal_get_path('module', 'citation_exporter') . '/scripts/rtf_to_pdf.sh ';
-  $out_dir = file_directory_temp();
-  exec($script . $filename . ' ' . $out_dir, $output, $return_value);
-  if ($return_value === 0) {
-    $filename = preg_replace('/\.rtf$/', '.pdf', $context['results']['filename']);
-    $context['results']['filename'] = $filename;
-    $context['results']['download_filename'] = 'export.pdf';
-    $context['results']['mime_type'] = 'application/pdf';
+function citation_exporter_batch_convert_text_to_pdf($filename, array &$context) {
+  module_load_include('php', 'citation_exporter', 'class_pdf');
+  $text = '';
+  $file = fopen($filename, 'rw');
+  while (!feof($file)) {
+    $text .= fread($file, 1024);
   }
-  else {
-    $context['success'] = FALSE;
-    $context['finished'] = 1;
-  }
+  fclose($file);
+  $temp_file_dir = file_directory_temp();
+  $temp_file = file_create_filename("pdf_export.pdf", $temp_file_dir);
+  citation_exporter_create_pdf($text, $temp_file);
+  $context['results']['filename'] = $temp_file;
+  $context['results']['download_filename'] = 'export.pdf';
+  $context['results']['mime_type'] = 'application/pdf';
 }
