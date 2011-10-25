@@ -56,7 +56,7 @@ function citation_exporter_batch_append_citation_to_text_file($filename, $style,
       $json = convert_mods_to_citeproc_jsons($mods);
       array_walk_recursive($json, 'convert_mods_to_citeproc_jsons_escape');
       $json = (object) $json;
-      $citation = json_decode(json_encode($json)); // HACKKKKK!
+      $citation = json_decode(@json_encode($json)); // HACKKKKK! 
       $text = $citeproc->render($citation, 'bibliography');
       $file = fopen($filename, 'a');
       if ($file) {
