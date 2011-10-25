@@ -43,7 +43,9 @@ function citation_exporter_batch_convert_rtf_to_pdf(array &$context) {
   $output = array();
   $return_value = FALSE;
   $filename = $context['results']['filename'];
-  exec('soffice.bin --headless -convert-to pdf ' . $filename, $output, $return_value);
+  $script = drupal_get_path('module', 'citation_exporter') . '/scripts/rtf_to_pdf.sh ';
+  $out_dir = file_directory_temp();
+  exec($script . $filename . ' ' . $out_dir, $output, $return_value);
   if ($return_value === 0) {
     $filename = preg_replace('/\.rtf$/', '.pdf', $context['results']['filename']);
     $context['results']['filename'] = $filename;
