@@ -20,7 +20,7 @@ module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
  */
 function citation_exporter_batch_get_pdf_operations(array $pids, $style) {
   $temp_file_dir = file_directory_temp();
-  $temp_text_file = file_create_filename("rtf_export.txt", $temp_file_dir);
+  $temp_text_file = file_create_filename("pdf_export.txt", $temp_file_dir);
   $temp_pids_file = file_create_filename("pids.txt", $temp_file_dir);
   citation_exporter_batch_store_pids_in_file($temp_pids_file, $pids);
   $total = count($pids);
