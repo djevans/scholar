@@ -46,6 +46,51 @@ function citation_exporter_batch_export(array $pids, $style, $file_format) {
 
 /**
  *
+ * @param string $filename
+ * @param array $pids 
+ */
+function citation_exporter_batch_store_pids_in_file($filename, array $pids) {
+  $file = fopen($filename, 'w');
+  foreach ($pids as $pid) {
+    fwrite($file, trim($pid) . "\n");
+  }
+  fclose($file);
+}
+
+/**
+ *
+ * @param type $filename
+ * @return type 
+ */
+function citation_exporter_batch_get_pids_from_file($filename) {
+  $file = fopen($filename, 'r');
+  $pids = array();
+  while (($pid = fgets($file)) !== false) {
+    $pids[] = trim($pid);
+  }
+  fclose($file);
+  return $pids;
+}
+
+/**
+ * Get some pids
+ */
+function citation_exporter_batch_get_num_pids_from_file($filename, $num = 1) {
+  $remaining = 0;
+  $ret = array();
+  $pids = file($filename);
+  if ($pids) {
+    for ($i = 0; $i < $num; $i++) {
+      $ret[] = trim(array_shift($pids));
+    }
+    citation_exporter_batch_store_pids_in_file($filename, $pids);
+    $remaining = count($pids);
+  }
+  return array($ret, $remaining);
+}
+
+/**
+ *
  * @param type $redirect
  * @param array $context 
  */

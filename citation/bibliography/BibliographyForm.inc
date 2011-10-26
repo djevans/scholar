@@ -231,6 +231,7 @@ function islandora_bibliography_form_export(array $form, array &$form_state) {
   $selections = array_filter($form_state['values']['table']['selections']);
   $pids = array_keys($selections);
   citation_exporter_batch_export($pids, $form_state['values']['style'], $form_state['values']['format']);
+  batch_process();
 }
 
 /**

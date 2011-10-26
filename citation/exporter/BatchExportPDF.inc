@@ -20,12 +20,13 @@ module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
  */
 function citation_exporter_batch_get_pdf_operations(array $pids, $style) {
   $temp_file_dir = file_directory_temp();
-  $temp_file = file_create_filename("rtf_export.txt", $temp_file_dir);
+  $temp_text_file = file_create_filename("rtf_export.txt", $temp_file_dir);
+  $temp_pids_file = file_create_filename("pids.txt", $temp_file_dir);
+  citation_exporter_batch_store_pids_in_file($temp_pids_file, $pids);
+  $total = count($pids);
   $operations = array();
-  foreach ($pids as $pid) {
-    $operations[] = array('citation_exporter_batch_append_citation_to_text_file', array($temp_file, $style, $pid));
-  }
-  $operations[] = array('citation_exporter_batch_convert_text_to_pdf', array($temp_file));
+  $operations[] = array('citation_exporter_batch_append_citations_to_text_file', array($temp_pids_file, $total, $temp_text_file, $style));
+  $operations[] = array('citation_exporter_batch_convert_text_to_pdf', array($temp_text_file));
   $operations[] = array('citation_exporter_batch_redirect', array($_GET['q']));
   return $operations;
 }
