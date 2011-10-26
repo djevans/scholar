@@ -137,6 +137,30 @@ function scholar_register_content_models_for_viewer() {
     'file' => 'CitationModel',
     'class' => 'CitationModel'
   );
+  $models['ir:authorityCModel'] = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'models/Default',
+    'class' => 'DefaultModelViewer'
+  );
+  $models['ir:citationCollectionCModel'] = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'models/Default',
+    'class' => 'DefaultModelViewer'
+  );
+  $models['ir:authorityCollectionCModel'] = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'models/Default',
+    'class' => 'DefaultModelViewer'
+  );
+  $models['islandora:collectionCModel'] = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'models/Default',
+    'class' => 'DefaultModelViewer'
+  );
   return $models;
 }
 
