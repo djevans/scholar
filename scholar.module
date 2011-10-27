@@ -582,7 +582,7 @@ function scholar_bulk_ingest_form_submit(array &$form, array &$form_state) {
       $temp_file_path = file_create_filename("datastream.xml", $temp_file_dir);
       $document->save($temp_file_path);
       unset($documents[$key]);
-      $operations[] = array('scholar_batch_ingest_endnote_document', array($temp_file_path, $collection_pid, $content_model_pid));
+        $operations[] = array('scholar_batch_ingest_endnote_document', array($temp_file_path, $collection_pid, $content_model_pid));
     }
     unset($documents);
   }
