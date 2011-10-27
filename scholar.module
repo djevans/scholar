@@ -576,26 +576,27 @@ function scholar_bulk_ingest_form_submit(array &$form, array &$form_state) {
   $mime_type = $_FILES['files']['type']['file'];
   $tmp_filename = $_FILES['files']['tmp_name']['file'];
   if ($mime_type == 'text/xml') {
-    $documents = split_endnote_records_into_mulitiple_documents($tmp_filename);
-    $temp_file_dir = file_directory_temp();
-    foreach ($documents as $key => $document) {
+    /*
+      $documents = split_endnote_records_into_mulitiple_documents($tmp_filename);
+      $temp_file_dir = file_directory_temp();
+      foreach ($documents as $key => $document) {
       $temp_file_path = file_create_filename("datastream.xml", $temp_file_dir);
       $document->save($temp_file_path);
       unset($documents[$key]);
-        $operations[] = array('scholar_batch_ingest_endnote_document', array($temp_file_path, $collection_pid, $content_model_pid));
-    }
-    unset($documents);
+      $operations[] = array('scholar_batch_ingest_endnote_document', array($temp_file_path, $collection_pid, $content_model_pid));
+      }
+      unset($documents); */
   }
   else {
-    $documents = bibutils_ris_file_to_mods_documents($tmp_filename);
-    $temp_file_dir = file_directory_temp();
-    foreach ($documents as $key => $document) {
+    /* $documents = bibutils_ris_file_to_mods_documents($tmp_filename);
+      $temp_file_dir = file_directory_temp();
+      foreach ($documents as $key => $document) {
       $temp_file_path = file_create_filename("datastream.xml", $temp_file_dir);
       $document->save($temp_file_path);
       unset($documents[$key]);
       $operations[] = array('scholar_batch_ingest_mods_document', array($temp_file_path, $collection_pid, $content_model_pid));
-    }
-    unset($documents);
+      }
+      unset($documents); */
   }
   $batch = array(
     'title' => t('Ingesting Files'),
@@ -607,7 +608,7 @@ function scholar_bulk_ingest_form_submit(array &$form, array &$form_state) {
 
 /**
  * 
- */
+ *
 function scholar_batch_ingest_endnote_document($tmp_file_name, $collection_pid, $content_model_pid) {
   module_load_include('inc', 'islandora_content_model_forms', 'FOXML');
   module_load_include('inc', 'fedora_repository', 'CollectionPolicy');
@@ -637,7 +638,7 @@ function scholar_batch_ingest_endnote_document($tmp_file_name, $collection_pid, 
  *   The collection to ingest into.
  * @param string $content_model_pid
  *   The content to give to the new object. 
- */
+ *
 function scholar_batch_ingest_mods_document($tmp_file_name, $collection_pid, $content_model_pid) {
   module_load_include('inc', 'islandora_content_model_forms', 'FOXML');
   module_load_include('inc', 'fedora_repository', 'CollectionPolicy');

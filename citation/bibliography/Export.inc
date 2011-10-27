@@ -47,7 +47,7 @@ function islandora_bibliography_export() {
  *
  * @param array $pids
  * @param array $context
- */
+ *
 function _islandora_bibliography_batch_combine_mods($filename, $pid, array &$context) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $mods = new DOMDocument();
@@ -71,7 +71,7 @@ function _islandora_bibliography_batch_combine_mods($filename, $pid, array &$con
  * @param array $pids
  * @param string $redirect
  * @param array $context
- */
+ *
 function _islandora_bibliography_convert_mods_to_ris($filename, array &$context) {
   $context['results']['filename'] = bibutils_mods_file_to_ris_document($filename);
   $context['results']['mime_type'] = 'application/x-Research-Info-Systems';
@@ -82,7 +82,7 @@ function _islandora_bibliography_convert_mods_to_ris($filename, array &$context)
  *
  * @param type $redirect
  * @param array $context
- */
+ *
 function _islandora_bibliography_redirect($redirect, array &$context) {
   $context['results']['redirect'] = $redirect;
 }
@@ -90,7 +90,7 @@ function _islandora_bibliography_redirect($redirect, array &$context) {
 /**
  *
  * @param type $pid
- */
+ *
 function _islandora_bibliography_batch_convert_mods_to_json($pid, array &$context) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   module_load_include('php', 'citeproc', 'generators/converter');
@@ -107,10 +107,10 @@ function _islandora_bibliography_batch_convert_mods_to_json($pid, array &$contex
 function _islandora_bibliography_convert_json_to_rtf($style, array &$context) {
   module_load_include('php', 'islandora_bibliography', 'class_rtf');
   module_load_include('php', 'CiteProc', 'lib/citeproc-php/CiteProc');
-  /* Style */
+  /* Style *
   $csl = new DomDocument();
   $csl->load(drupal_get_path('module', 'CiteProc') . '/data/' . $style);
-  /* Citations */
+  /* Citations *
   $citeproc = new citeproc($csl->saveXML());
   $rtf = new rtf();
   foreach ($context['results']['data'] as $citation) {
@@ -119,7 +119,7 @@ function _islandora_bibliography_convert_json_to_rtf($style, array &$context) {
     $text = $citeproc->render($citation, 'bibliography');
     $rtf->addText($text . '<br/>');
   }
-  /* File */
+  /* File *
   $temp_file_dir = file_directory_temp();
   $temp_file_name = file_create_filename("export.rtf", $temp_file_dir);
   $file = fopen($temp_file_name, 'w');
@@ -128,7 +128,7 @@ function _islandora_bibliography_convert_json_to_rtf($style, array &$context) {
     fwrite($file, $document);
     fclose($file);
   }
-  /* Batch Values */
+  /* Batch Values *
   $context['results']['filename'] = $temp_file_name;
   $context['results']['download_filename'] = 'export.rtf';
   $context['results']['mime_type'] = 'application/rtf';
@@ -150,7 +150,7 @@ function _islandora_bibliography_convert_rtf_to_pdf(array &$context) {
  * @param boolean $successful
  * @param array $results
  * @param array $operations
- */
+ *
 function _islandora_bibliography_export_citations($successful, array $results, array $operations) {
   $_SESSION['bibliography']['export']['filename'] = $results['filename'];
   $_SESSION['bibliography']['export']['download_filename'] = $results['download_filename'];
@@ -164,7 +164,7 @@ function _islandora_bibliography_export_citations($successful, array $results, a
  * @param type $style
  * @param string $file_format
  *   Either pdf, rtf, ris, if null display to screen.
- */
+ *
 function islandora_bibliography_export_citations(array $pids, $style, $file_format = NULL) {
   $operations = array();
   switch ($file_format) {
@@ -204,4 +204,4 @@ function islandora_bibliography_export_citations(array $pids, $style, $file_form
     );
     batch_set($batch);
   }
-}
+}*/

@@ -46,7 +46,7 @@ function bibutils_postprocess_bibutils_convert($src, $src_format, $dest, $dest_f
  * 
  * @return array
  *   Where the first parameter was the exit status of the command and the second is the commands output.
- */
+ *
 function _bibutils_execute_command($command) {
   $return_value = FALSE;
   ob_start();
@@ -66,7 +66,7 @@ function _bibutils_execute_command($command) {
  * 
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
- */
+ *
 function _bibutils_convert_to_mods_document($command) {
   list($return_value, $output) = _bibutils_execute_command($command);
   $successful = $return_value === 0;
@@ -94,7 +94,7 @@ function _bibutils_convert_to_mods_document($command) {
  * 
  * @return DOMDocument[]
  *   An array of DOMDocuments that repersent each <record> record within the <records>
- */
+ *
 function split_endnote_records_into_mulitiple_documents($filename) {
   $endnote = new DOMDocument();
   $endnote->load($filename);
@@ -121,7 +121,7 @@ function split_endnote_records_into_mulitiple_documents($filename) {
  * 
  * @return DOMDocument[]
  *   An array of DOMDocuments that repersent each <mods> record within the <modsCollection>
- */
+ *
 function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
   $xpath = new DOMXPath($mods);
   $xpath->registerNamespace('mods', 'http://www.loc.gov/mods/v3');
@@ -146,7 +146,7 @@ function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
  * 
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
- */
+ *
 function bibutils_endnote_xml_file_to_mods_document($filename) {
   $command = 'endx2xml ' . $filename . ' 2>&-';
   $document = _bibutils_convert_to_mods_document($command);
@@ -161,7 +161,7 @@ function bibutils_endnote_xml_file_to_mods_document($filename) {
  * 
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
- */
+ *
 function bibutils_ris_file_to_mods_document($filename) {
   $command = 'ris2xml ' . $filename . ' 2>&-';
   return _bibutils_convert_to_mods_document($command);
@@ -178,7 +178,7 @@ function bibutils_ris_file_to_mods_document($filename) {
  * 
  * @return DOMDocument[]
  *   An array of generated MODS documents, FALSE if the function failed.
- */
+ *
 function bibutils_endnote_xml_file_to_mods_documents($filename) {
   $mods = bibutils_endnote_xml_file_to_mods_document($filename);
   $documents = ($mods !== FALSE) ?
@@ -199,7 +199,7 @@ function bibutils_endnote_xml_file_to_mods_documents($filename) {
  * 
  * @return DOMDocument[]
  *   An array of generated MODS documents, FALSE if the function failed.
- */
+ *
 function bibutils_ris_file_to_mods_documents($filename) {
   $mods = bibutils_ris_file_to_mods_document($filename);
   return ($mods !== FALSE) ?
@@ -214,7 +214,7 @@ function bibutils_ris_file_to_mods_documents($filename) {
  *   The filename of the MODS document.
  * @return DOMDocument
  *   The
- */
+ *
 function bibutils_mods_file_to_ris_document($filename) {
   $command = 'xml2ris ' . $filename . ' 2>&-';
   list($return_value, $output) = _bibutils_execute_command($command);
@@ -229,4 +229,4 @@ function bibutils_mods_file_to_ris_document($filename) {
   }
   drupal_set_message(t('Could not convert to RIS. %command', array('%command' => $command)), 'error');
   return FALSE;
-}
+}*/

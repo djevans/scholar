@@ -72,8 +72,13 @@ function _citation_exporter_batch_combine_mods($filename, array $pids) {
  * @param array $context
  *   The batch processes context.
  */
-function citation_exporter_batch_convert_mods_to_ris($filename, array &$context) {
-  $context['results']['filename'] = bibutils_mods_file_to_ris_document($filename);
-  $context['results']['mime_type'] = 'application/x-Research-Info-Systems';
-  $context['results']['download_filename'] = 'export.ris';
+function citation_exporter_batch_convert_mods_to_ris($mods_filename, array &$context) {
+  module_load_include('inc', 'bibutils', 'Bibutils');
+  $temp_file_dir = file_directory_temp();
+  $ris_filename = file_create_filename("ris_export.ris", $temp_file_dir);
+  if (Bibutils::Convert($filename, 'MODS', $ris_filename, 'RIS')) {
+    $context['results']['filename'] = $ris_filename;
+    $context['results']['mime_type'] = 'application/x-Research-Info-Systems';
+    $context['results']['download_filename'] = 'export.ris';
+  }
 }
