@@ -34,6 +34,23 @@ function bibutils_batch_get_endnote_record($filename) {
 }
 
 /**
+ * Gets the number of records in the EndNote XML file.
+ * 
+ * @param string $filename 
+ *   The filename of the EndNote XML file.
+ * 
+ * @return int
+ *   The number of Records in the EndNote XML file.
+ */
+function bibutils_batch_get_number_endnote_records($filename) {
+  $endnote = new DOMDocument();
+  $endnote->load($filename);
+  $xpath = new DOMXPath($endnote);
+  $results = $xpath->query('/xml/records/record');
+  return $results ? $results->length : 0;
+}
+
+/**
  * Removes a single record from the RIS file and returns it.
  * 
  * @param string $filename
@@ -77,28 +94,22 @@ function bibutils_batch_get_ris_record($filename) {
 }
 
 /**
- * An internal function that is not meant to be used outside of this file.
+ * Gets the number of records in the RIS file.
  * 
- * Generates a DOMDocument for each <mods> element within the given MODS document.
+ * @param string $filename 
+ *   The filename of the RIS file.
  * 
- * @param DOMDocument $mods 
- *   A Valid MODS Document.
- * 
- * @return DOMDocument[]
- *   An array of DOMDocuments that repersent each <mods> record within the <modsCollection>
- *
-function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
-  $xpath = new DOMXPath($mods);
-  $xpath->registerNamespace('mods', 'http://www.loc.gov/mods/v3');
-  $results = $xpath->query('/mods:modsCollection/mods:mods');
-  $documents = array();
-  $count = $results->length;
-  for ($i = 0; $i < $count; $i++) {
-    $doc = new DOMDocument();
-    $child = $results->item($i);
-    $child->setAttribute('xmlns', 'http://www.loc.gov/mods/v3');
-    $doc->loadXML($mods->saveXML($child));
-    $documents[] = $doc;
+ * @return int
+ *   The number of Records in the RIS file.
+ */
+function bibutils_batch_get_number_ris_records($filename) {
+  $count = 0;
+  $file = fopen($filename, 'r');
+  while (($line = fgets($file)) !== false) {
+    if (trim($line) == 'ER  -') {
+      $count++;
+    }
   }
-  return $documents;
-}*/
+  fclose($file);
+  return $count;
+}

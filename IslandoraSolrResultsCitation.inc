@@ -250,6 +250,7 @@ function scholar_search_results_form_export(array $form, array &$form_state) {
   }
   module_load_include('inc', 'citation_exporter', 'Batch');
   citation_exporter_batch_export($pids, $form_state['values']['style'], $form_state['values']['format']);
+  batch_process();
   unset($form_state['storage']);
 }
 
