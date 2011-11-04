@@ -15,10 +15,10 @@ class Bibutils {
    */
   private static $conversionTable = array(
     'EndNoteXML' => array(
-      'MODS' => 'endx2xml',
+      'MODS' => 'endx2xml -i unicode',
     ),
     'RIS' => array(
-      'MODS' => 'ris2xml',
+      'MODS' => 'ris2xml -i unicode',
     ),
     'MODS' => array(
       'RIS' => 'xml2ris',
