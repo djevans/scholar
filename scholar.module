@@ -20,7 +20,7 @@ define('THEME_SCHOLOR_OVERVIEW_PANEL_CITATION', 'scholar_overview_panel_citation
 function scholar_menu() {
   $items = array();
   $items[MENU_SCHOLAR_HOME] = array(
-    'title' => 'Institutional Repository',
+    'title' => 'Search Publications',
     'file' => 'pages/Home.inc',
     'page callback' => 'scholar_home',
     'access callback' => 'user_access',
