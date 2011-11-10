@@ -9,6 +9,18 @@ div.form-item select {
   display: inline-block;
 }*/
 
+
+div.form-item { 
+  display: inline-block;
+}
+
+.progress-disabled, .ahah-progress, .ahah-progress throbber {
+  float:none; 
+}
+.ahah-progress {
+  display: inline-block;
+}
+/*
 .scholar_search_item {
   margin: 1em;
 }
@@ -27,4 +39,4 @@ div.scholar-search-controls > .form-item {
 
 div.scholar-export-controls > .form-item {
   display: inline-block;
-}
+}*/

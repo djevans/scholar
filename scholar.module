@@ -8,7 +8,8 @@
 /**
  * Constants
  */
-define('MENU_SCHOLAR_HOME', 'ir');
+define('MENU_SCHOLAR_HOME', 'scholar');
+define('MENU_SCHOLAR_ADVANCED_SEARCH_ADD_FIELD', 'scholar/search/advanced/field/add');
 define('THEME_SCHOLAR_HOME', 'scholar_home');
 define('THEME_SCHOLAR_SEARCH_ITEM', 'scholar_search_item');
 define('THEME_SCHOLAR_SEARCH_TABLE', 'scholar_search_results_table');
@@ -26,6 +27,13 @@ function scholar_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
+  );
+  $items[MENU_SCHOLAR_ADVANCED_SEARCH_ADD_FIELD] = array(
+    'file' => 'SearchForm.inc',
+    'page callback' => 'scholar_search_advanced_add_field',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
   );
   return $items;
 }

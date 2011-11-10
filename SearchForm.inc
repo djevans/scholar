@@ -16,6 +16,7 @@
  * @return array
  */
 function scholar_search_form(array &$form_state) {
+  drupal_add_js(drupal_get_path('module', 'scholar') . '/js/Ahah.js');
   $search_fields = array(
     'coh_search_abstract' => t('Abstract'),
     'coh_search_author_identifier' => t('Author Identifier'),
@@ -67,34 +68,56 @@ function scholar_search_form(array &$form_state) {
       '#type' => 'textfield',
     )
   );
-  $values = isset($_SESSION['scholar']['search']['values']) ? $_SESSION['scholar']['search']['values'] : NULL;
-  unset($_SESSION['scholar']['search']['values']);
-  return array(
-    'terms' => array(
-      '#prefix' => '<div class="scholar-search-terms">',
+  if (isset($form_state['values'])) {
+    $values = $form_state['values'];
+  }
+  else {
+    $values = isset($_SESSION['scholar']['search']['values']) ? $_SESSION['scholar']['search']['values'] : NULL;
+    unset($_SESSION['scholar']['search']['values']);
+  }
+  $num_terms = $form_state['num_terms'] = isset($form_state['num_terms']) ? $form_state['num_terms'] : 1;
+  $terms = array(
+    '#prefix' => '<div id="scholar-search-terms">',
+    '#suffix' => '</div>',
+    '#tree' => TRUE,
+  );
+  for ($i = 0; $i < $num_terms; $i++) {
+    $terms[] = array(
+      '#prefix' => '<div>',
       '#suffix' => '</div>',
-      '#tree' => TRUE,
-      0 => array( // Default's to title
-        '#prefix' => '<div>',
-        '#suffix' => '</div>',
-        'field' => array(
-          '#title' => t('Field'),
-          '#type' => 'select',
-          '#default_value' => isset($values['terms'][0]['field']) ? $values['terms'][0]['field'] : 'coh_search_title',
-          '#options' => $search_fields
-        ),
-        'search' => array(
-          '#title' => t('Search'),
-          '#type' => 'textfield',
-          '#default_value' => isset($values['terms'][0]['search']) ? $values['terms'][0]['search'] : NULL,
+      'field' => array(
+        '#title' => t('Field'),
+        '#type' => 'select',
+        '#default_value' => isset($values['terms'][$i]['field']) ? $values['terms'][$i]['field'] : 'coh_search_title',
+        '#options' => $search_fields
+      ),
+      'search' => array(
+        '#title' => t('Search'),
+        '#type' => 'textfield',
+        '#default_value' => isset($values['terms'][$i]['search']) ? $values['terms'][$i]['search'] : NULL,
+      ),
+      'hidden_submit' => array(// Used for when the user presses enter on the search field.
+        '#type' => 'submit',
+        '#value' => 'Search',
+        '#attributes' => array('style' => 'visibility:hidden;position:fixed;top:-1000px;right:-1000px;')
+      ),
+      'add' => array(
+        '#type' => 'button',
+        '#value' => 'Add Field',
+        /* '#submit' => array(
+          'scholar_search_form_add_field_submit'
+          ), */
+        '#ahah' => array(
+          'path' => MENU_SCHOLAR_ADVANCED_SEARCH_ADD_FIELD,
+          'wrapper' => 'scholar-search-terms',
+          'method' => 'replace',
+          'effect' => 'fade'
         )
-      )
-    ),
-    'hidden_submit' => array(// Used for when the user presses enter on the search field.
-      '#type' => 'submit',
-      '#value' => 'Search',
-      '#attributes' => array('style' => 'visibility:hidden')
-    ),
+      ),
+    );
+  }
+  return array(
+    'terms' => $terms,
     'controls' => array(
       '#type' => 'markup',
       '#prefix' => '<div class="scholar-search-controls">',
@@ -102,7 +125,7 @@ function scholar_search_form(array &$form_state) {
       'sort' => array(
         '#title' => t('Sort By'),
         '#type' => 'select',
-        '#default_value' => isset($values['sort']) ? $values['sort'] : NULL, 
+        '#default_value' => isset($values['sort']) ? $values['sort'] : NULL,
         '#options' => array(
           NULL => t('Relevance'),
           'coh_sort_title' => t('Title'),
@@ -112,15 +135,11 @@ function scholar_search_form(array &$form_state) {
       'order' => array(
         '#title' => t('Order'),
         '#type' => 'select',
-        '#default_value' => isset($values['order']) ? $values['order'] : 'asc', 
+        '#default_value' => isset($values['order']) ? $values['order'] : 'asc',
         '#options' => array(
           'asc' => t('Ascending'),
           'desc' => t('Descending'),
         ),
-      ),
-      'add' => array(
-        '#type' => 'button',
-        '#value' => 'Add Field'
       ),
       'submit' => array(
         '#type' => 'submit',
@@ -145,17 +164,27 @@ function scholar_search_form_submit(array $form, array &$form_state) {
 }
 
 /**
+ * 
+ * @param array $form
+ * @param array $form_state 
+ */
+function scholar_search_form_add_field_submit(array $form, array &$form_state) {
+  $form_state['num_terms']++;
+}
+
+/**
  *
  * @param array $form_state 
  */
 function scholar_search_form_build_query(array &$form_state) {
+  /**
+   * @todo 
+   */
   $query = 'dc.title:*';
   foreach ($form_state['values']['terms'] as $term) {
     $field = $term['field'];
     $search = $term['search'];
   }
-  //$field = $form_state['values']['field'];
-  //$search = $form_state['values']['search'];
   $query = !empty($search) ? $field . ':' . $search : '*'; // Empty return all results. 
   return $query;
 }
@@ -171,4 +200,14 @@ function scholar_search_form_store_sort_in_session(array &$form_state) {
     $order = $form_state['values']['order'];
     $_SESSION['scholar']['search']['sort'] = $sort . ' ' . $order;
   }
+}
+
+function scholar_search_advanced_add_field() {
+  module_load_include('inc', 'xml_form_elements', 'Ahah');
+  list($form_id, $form_build_id, $form, $form_state) = Ahah::getFormInfo();
+  $form = Ahah::processForm($form_id, $form, $form_state);
+  $form_state['num_terms'] = count(element_children($form['terms'])) + 1;
+  //$form_state['values'] = $form_state[]
+  $form = Ahah::rebuildForm($form_id, $form_build_id, $form, $form_state);
+  Ahah::respond($form['terms']);
 }
