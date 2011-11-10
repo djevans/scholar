@@ -53,7 +53,7 @@ function scholar_search_form(array &$form_state) {
     'coh_search_division_id' => t('Division ID'),
     'coh_search_division_name' => t('Division Name'),
     'coh_search_cores' => t('Cores'),
-    //'dc.text' => t('Text'),
+      //'dc.text' => t('Text'),
   );
   $search_term = array(
     '#prefix' => '<div>',
@@ -67,57 +67,33 @@ function scholar_search_form(array &$form_state) {
       '#type' => 'textfield',
     )
   );
-  $terms = array(
-  );
+  $values = isset($_SESSION['scholar']['search']['values']) ? $_SESSION['scholar']['search']['values'] : NULL;
+  unset($_SESSION['scholar']['search']['values']);
   return array(
     'terms' => array(
       '#prefix' => '<div class="scholar-search-terms">',
       '#suffix' => '</div>',
       '#tree' => TRUE,
-      0 => array(// Defaults to title
+      0 => array( // Default's to title
         '#prefix' => '<div>',
         '#suffix' => '</div>',
         'field' => array(
           '#title' => t('Field'),
           '#type' => 'select',
-          //'#value' => 'dc.text',
+          '#default_value' => isset($values['terms'][0]['field']) ? $values['terms'][0]['field'] : 'coh_search_title',
           '#options' => $search_fields
         ),
         'search' => array(
+          '#title' => t('Search'),
           '#type' => 'textfield',
+          '#default_value' => isset($values['terms'][0]['search']) ? $values['terms'][0]['search'] : NULL,
         )
-      ),
-    /* 1 => array(// Defaults to title
-      '#prefix' => '<div>',
-      '#suffix' => '</div>',
-      'field' => array(
-      '#title' => t('Field'),
-      '#type' => 'select',
-      '#value' => 'dc.text',
-      '#options' => $search_fields
-      ),
-      'search' => array(
-      '#type' => 'textfield',
       )
-      ),
-      2 => array(// Defaults to title
-      '#prefix' => '<div>',
-      '#suffix' => '</div>',
-      'field' => array(
-      '#title' => t('Field'),
-      '#type' => 'select',
-      '#value' => 'dc.text',
-      '#options' => $search_fields
-      ),
-      'search' => array(
-      '#type' => 'textfield',
-      )
-      ), */
     ),
     'hidden_submit' => array(// Used for when the user presses enter on the search field.
       '#type' => 'submit',
-      '#attributes' => array('style' => 'visibility:hidden'),
-      '#value' => 'Search'
+      '#value' => 'Search',
+      '#attributes' => array('style' => 'visibility:hidden')
     ),
     'controls' => array(
       '#type' => 'markup',
@@ -126,15 +102,17 @@ function scholar_search_form(array &$form_state) {
       'sort' => array(
         '#title' => t('Sort By'),
         '#type' => 'select',
+        '#default_value' => isset($values['sort']) ? $values['sort'] : NULL, 
         '#options' => array(
-          '' => t('Relevance'),
-          'coh_title_sort' => t('Title'),
-          'coh_date_sort' => t('Date Added'),
+          NULL => t('Relevance'),
+          'coh_sort_title' => t('Title'),
+          'coh_sort_date' => t('Date Added'),
         ),
       ),
       'order' => array(
         '#title' => t('Order'),
         '#type' => 'select',
+        '#default_value' => isset($values['order']) ? $values['order'] : 'asc', 
         '#options' => array(
           'asc' => t('Ascending'),
           'desc' => t('Descending'),
@@ -159,7 +137,9 @@ function scholar_search_form(array &$form_state) {
  * @param array $form_state 
  */
 function scholar_search_form_submit(array $form, array &$form_state) {
-  scholar_search_form_store_sort_in_session($form_state);
+  $_SESSION['scholar']['search']['values'] = $form_state['values'];
+  $_SESSION['scholar']['search']['sort'] = $form_state['values']['sort'];
+  $_SESSION['scholar']['search']['order'] = $form_state['values']['order'];
   $query = scholar_search_form_build_query($form_state);
   $form_state['redirect'] = 'islandora/solr/search/' . $query . '/'; // Redirect to the search.
 }

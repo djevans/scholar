@@ -22,10 +22,11 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
   function displayResults(IslandoraSolrQueryProcessor $query_processor, $title = "Search Results", $output = '') {
     module_load_include('inc', 'scholar', 'SearchForm');
     drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
-    if (isset($_SESSION['scholar']['search']['sort'])) {
+    $sort = $_SESSION['scholar']['search']['sort'];
+    $order = $_SESSION['scholar']['search']['order'];
+    if (!empty($_SESSION['scholar']['search']['sort'])) {
       $query_processor->solrParams['fl'] = 'PID';
-      $query_processor->solrParams['sort'] = $_SESSION['scholar']['search']['sort'];
-      unset($_SESSION['scholar']['search']['sort']);
+      $query_processor->solrParams['sort'] = $sort . ' ' . $order;
       $query_processor->executeQuery();
     }
     $total = (int) $query_processor->solrResult->response->numFound;
