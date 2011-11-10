@@ -17,16 +17,43 @@
  */
 function scholar_search_form(array &$form_state) {
   $search_fields = array(
-    'dc.title' => t('Title'),
-    'dc.author' => t('Author'),
-    '1' => t('Publication Type'),
-    '2' => t('Funding Agency'),
-    '3' => t('Cancer Center Program'),
-    '4' => t('Grant Number'),
-    '5' => t('Publication Date'),
-    '6' => t('Date Added'),
-    '7' => t('Peer Reviewed'),
-    'dc.text' => t('Text'),
+    'coh_search_abstract' => t('Abstract'),
+    'coh_search_author_identifier' => t('Author Identifier'),
+    'coh_search_author' => t('Author'),
+    'coh_search_author_affiliation' => t('Author Affiliation'),
+    'coh_search_book_title' => t('Book Title'),
+    'coh_search_collection_series_title' => t('Collection/Series Title'),
+    'coh_search_group_author' => t('Group Author'),
+    'coh_search_editor' => t('Editor'),
+    'coh_search_grant_number' => t('Grant Number'),
+    'coh_search_funding_agency' => t('Funding Agency'),
+    'coh_search_isbn' => t('ISBN'),
+    'coh_search_issn' => t('ISSN'),
+    'coh_search_full_journal_title' => t('Full Journal Title'),
+    'coh_search_language' => t('Language'),
+    'coh_search_mesh_terms' => t('MeSH Terms'),
+    'coh_search_publication_type' => t('Publication Type'),
+    'coh_search_chemical_or_substance_name' => t('Chemical or Substance Name'),
+    'coh_search_secondary_source_id' => t('Secondary Source ID'),
+    'coh_search_title' => t('Title'),
+    'coh_search_doi' => t('DOI'),
+    'coh_search_conference' => t('Conference'),
+    'coh_search_keywords' => t('Keywords'),
+    'coh_search_book_group_authors' => t('Book Group Authors'),
+    'coh_search_times_cited' => t('Times Cited'), // Hack this one...
+    'coh_search_year_published' => t('Year published'),
+    'coh_search_tumor_model' => t('Tumour Model'),
+    'coh_search_biological_pathway' => t('Biological Pathway'),
+    'coh_search_status' => t('Status'),
+    'coh_search_osr_id_number' => t('OSR ID number'),
+    'coh_search_cancer_center_program_code' => t('Cancer Center Program Code'),
+    'coh_search_cancer_center_membership_level' => t('Cancer Center Membership Level'),
+    'coh_search_dept_id' => t('Dept ID'),
+    'coh_search_dept_name' => t('Dept Name'),
+    'coh_search_division_id' => t('Division ID'),
+    'coh_search_division_name' => t('Division Name'),
+    'coh_search_cores' => t('Cores'),
+    //'dc.text' => t('Text'),
   );
   $search_term = array(
     '#prefix' => '<div>',
@@ -42,9 +69,6 @@ function scholar_search_form(array &$form_state) {
   );
   $terms = array(
   );
-//  foreach ($form_state['value']['terms'] as $term) {
-//    
-//  }
   return array(
     'terms' => array(
       '#prefix' => '<div class="scholar-search-terms">',
@@ -63,32 +87,32 @@ function scholar_search_form(array &$form_state) {
           '#type' => 'textfield',
         )
       ),
-      /*1 => array(// Defaults to title
-        '#prefix' => '<div>',
-        '#suffix' => '</div>',
-        'field' => array(
-          '#title' => t('Field'),
-          '#type' => 'select',
-          '#value' => 'dc.text',
-          '#options' => $search_fields
-        ),
-        'search' => array(
-          '#type' => 'textfield',
-        )
+    /* 1 => array(// Defaults to title
+      '#prefix' => '<div>',
+      '#suffix' => '</div>',
+      'field' => array(
+      '#title' => t('Field'),
+      '#type' => 'select',
+      '#value' => 'dc.text',
+      '#options' => $search_fields
+      ),
+      'search' => array(
+      '#type' => 'textfield',
+      )
       ),
       2 => array(// Defaults to title
-        '#prefix' => '<div>',
-        '#suffix' => '</div>',
-        'field' => array(
-          '#title' => t('Field'),
-          '#type' => 'select',
-          '#value' => 'dc.text',
-          '#options' => $search_fields
-        ),
-        'search' => array(
-          '#type' => 'textfield',
-        )
-      ),*/
+      '#prefix' => '<div>',
+      '#suffix' => '</div>',
+      'field' => array(
+      '#title' => t('Field'),
+      '#type' => 'select',
+      '#value' => 'dc.text',
+      '#options' => $search_fields
+      ),
+      'search' => array(
+      '#type' => 'textfield',
+      )
+      ), */
     ),
     'hidden_submit' => array(// Used for when the user presses enter on the search field.
       '#type' => 'submit',
