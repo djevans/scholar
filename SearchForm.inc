@@ -109,7 +109,7 @@ function scholar_search_form(array &$form_state) {
       $term['remove'] = array(
         '#type' => 'button',
         '#field' => $i,
-        '#value' => 'Remove Field',  
+        '#value' => 'Remove Field',
         '#name' => 'remove-field-' . $i,
         '#ahah' => array(
           'path' => MENU_SCHOLAR_ADVANCED_SEARCH_REMOVE_FIELD,
@@ -165,16 +165,8 @@ function scholar_search_form_submit(array $form, array &$form_state) {
   $_SESSION['scholar']['search']['sort'] = $form_state['values']['sort'];
   $_SESSION['scholar']['search']['order'] = $form_state['values']['order'];
   $query = scholar_search_form_build_query($form_state);
-  $form_state['redirect'] = 'islandora/solr/search/' . $query . '/'; // Redirect to the search.
-}
-
-/**
- * 
- * @param array $form
- * @param array $form_state 
- */
-function scholar_search_form_add_field_submit(array $form, array &$form_state) {
-  $form_state['num_terms']++;
+  $form_state['redirect'] = 'islandora/solr/search/' . urlencode($query) . '/'; // Redirect to the search.
+  //coh_search_title %253A %2528 cancer %2529
 }
 
 /**
@@ -182,15 +174,16 @@ function scholar_search_form_add_field_submit(array $form, array &$form_state) {
  * @param array $form_state 
  */
 function scholar_search_form_build_query(array &$form_state) {
-  /**
-   * @todo 
-   */
   $query = 'dc.title:*';
+  $statements = array();
   foreach ($form_state['values']['terms'] as $term) {
     $field = $term['field'];
-    $search = $term['search'];
+    $search = trim($term['search']);
+    if (!empty($search)) {
+      $statements[] = "$field:($search)";
+    }
   }
-  $query = !empty($search) ? $field . ':' . $search : '*'; // Empty return all results. 
+  $query = !empty($statements) ? implode(' AND ', $statements) : '*'; // Empty return all results. 
   return $query;
 }
 
@@ -222,8 +215,6 @@ function scholar_search_advanced_remove_field() {
   $form = Ahah::processForm($form_id, $form, $form_state);
   $field = $form_state['clicked_button']['#field'];
   array_splice($form_state['values']['terms'], $field, 1);
-  //unset($form_state['values']['terms'][$field]);
-  //unset($form_state['#post']['terms'][$field]);
   $form_state['num_terms'] = count($form_state['values']['terms']);
   $form = Ahah::rebuildForm($form_id, $form_build_id, $form, $form_state);
   Ahah::respond($form['terms']);

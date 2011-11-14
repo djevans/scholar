@@ -31,7 +31,7 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     }
     $total = (int) $query_processor->solrResult->response->numFound;
     $output = '<h4>Advanced Search</h4>';
-    $output .= drupal_get_form('scholar_search_form', $query_processor);
+    $output .= drupal_get_form('scholar_search_form');
     if ($total === 0) {
       $output .= "<h2>Search Results</h2>";
       $output .= "<div>Sorry, but your search returned no results.</div>";
