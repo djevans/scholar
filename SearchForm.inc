@@ -17,6 +17,7 @@
  */
 function scholar_search_form(array &$form_state) {
   drupal_add_js(drupal_get_path('module', 'scholar') . '/js/Ahah.js');
+  drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
   $num_terms = 1;
   if (isset($form_state['values'])) {
     $values = $form_state['values'];
