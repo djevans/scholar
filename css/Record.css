@@ -14,10 +14,10 @@
   padding: 0.4em;
 }
 
-#abstract {
+.overview-field {
   margin: 2em;
 }
 
-#abstract-content {
+.overview-field-content {
   margin: 0.4em;
 }

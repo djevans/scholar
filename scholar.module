@@ -14,7 +14,7 @@ define('MENU_SCHOLAR_ADVANCED_SEARCH_REMOVE_FIELD', 'scholar/search/advanced/fie
 define('THEME_SCHOLAR_HOME', 'scholar_home');
 define('THEME_SCHOLAR_SEARCH_ITEM', 'scholar_search_item');
 define('THEME_SCHOLAR_SEARCH_TABLE', 'scholar_search_results_table');
-define('THEME_SCHOLOR_OVERVIEW_PANEL_CITATION', 'scholar_overview_panel_citation');
+define('THEME_SCHOLAR_OVERVIEW_PANEL_CITATION', 'scholar_overview_panel_citation');
 
 /**
  * Implements hook_menu().
@@ -64,7 +64,7 @@ function scholar_theme() {
       'file' => 'IslandoraSolrResultsCitation.inc',
       'arguments' => array('element' => NULL)
     ),
-    THEME_SCHOLOR_OVERVIEW_PANEL_CITATION => array(
+    THEME_SCHOLAR_OVERVIEW_PANEL_CITATION => array(
       'template' => 'templates/CitationModel',
       'file' => 'CitationModel.inc',
       'arguments' => array('pid' => NULL)

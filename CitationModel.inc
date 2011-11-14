@@ -60,7 +60,7 @@ class CitationModel extends AbstractModel {
    * @return string
    */
   public function render() {
-    return theme('scholar_overview_panel_citation', $this->pid);
+    return theme(THEME_SCHOLAR_OVERVIEW_PANEL_CITATION, $this->pid);
   }
 
   /**
@@ -111,6 +111,13 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
       $mods = new SimpleXMLElement($mods);
       $mods->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
       $variables['abstract'] = implode('<br/>', $mods->xpath('/mods:mods/mods:abstract'));
+      $variables['subject'] = implode('<br/>', $mods->xpath('/mods:mods/mods:subject/mods:topic'));
+      $variables['grant_number'] = implode('<br/>', $mods->xpath('/mods:mods/mods:name[@type="corporate"]/mods:role[mods:roleTerm[@type="text"]="funding agency"]/../mods:description[@type="grant number"]'));
+      $variables['funding_agency'] = implode('<br/>', $mods->xpath('/mods:mods/mods:name[@type="corporate"]/mods:role[mods:roleTerm[@type="text"]="funding agency"]/../mods:namePart'));
+      $variables['core_facility'] = implode('<br/>', $mods->xpath('/mods:mods/mods:note[@type="core facilities"]'));
+      $variables['source_system'] = implode('<br/>', $mods->xpath('/mods:mods/mods:recordInfo/mods:recordOrigin'));
+      $variables['ccsg_program'] = implode('<br/>', array()); // @todo
+      $variables['peer_reviewed'] = implode('<br/>', $mods->xpath('/mods:mods/mods:note[@type="peer reviewed"]'));
     }
   }
 }
