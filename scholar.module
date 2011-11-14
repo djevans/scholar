@@ -10,6 +10,7 @@
  */
 define('MENU_SCHOLAR_HOME', 'scholar');
 define('MENU_SCHOLAR_ADVANCED_SEARCH_ADD_FIELD', 'scholar/search/advanced/field/add');
+define('MENU_SCHOLAR_ADVANCED_SEARCH_REMOVE_FIELD', 'scholar/search/advanced/field/remove');
 define('THEME_SCHOLAR_HOME', 'scholar_home');
 define('THEME_SCHOLAR_SEARCH_ITEM', 'scholar_search_item');
 define('THEME_SCHOLAR_SEARCH_TABLE', 'scholar_search_results_table');
@@ -31,6 +32,13 @@ function scholar_menu() {
   $items[MENU_SCHOLAR_ADVANCED_SEARCH_ADD_FIELD] = array(
     'file' => 'SearchForm.inc',
     'page callback' => 'scholar_search_advanced_add_field',
+    'access callback' => 'user_access',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  $items[MENU_SCHOLAR_ADVANCED_SEARCH_REMOVE_FIELD] = array(
+    'file' => 'SearchForm.inc',
+    'page callback' => 'scholar_search_advanced_remove_field',
     'access callback' => 'user_access',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
