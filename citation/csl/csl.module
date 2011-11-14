@@ -132,13 +132,15 @@ function csl_manage_add_style_validate(array $form, array &$form_state) {
   elseif (!$file_was_uploaded) {
     form_set_error('file', t('a valid CSL 1.0 Style must be uploaded.'));
   }
-  else { // File was uploaded make sure it is valid.
+  /* No longer requireing styles to be valid CSL.
+    else { // File was uploaded make sure it is valid.
     $definition = new DOMDocument();
     $definition->load($_FILES['files']['tmp_name']['file']);
     if (!CSL::Valid($definition)) {
-      form_set_error('file', t('the uploaded file must be a valid CSL 1.0 Style. The provided file was not valid.'));
+    form_set_error('file', t('the uploaded file must be a valid CSL 1.0 Style. The provided file was not valid.'));
     }
-  }
+    }
+   */
 }
 
 /**

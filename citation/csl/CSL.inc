@@ -92,7 +92,10 @@ class CSL {
    *  TRUE if successful, otherwise FALSE.
    */
   public static function Create($style_name, DOMDocument $definition) {
-    if (!self::Exists($style_name) && self::Valid($definition)) {
+    if (!self::Exists($style_name)) {
+      if (!self::Valid($definition)) {
+        drupal_set_message("The $style_name is not valid CSL 1.0 problems may occur.");
+      }
       $object = new stdClass();
       $object->name = $style_name;
       $object->style = $definition->saveXML();
