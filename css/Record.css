@@ -5,3 +5,19 @@
     Description:
         Purpose of the stylesheet follows.
 */
+
+#citation {
+  margin: 2em;
+}
+
+#citation .citeproc-bibliography {
+  padding: 0.4em;
+}
+
+.overview-field {
+  margin: 2em;
+}
+
+.overview-field-content {
+  margin: 0.4em;
+}

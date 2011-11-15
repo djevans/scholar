@@ -9,6 +9,34 @@
  */
 
 /**
+ * Implements hook_postprocess_bibutils_convert()
+ * 
+ * Cleans the MODS output from Bibutils.
+ * 
+ * @param string $src
+ *   The filename of the source file.
+ * @param string $src_format
+ *   The format of the source file.
+ * @param string $dest
+ *   The filename of the destination file.
+ * @param string $dest_format 
+ *   The format of the destination file.
+ * 
+ * @return boolean
+ *   TRUE if the MODS is successfully cleaned or if no processing is done, FALSE otherwise.
+ */
+function bibutils_postprocess_bibutils_convert($src, $src_format, $dest, $dest_format) {
+  if ($dest_format == 'MODS') {
+    return Bibutils::CleanModsFile($dest);
+  }
+  return TRUE;
+}
+
+/**
+ *  @todo Move global functions into their own files.
+ */
+
+/**
  * An internal function that is not meant to be used outside of this file.
  * 
  * Executes the given command and the exit status and output of the command.
@@ -18,7 +46,7 @@
  * 
  * @return array
  *   Where the first parameter was the exit status of the command and the second is the commands output.
- */
+ *
 function _bibutils_execute_command($command) {
   $return_value = FALSE;
   ob_start();
@@ -38,7 +66,7 @@ function _bibutils_execute_command($command) {
  * 
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
- */
+ *
 function _bibutils_convert_to_mods_document($command) {
   list($return_value, $output) = _bibutils_execute_command($command);
   $successful = $return_value === 0;
@@ -48,14 +76,39 @@ function _bibutils_convert_to_mods_document($command) {
     $transform->load($transform_filename);
     $doc = new DOMDocument();
     $doc->loadXML($output);
-    $xslt = new XSLTProcessor();
-    $xslt->importStyleSheet($transform);
-    return $xslt->transformToDoc($doc->documentElement);
+    if (isset($doc->documentElement)) {
+      $xslt = new XSLTProcessor();
+      $xslt->importStyleSheet($transform);
+      return $xslt->transformToDoc($doc->documentElement);
+    }
   }
-  else {
-    drupal_set_message(t('Could not convert %filename, to MODS.', array('%filename' => $filename)), 'error');
-  }
+  drupal_set_message(t('Could not convert to MODS. %command', array('%command' => $command)), 'error');
   return FALSE;
+}
+
+/**
+ * Generates a DOMDocument for each <record> element within the given EndNoteXML document.
+ * 
+ * @param string $filename
+ *   A Valid EndNoteXML Document, filename.
+ * 
+ * @return DOMDocument[]
+ *   An array of DOMDocuments that repersent each <record> record within the <records>
+ *
+function split_endnote_records_into_mulitiple_documents($filename) {
+  $endnote = new DOMDocument();
+  $endnote->load($filename);
+  $xpath = new DOMXPath($endnote);
+  $results = $xpath->query('/xml/records/record');
+  $documents = array();
+  $count = $results->length;
+  for ($i = 0; $i < $count; $i++) {
+    $doc = new DOMDocument();
+    $child = $results->item($i);
+    $doc->loadXML('<xml><records>' . $endnote->saveXML($child) . '</records></xml>');
+    $documents[] = $doc;
+  }
+  return $documents;
 }
 
 /**
@@ -68,7 +121,7 @@ function _bibutils_convert_to_mods_document($command) {
  * 
  * @return DOMDocument[]
  *   An array of DOMDocuments that repersent each <mods> record within the <modsCollection>
- */
+ *
 function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
   $xpath = new DOMXPath($mods);
   $xpath->registerNamespace('mods', 'http://www.loc.gov/mods/v3');
@@ -93,10 +146,11 @@ function _split_mods_collection_into_mulitiple_documents(DOMDocument $mods) {
  * 
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
- */
+ *
 function bibutils_endnote_xml_file_to_mods_document($filename) {
-  $command = 'endx2xml ' . $filename . ' 2>&- | modsclean 2>&-';
-  return _bibutils_convert_to_mods_document($command);
+  $command = 'endx2xml ' . $filename . ' 2>&-';
+  $document = _bibutils_convert_to_mods_document($command);
+  return $document;
 }
 
 /**
@@ -107,9 +161,9 @@ function bibutils_endnote_xml_file_to_mods_document($filename) {
  * 
  * @return DOMDocument
  *   The generated MODS document, FALSE if the function failed.
- */
+ *
 function bibutils_ris_file_to_mods_document($filename) {
-  $command = 'ris2xml ' . $filename . ' 2>&- | modsclean 2>&-';
+  $command = 'ris2xml ' . $filename . ' 2>&-';
   return _bibutils_convert_to_mods_document($command);
 }
 
@@ -124,12 +178,14 @@ function bibutils_ris_file_to_mods_document($filename) {
  * 
  * @return DOMDocument[]
  *   An array of generated MODS documents, FALSE if the function failed.
- */
+ *
 function bibutils_endnote_xml_file_to_mods_documents($filename) {
   $mods = bibutils_endnote_xml_file_to_mods_document($filename);
-  return ($mods !== FALSE) ?
+  $documents = ($mods !== FALSE) ?
       _split_mods_collection_into_mulitiple_documents($mods) :
       FALSE;
+  unset($mods);
+  return $documents;
 }
 
 /**
@@ -143,10 +199,34 @@ function bibutils_endnote_xml_file_to_mods_documents($filename) {
  * 
  * @return DOMDocument[]
  *   An array of generated MODS documents, FALSE if the function failed.
- */
+ *
 function bibutils_ris_file_to_mods_documents($filename) {
   $mods = bibutils_ris_file_to_mods_document($filename);
   return ($mods !== FALSE) ?
       _split_mods_collection_into_mulitiple_documents($mods) :
       FALSE;
 }
+
+/**
+ * Converts a MODS document to a RIS document.
+ * 
+ * @param string $filename
+ *   The filename of the MODS document.
+ * @return DOMDocument
+ *   The
+ *
+function bibutils_mods_file_to_ris_document($filename) {
+  $command = 'xml2ris ' . $filename . ' 2>&-';
+  list($return_value, $output) = _bibutils_execute_command($command);
+  $successful = $return_value === 0;
+  if ($successful && !empty($output)) { // Successfully executed the command.
+    $temp_file_dir = file_directory_temp();
+    $temp_file_name = file_create_filename("ris.ris", $temp_file_dir);
+    $file = fopen($temp_file_name, 'w');
+    fwrite($file, $output);
+    fclose($file);
+    return $temp_file_name;
+  }
+  drupal_set_message(t('Could not convert to RIS. %command', array('%command' => $command)), 'error');
+  return FALSE;
+}*/
