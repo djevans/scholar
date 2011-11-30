@@ -97,7 +97,7 @@ function scholar_search_form(array &$form_state) {
       ),
       'add' => array(
         '#type' => 'button',
-        '#value' => 'Add Field',
+        '#value' => '+',
         '#ahah' => array(
           'path' => MENU_SCHOLAR_ADVANCED_SEARCH_ADD_FIELD,
           'wrapper' => 'scholar-search-terms',
@@ -110,7 +110,7 @@ function scholar_search_form(array &$form_state) {
       $term['remove'] = array(
         '#type' => 'button',
         '#field' => $i,
-        '#value' => 'Remove Field',
+        '#value' => '-',
         '#name' => 'remove-field-' . $i,
         '#ahah' => array(
           'path' => MENU_SCHOLAR_ADVANCED_SEARCH_REMOVE_FIELD,
