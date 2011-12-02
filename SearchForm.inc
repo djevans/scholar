@@ -45,7 +45,7 @@ function scholar_search_form(array &$form_state) {
         '#title' => t('Field'),
         '#type' => 'select',
         '#default_value' => isset($values['terms'][$i]['field']) ? $values['terms'][$i]['field'] : 'coh_search_title',
-        '#options' => array(
+        '#options' => variable_get('islandora_solr_searchterms', array(
           'coh_search_abstract' => t('Abstract'),
           'coh_search_author_identifier' => t('Author Identifier'),
           'coh_search_author' => t('Author'),
@@ -131,9 +131,9 @@ function scholar_search_form(array &$form_state) {
       'sort' => array(
         '#title' => t('Sort By'),
         '#type' => 'select',
-        '#default_value' => isset($values['sort']) ? $values['sort'] : NULL,
+        '#default_value' => isset($values['sort']) ? $values['sort'] : 'score',
         '#options' => array(
-          NULL => t('Relevance'),
+          'score' => t('Relevance'),
           'coh_sort_title' => t('Title'),
           'coh_sort_date' => t('Date Added'),
         ),
