@@ -139,7 +139,8 @@ function scholar_bulk_ingest_file_upload_validate(array $element, array &$form_s
 function scholar_bulk_ingest_form_submit(array &$form, array &$form_state) {
   $collection_pid = $form_state['values']['collection_pid'];
   $content_model_pid = ContentModel::getPidFromIdentifier($form_state['values']['content_model_pid']);
-  $mime_type = $_FILES['files']['type']['file'];
+  $mime_type = $_FILES['files']['type']['file'];  //Not using $file->filemime, 
+  //because the underlying Drupal stuff doesn't do XML...  Blargh.
   $file = file_save_upload('file');
   $filename = $file->filepath;
   $function = ($mime_type == 'text/xml') ? 'scholar_batch_ingest_endnote_document' : 'scholar_batch_ingest_ris_document';
@@ -182,6 +183,8 @@ function scholar_batch_ingest_endnote_document($filename, $collection_pid, $cont
   if (Bibutils::Convert($endnote_filename, 'EndNoteXML', $mods_filename, 'MODS')) {
     scholar_batch_ingest_mods($mods_filename, $collection_pid, $content_model_pid, array('ENDNOTE' => $endnote_filename));
   }
+  unlink($endnote_filename);
+  unlink($mods_filename);
   $context['sandbox']['progress']++;
   if ($context['sandbox']['progress'] != $context['sandbox']['total']) {
     $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['total'];
