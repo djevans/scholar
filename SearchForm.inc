@@ -83,7 +83,7 @@ function scholar_search_form(array &$form_state) {
           'coh_search_division_name' => t('Division Name'),
           'coh_search_cores' => t('Cores'),
         //'dc.text' => t('Text'),
-        )
+        ))
       ),
       'search' => array(
         '#title' => t('Search'),
