@@ -107,8 +107,13 @@ function csl_manage(array &$form_state) {
 function csl_manage_delete_style_submit(array $form, array &$form_state) {
   module_load_include('inc', 'csl', 'CSL');
   $style = $form_state['clicked_button']['#style'];
-  $msg = CSL::Delete($style) ? 'Successfully deleted style: %style' : 'Failed to deleted style: %style';
-  drupal_set_message(t($msg, array('%style' => $style)));
+  $style_t = array('%style' => $style);
+  if (CSL::Delete($style)) {
+    drupal_set_message(t('Successfully deleted style: %style', $style_t));
+  }
+  else {
+    drupal_set_message(t('Failed to deleted style: %style', $style_t));
+  }
 }
 
 /**

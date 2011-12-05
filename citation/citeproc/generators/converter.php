@@ -323,10 +323,12 @@ function convert_mods_to_citeproc_json_names(SimpleXMLElement $mods) {
   foreach ($queries as $query) {
     list($path, $default_role, $valid_roles) = $query;
     $names = $mods->xpath($path);
-    foreach ($names as $name) {
-      $name->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
-      $role = convert_mods_to_citeproc_json_name_role($name, $valid_roles, $default_role);
-      $output[$role][] = convert_mods_to_citeproc_json_name($name);
+    if (!empty($names)) {
+      foreach ($names as $name) {
+        $name->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
+        $role = convert_mods_to_citeproc_json_name_role($name, $valid_roles, $default_role);
+        $output[$role][] = convert_mods_to_citeproc_json_name($name);
+      }
     }
   }
   return $output;

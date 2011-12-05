@@ -61,8 +61,8 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $record_start = $results->response->start;
     $limit_results = variable_get('islandora_solr_search_limit_result_fields', 0);
     module_load_include('inc', 'csl', 'CSL');
-    $styles = CSL::GetNames();
-    $style = citeproc_style('APA');
+    $styles = array_values(CSL::GetNames()); //Array returned has keys == values, for some reason...  Whatever.
+    $style = citeproc_style($styles[0]);
     foreach ($results->response->docs as $doc) {
       $pid = $doc->PID;
       $item = new Fedora_Item($pid);
