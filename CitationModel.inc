@@ -110,14 +110,20 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
     if (!empty($mods)) {
       $mods = new SimpleXMLElement($mods);
       $mods->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
-      $variables['abstract'] = implode('<br/>', $mods->xpath('/mods:mods/mods:abstract'));
-      $variables['subject'] = implode('<br/>', $mods->xpath('/mods:mods/mods:subject/mods:topic'));
-      $variables['grant_number'] = implode('<br/>', $mods->xpath('/mods:mods/mods:name[@type="corporate"]/mods:role[mods:roleTerm[@type="text"]="funding agency"]/../mods:description[@type="grant number"]'));
-      $variables['funding_agency'] = implode('<br/>', $mods->xpath('/mods:mods/mods:name[@type="corporate"]/mods:role[mods:roleTerm[@type="text"]="funding agency"]/../mods:namePart'));
-      $variables['core_facility'] = implode('<br/>', $mods->xpath('/mods:mods/mods:note[@type="core facilities"]'));
-      $variables['source_system'] = implode('<br/>', $mods->xpath('/mods:mods/mods:recordInfo/mods:recordOrigin'));
-      $variables['ccsg_program'] = implode('<br/>', array()); // @todo
-      $variables['peer_reviewed'] = implode('<br/>', $mods->xpath('/mods:mods/mods:note[@type="peer reviewed"]'));
+      $parts = array(
+        'abstract' => '/mods:mods/mods:abstract',
+        'subject' => '/mods:mods/mods:subject/mods:topic',
+        'grant_number' => '/mods:mods/mods:name[@type="corporate"]/mods:role[mods:roleTerm[@type="text"]="funding agency"]/../mods:description[@type="grant number"]',
+        'funding_agency' => '/mods:mods/mods:name[@type="corporate"]/mods:role[mods:roleTerm[@type="text"]="funding agency"]/../mods:namePart',
+         'core_facility' => '/mods:mods/mods:note[@type="core facilities"]',
+         'source_system' => '/mods:mods/mods:recordInfo/mods:recordOrigin',
+         'ccsg_program' => 'string()', // @todo
+         'peer_reviewed' => '/mods:mods/mods:note[@type="peer reviewed"]'
+      );
+      
+      foreach ($parts as $key => $xpath) {
+        $variables[$key] = implode('<br/>', $mods->xpath($xpath));
+      }
     }
   }
 }
