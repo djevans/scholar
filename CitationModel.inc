@@ -70,15 +70,26 @@ class CitationModel extends AbstractModel {
    */
   public function getCitation($style_name) {
     if (isset($this->item->datastreams['MODS'])) {
-      $mods = $this->item->get_datastream_dissemination('MODS');
-      $mods = trim($mods);
-      if (!empty($mods)) {
-        $doc = new DOMDocument();
-        $doc->loadXML($mods);
-        $style = citeproc_style($style_name);
-        $bibliography = citeproc_bibliography_from_mods($style, $doc);
-        return array($bibliography->getID(), $bibliography->render());
+      $style = citeproc_style($style_name);
+      
+      $cache_id = "citation_{$this->pid}";
+      $cached_raw = cache_get($cache_id);
+      
+      $bibliography = NULL;
+      if (!empty($cached_raw)) {
+        $bibliography = citeproc_bibliograph_from_raw_array($style, $cached_raw);
       }
+      else {
+        $mods = $this->item->get_datastream_dissemination('MODS');
+        $mods = trim($mods);
+        if (!empty($mods)) {
+          $doc = new DOMDocument();
+          $doc->loadXML($mods);
+          
+          $bibliography = citeproc_bibliography_from_mods($style, $doc, $cache_id);
+        }
+      }
+      return array($bibliography->getID(), $bibliography->render());
     }
     return array(NULL, '');
   }

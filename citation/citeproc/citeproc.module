@@ -6,26 +6,53 @@
  * Implements hooks and callbacks for this module.
  */
 
-function citeproc_item_from_mods(DOMDocument $mods) {
+function citeproc_item_from_mods(DOMDocument $mods, $cache_id = NULL) {
   module_load_include('inc', 'citeproc', 'CiteProcJSItem');
   module_load_include('php', 'citeproc', 'generators/converter');
+
+  
+  $raw = '';
+  if (!is_null($cache_id)) {
+    $raw = cache_get($cache_id);
+  }
+  
+  if (empty($raw)) {
+    $raw = convert_mods_to_citeproc_jsons($mods->saveXML());
+    if (!is_null($cache_id)) {
+      cache_set($cache_id, $raw);
+    }
+  }
+
   $item = new CiteProcJSItem();
-  $raw = convert_mods_to_citeproc_jsons($mods->saveXML());
   $item->set($raw);
   return $item;
 }
 
-function citeproc_citation_from_mods(DOMDocument $mods) {
+function citeproc_citation_from_mods(DOMDocument $mods, $cache_id = NULL) {
   module_load_include('inc', 'citeproc', 'CiteProcJSCitation');
-  $item = citeproc_item_from_mods($mods);
+  $item = citeproc_item_from_mods($mods, $cache_id);
   $citation = new CiteProcJSCitation();
   $citation->addItem($item);
   return $citation;
 }
 
-function citeproc_bibliography_from_mods(CiteProcJSStyle $style, DOMDocument $mods) {
+function citeproc_bibliography_from_mods(CiteProcJSStyle $style, DOMDocument $mods, $cache_id = NULL) {
   module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
-  $citation = citeproc_citation_from_mods($mods);
+  $citation = citeproc_citation_from_mods($mods, $cache_id);
+  $bibliography = new CiteProcJSBibliography($style);
+  $bibliography->addCitation($citation);
+  return $bibliography;
+}
+
+function citeproc_bibliography_from_raw_array(CiteProcJSStyle $style, array $raw) {
+  module_load_include('inc', 'citeproc', 'CiteProcJSItem');
+  module_load_include('inc', 'citeproc', 'CiteProcJSCitation');
+  module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
+  
+  $item = new CiteProcJSItem();
+  $item->set($raw);
+  $citation = new CiteProcJSCitation();
+  $citation->addItem($item);
   $bibliography = new CiteProcJSBibliography($style);
   $bibliography->addCitation($citation);
   return $bibliography;
