@@ -508,7 +508,7 @@ function convert_mods_to_citeproc_json($mods, $item_id) {
   //  might try checking if the 'mods' prefix is bound: if it is not, then 
   //  try binding to an empty string?  Dunno...  Something like:
   add_mods_namespace($xml);
-  $mods_namespace = $xml->getNamespaces()['mods'];
+  //$mods_namespace = $xml->getNamespaces()['mods'];
   
 
   /**
