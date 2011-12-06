@@ -77,7 +77,7 @@ class CitationModel extends AbstractModel {
       
       $bibliography = NULL;
       if (!empty($cached_raw)) {
-        $bibliography = citeproc_bibliograph_from_raw_array($style, $cached_raw);
+        $bibliography = citeproc_bibliography_from_raw_array($style, $cached_raw);
       }
       else {
         $mods = $this->item->get_datastream_dissemination('MODS');
