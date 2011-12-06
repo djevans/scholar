@@ -18,6 +18,7 @@
 function scholar_search_form(array &$form_state) {
   drupal_add_js(drupal_get_path('module', 'scholar') . '/js/Ahah.js');
   drupal_add_css(drupal_get_path('module', 'scholar') . '/css/Search.css');
+  module_load_include('inc', 'islandora_solr_search', 'includes/common');
   $num_terms = 1;
   if (isset($form_state['values'])) {
     $values = $form_state['values'];
@@ -45,7 +46,7 @@ function scholar_search_form(array &$form_state) {
         '#title' => t('Field'),
         '#type' => 'select',
         '#default_value' => isset($values['terms'][$i]['field']) ? $values['terms'][$i]['field'] : 'coh_search_title',
-        '#options' => islandora_build_substitution_array(variable_get('islandora_solr_searchterms', <<<EOT
+        '#options' => islandora_build_substitution_list(variable_get('islandora_solr_searchterms', <<<EOT
 dc.title ~ Title
 coh_search_abstract ~ Abstract
 coh_search_author_identifier ~ Author Identifier
