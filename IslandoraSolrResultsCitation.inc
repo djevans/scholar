@@ -86,14 +86,27 @@ function template_preprocess_scholar_search_item(array &$variables) {
   if ($item->exists() && isset($item->datastreams['MODS'])) {
     $title = $item->objectProfile->objLabel;
     $variables['title'] = l($title, 'fedora/repository/' . htmlspecialchars($pid, ENT_QUOTES, 'utf-8'));
-    $mods = $item->get_datastream_dissemination('MODS');
-    $mods = trim($mods);
-    if (!empty($mods)) {
-      $doc = new DOMDocument();
-      $doc->loadXML($mods);
-      $bibliography = citeproc_bibliography_from_mods($variables['style'], $doc);
-      $variables['citation'] = $bibliography->render();
+    
+    $style = $variables['style'];
+    $cache_id = "citation_{$pid}";
+    $cached_raw = cache_get($cache_id);
+    
+    $bibliography = NULL;
+    if (!empty($cached_raw)) {
+      dd($cached_raw);
+      $bibliography = citeproc_bibliography_from_raw_array($style, $cached_raw->data);
     }
+    else {
+      $mods = $item->get_datastream_dissemination('MODS');
+      $mods = trim($mods);
+      if (!empty($mods)) {
+        $doc = new DOMDocument();
+        $doc->loadXML($mods);
+        
+        $bibliography = citeproc_bibliography_from_mods($style, $doc, $cache_id);
+      }
+    }
+    $variables['citation'] = $bibliography->render();
   }
 }
 

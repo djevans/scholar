@@ -13,13 +13,16 @@ function citeproc_item_from_mods(DOMDocument $mods, $cache_id = NULL) {
   
   $raw = '';
   if (!is_null($cache_id)) {
+    //dd(t('Trying to use cached version stupidly...: !id', array('!id' => $cache_id)));
     $raw = cache_get($cache_id);
   }
   
   if (empty($raw)) {
     $raw = convert_mods_to_citeproc_jsons($mods->saveXML());
     if (!is_null($cache_id)) {
-      cache_set($cache_id, $raw);
+      //dd(t('Setting cache: !id', array('!id' => $cache_id)));
+      //Cache for 12 hours...  Might be better to have them be permanent, and have the form submit clear them?
+      cache_set($cache_id, $raw, 'cache', time() + (3600 * 1000 * 12));
     }
   }
 
