@@ -100,12 +100,12 @@ function convert_mods_to_citeproc_jsons($mods) {
  */
 function convert_mods_to_citeproc_json_title(SimpleXMLElement $mods) {
   $output = '';
-  //$titles = $mods->xpath("/mods:mods/mods:titleInfo/mods:title");
   add_mods_namespace($mods);
+  $titles = $mods->xpath("/mods:mods/mods:titleInfo/mods:title");
+
   if (!empty($titles)) {
     while (list($num, $node) = each($titles)) {
       add_mods_namespace($node);
-      //$node->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
       $title = (string) $node;
       $subtitle = convert_mods_to_citeproc_json_query($node, '../mods:subTitle');
       $nonSort = convert_mods_to_citeproc_json_query($node, '../mods:nonSort');
