@@ -64,15 +64,48 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $styles = array_values(CSL::GetNames()); //Array returned has keys == values, for some reason...  Whatever.
     $style = citeproc_style($styles[0]);
     foreach ($results->response->docs as $doc) {
-      $pid = $doc->PID;
-      $item = new Fedora_Item($pid);
-      if ($item->exists() && isset($item->datastreams['MODS'])) {
-        $output .= theme(THEME_SCHOLAR_SEARCH_ITEM, $pid, $style);
-      }
+      //$pid = $doc->PID;
+      $output .= theme(THEME_SCHOLAR_SEARCH_ITEM_ALT, $doc, $style);
     }
     return $output;
   }
 
+}
+
+function template_preprocess_scholar_search_alt_item(array &$vars)  {
+  $s_doc =& $vars['solr_doc'];
+  $pid = $s_doc->PID;
+  $title = $s_doc->{'mods.title'};
+  if (is_array($title)) {$title = $title[0];}
+  
+  $vars['title'] = l($title, 'fedora/repository/' . htmlspecialchars($pid, ENT_QUOTES, 'utf-8'));
+  
+  $style = $vars['style'];
+  $cache_id = "citation_{$pid}";
+  $cached_raw = cache_get($cache_id);
+  
+  $bibliography = NULL;
+  if (!empty($cached_raw)) {
+    //dd($cached_raw);
+    $bibliography = citeproc_bibliography_from_raw_array($style, $cached_raw->data);
+  }
+  else {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    $item = new Fedora_Item($pid);
+    $mods = $item->exists() && isset($item->datastreams['MODS'])? 
+      $item->get_datastream_dissemination('MODS'):
+      '';
+    $mods = trim($mods);
+    if (!empty($mods)) {
+      $doc = new DOMDocument();
+      $doc->loadXML($mods);
+      
+      $bibliography = citeproc_bibliography_from_mods($style, $doc, $cache_id);
+    }
+  }
+  $vars['citation'] = !is_null($bibliography)?
+    $bibliography->render():
+    '';
 }
 
 /**
@@ -126,20 +159,23 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
 
   module_load_include('inc', 'csl', 'CSL');
   $styles = CSL::GetNames();
-  $style = citeproc_style('APA'); //array_shift($styles));
+  $ss = array_keys($styles);
+  $style = citeproc_style($ss[0]); //array_shift($styles));
   $pids = array();
   foreach ($results->response->docs as $doc) {
     $pid = $doc->PID;
     $result = '';
-    $item = new Fedora_Item($pid);
-    if ($item->exists() && isset($item->datastreams['MODS'])) {
+    //REMOVEME:  Blargh...
+    //$item = new Fedora_Item($pid); //Instanciating and checking is expensive!  Filtering should come from the search, anyway!
+    //if ($item->exists() && isset($item->datastreams['MODS'])) {
       $pids[] = $pid;
-      $result = theme(THEME_SCHOLAR_SEARCH_ITEM, $pid, $style);
+      //dd($doc);
+      $result = theme(THEME_SCHOLAR_SEARCH_ITEM_ALT, $doc, $style);
       $table['rows'][] = array(
         '#pid' => $pid,
         'result' => array('#value' => $result),
       );
-    }
+    //}
   }
   $checkboxes = array_fill_keys($pids, '');
   $table['selections'] = array(

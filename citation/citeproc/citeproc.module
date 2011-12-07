@@ -6,19 +6,24 @@
  * Implements hooks and callbacks for this module.
  */
 
-function citeproc_item_from_mods(DOMDocument $mods, $cache_id = NULL) {
+function citeproc_item_from_mods($mods, $cache_id = NULL) {
   module_load_include('inc', 'citeproc', 'CiteProcJSItem');
   module_load_include('php', 'citeproc', 'generators/converter');
 
   
   $raw = '';
   if (!is_null($cache_id)) {
-    //dd(t('Trying to use cached version stupidly...: !id', array('!id' => $cache_id)));
+    //dd(t('Trying to use cached version stupidly...: !id', array('!id' => $cache_id))); //Stupid, because if it were cached, we didn't have to load the MODS at an earlier step...
     $raw = cache_get($cache_id);
   }
   
   if (empty($raw)) {
-    $raw = convert_mods_to_citeproc_jsons($mods->saveXML());
+    if (is_a($mods, 'DOMDocument')) {
+      $raw = convert_mods_to_citeproc_jsons($mods->saveXML());
+    }
+    else { //assume a string...
+      $raw = convert_mods_to_citeproc_jsons($mods);
+    }
     if (!is_null($cache_id)) {
       //dd(t('Setting cache: !id', array('!id' => $cache_id)));
       //Cache for 12 hours...  Might be better to have them be permanent, and have the form submit clear them?
@@ -31,7 +36,7 @@ function citeproc_item_from_mods(DOMDocument $mods, $cache_id = NULL) {
   return $item;
 }
 
-function citeproc_citation_from_mods(DOMDocument $mods, $cache_id = NULL) {
+function citeproc_citation_from_mods($mods, $cache_id = NULL) {
   module_load_include('inc', 'citeproc', 'CiteProcJSCitation');
   $item = citeproc_item_from_mods($mods, $cache_id);
   $citation = new CiteProcJSCitation();
@@ -39,7 +44,7 @@ function citeproc_citation_from_mods(DOMDocument $mods, $cache_id = NULL) {
   return $citation;
 }
 
-function citeproc_bibliography_from_mods(CiteProcJSStyle $style, DOMDocument $mods, $cache_id = NULL) {
+function citeproc_bibliography_from_mods(CiteProcJSStyle $style, $mods, $cache_id = NULL) {
   module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
   $citation = citeproc_citation_from_mods($mods, $cache_id);
   $bibliography = new CiteProcJSBibliography($style);

@@ -13,6 +13,7 @@ define('MENU_SCHOLAR_ADVANCED_SEARCH_ADD_FIELD', 'scholar/search/advanced/field/
 define('MENU_SCHOLAR_ADVANCED_SEARCH_REMOVE_FIELD', 'scholar/search/advanced/field/remove');
 define('THEME_SCHOLAR_HOME', 'scholar_home');
 define('THEME_SCHOLAR_SEARCH_ITEM', 'scholar_search_item');
+define('THEME_SCHOLAR_SEARCH_ITEM_ALT', 'scholar_search_alt_item');
 define('THEME_SCHOLAR_SEARCH_TABLE', 'scholar_search_results_table');
 define('THEME_SCHOLAR_OVERVIEW_PANEL_CITATION', 'scholar_overview_panel_citation');
 
@@ -59,6 +60,11 @@ function scholar_theme() {
       'template' => 'templates/SearchItem',
       'file' => 'IslandoraSolrResultsCitation.inc',
       'arguments' => array('pid' => NULL, 'style' => NULL)
+    ),
+    THEME_SCHOLAR_SEARCH_ITEM_ALT => array(
+      'template' => 'templates/SearchItem',
+      'file' => 'IslandoraSolrResultsCitation.inc',
+      'arguments' => array('solr_doc' => NULL, 'style' => NULL)
     ),
     THEME_SCHOLAR_SEARCH_TABLE => array(
       'file' => 'IslandoraSolrResultsCitation.inc',
