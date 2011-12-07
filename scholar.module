@@ -18,6 +18,11 @@ define('THEME_SCHOLAR_SEARCH_TABLE', 'scholar_search_results_table');
 define('THEME_SCHOLAR_OVERVIEW_PANEL_CITATION', 'scholar_overview_panel_citation');
 
 /**
+ * Includes
+ */
+module_load_include('inc', 'scholar', 'Batch'); // To Deal with missing function during submit callback, worked at one time.
+
+/**
  * Implements hook_menu().
  */
 function scholar_menu() {
