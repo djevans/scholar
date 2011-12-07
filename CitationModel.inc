@@ -26,7 +26,7 @@ class CitationModel extends AbstractModel {
    * 
    * @var Fedora_Item
    */
-  protected $item;
+  public $item;
 
   /**
    * Creates CitationModel instance.
