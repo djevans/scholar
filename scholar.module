@@ -186,8 +186,8 @@ function scholar_form_content_model_viewer_edit_metadata_form_alter(array &$form
         $doc = new DOMDocument();
         $doc->loadXML($mods);
         module_load_include('inc', 'csl', 'CSL');
-        $names = CSL::GetNames();
-        $style = citeproc_style('APA');
+        $names = array_keys(CSL::GetNames());
+        $style = citeproc_style($names[0]); //XXX:  This'll break if there're none...
         $bibliography = citeproc_bibliography_from_mods($style, $doc);
       }
     }

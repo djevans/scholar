@@ -105,8 +105,9 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
   module_load_include('inc', 'csl', 'CSL');
   module_load_include('inc', 'islandora_bibliography', 'CitationForm');
   $pid = $variables['pid'];
-  $item = new Fedora_Item($pid);
+  //$item = new Fedora_Item($pid);
   $model = new CitationModel($pid);
+  $item =& $model->item;
   // Citations
   $styles = CSL::GetNames();
   foreach ($styles as $name) {
