@@ -231,8 +231,8 @@ function scholar_citation_from_solr_doc($doc, $style=NULL, $solr_mods_field='mod
     else {
       $mods = '';
       
-      if (isset($doc->mods_fullxml_store)) {
-        $mods = trim(html_entity_decode($doc->{$solr_mods_field}));
+      if (isset($doc->{$solr_mods_field})) {
+        $mods = trim($doc->{$solr_mods_field});
       }
      
       if (empty($mods)) {
