@@ -25,7 +25,7 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $sort = $_SESSION['scholar']['search']['sort'];
     $order = $_SESSION['scholar']['search']['order'];
     if (!empty($_SESSION['scholar']['search']['sort'])) {
-      $query_processor->solrParams['fl'] = 'PID';
+      $query_processor->solrParams['fl'] = 'PID,mod_fullxml_store';
       $query_processor->solrParams['sort'] = $sort . ' ' . $order;
       $query_processor->executeQuery();
     }
@@ -64,7 +64,6 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $styles = array_values(CSL::GetNames()); //Array returned has keys == values, for some reason...  Whatever.
     $style = citeproc_style($styles[0]);
     foreach ($results->response->docs as $doc) {
-      //$pid = $doc->PID;
       $output .= theme(THEME_SCHOLAR_SEARCH_ITEM_ALT, $doc, $style);
     }
     return $output;
@@ -75,37 +74,14 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
 function template_preprocess_scholar_search_alt_item(array &$vars)  {
   $s_doc =& $vars['solr_doc'];
   $pid = $s_doc->PID;
-  $title = $s_doc->{'mods.title'};
+  $title = $s_doc->mods_title_ms;
   if (is_array($title)) {$title = $title[0];}
   
   $vars['title'] = l($title, 'fedora/repository/' . htmlspecialchars($pid, ENT_QUOTES, 'utf-8'));
   
   $style = $vars['style'];
-  $cache_id = "citation_{$pid}";
-  $cached_raw = cache_get($cache_id);
   
-  $bibliography = NULL;
-  if (!empty($cached_raw)) {
-    //dd($cached_raw);
-    $bibliography = citeproc_bibliography_from_raw_array($style, $cached_raw->data);
-  }
-  else {
-    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    $item = new Fedora_Item($pid);
-    $mods = $item->exists() && isset($item->datastreams['MODS'])? 
-      $item->get_datastream_dissemination('MODS'):
-      '';
-    $mods = trim($mods);
-    if (!empty($mods)) {
-      $doc = new DOMDocument();
-      $doc->loadXML($mods);
-      
-      $bibliography = citeproc_bibliography_from_mods($style, $doc, $cache_id);
-    }
-  }
-  $vars['citation'] = !is_null($bibliography)?
-    $bibliography->render():
-    '';
+  $vars['citation'] = scholar_citation_from_solr_doc($s_doc);
 }
 
 /**
@@ -126,7 +102,7 @@ function template_preprocess_scholar_search_item(array &$variables) {
     
     $bibliography = NULL;
     if (!empty($cached_raw)) {
-      dd($cached_raw);
+      //dd($cached_raw);
       $bibliography = citeproc_bibliography_from_raw_array($style, $cached_raw->data);
     }
     else {
@@ -165,17 +141,12 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
   foreach ($results->response->docs as $doc) {
     $pid = $doc->PID;
     $result = '';
-    //REMOVEME:  Blargh...
-    //$item = new Fedora_Item($pid); //Instanciating and checking is expensive!  Filtering should come from the search, anyway!
-    //if ($item->exists() && isset($item->datastreams['MODS'])) {
       $pids[] = $pid;
-      //dd($doc);
       $result = theme(THEME_SCHOLAR_SEARCH_ITEM_ALT, $doc, $style);
       $table['rows'][] = array(
         '#pid' => $pid,
         'result' => array('#value' => $result),
       );
-    //}
   }
   $checkboxes = array_fill_keys($pids, '');
   $table['selections'] = array(
@@ -333,3 +304,4 @@ function theme_scholar_search_results_table(array $element) {
   $attributes = isset($element['#id']) ? array('id' => $element['#id']) : NULL;
   return '<div class="scholar-search-results">' . theme_table($element['#header'], $rows, $attributes) . '</div>';
 }
+

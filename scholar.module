@@ -203,3 +203,62 @@ function scholar_form_content_model_viewer_edit_metadata_form_alter(array &$form
     $form['#attributes'] = array('enctype' => 'multipart/form-data'); // Allow the uploading of files.
   }
 }
+
+/**
+ * @param $doc              A Solr document object
+ * @param $style            A CiteprocJSStyle object, or NULL (to use the default)
+ * @param $solr_mods_field  A field in the Solr object, which holds the entire contents of the MODS document (with entities escaped)
+ * @returm The citation, or an empty string.
+ */
+function scholar_citation_from_solr_doc($doc, $style=NULL, $solr_mods_field='mods_fullxml_store') {
+  $pid = $doc->PID;
+  
+  $cache_id = "citation_$pid";
+  $cache_raw = cache_get($cache_id);
+  
+  if (module_exists('citeproc')) {
+    module_load_include('inc', 'csl', 'CSL');
+    $styles = array_keys(CSL::GetNames()); //Array returned has keys == human readable.
+    $style = is_null($style)?
+      citeproc_style(variable_get('islandora_fjm_recent_additions_csl', $styles[0])): //@todo:  Specify a default CSL
+      $style;
+    
+    $bibliograpy = NULL;
+    if (!empty($cache_raw)) {
+      dd('Got citation info from cache');
+      $bibliography = citeproc_bibliography_from_raw_array($style, $cache_raw->data);
+    }
+    else {
+      $mods = '';
+      
+      if (isset($doc->mods_fullxml_store)) {
+        $mods = trim(html_entity_decode($doc->{$solr_mods_field}));
+      }
+     
+      if (empty($mods)) {
+        //Try to get from Fedora...
+        module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+        $item = new Fedora_Item($pid);
+        if ($item->exists() && $item->datastreams['MODS']) {
+          dd('Trying to get MODS from Fedora');
+          $mods = trim($item->get_datastream_dissemination('MODS'));
+        }
+      }
+      else {
+        dd('Got MODS from Solr');
+      }
+
+      if (!empty($mods)) { 
+        $bibliography = citeproc_bibliography_from_mods($style, $mods, $cache_id);
+      }
+      else {
+        watchdog('islandora_fjm', 'Wanting to do citations, but failed loading mods');
+      }
+    }
+    
+    if (!is_null($bibliography)) {
+      return $bibliography->render();
+    }
+  }
+  return '';
+}
