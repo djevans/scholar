@@ -13,8 +13,9 @@ function citeproc_item_from_mods($mods, $cache_id = NULL) {
   
   $raw = '';
   if (!is_null($cache_id)) {
-    //dd(t('Trying to use cached version stupidly...: !id', array('!id' => $cache_id))); //Stupid, because if it were cached, we didn't have to load the MODS at an earlier step...
-    $raw = cache_get($cache_id);
+    //Stupid, because if it were cached, we didn't have to load the MODS at an earlier step...
+    $obj = cache_get($cache_id);
+    $raw = $obj->data;
   }
   
   if (empty($raw)) {
@@ -51,31 +52,13 @@ function citeproc_bibliography_from_raw_array(CiteProcJSStyle $style, array $raw
   module_load_include('inc', 'citeproc', 'CiteProcJSItem');
   module_load_include('inc', 'citeproc', 'CiteProcJSCitation');
   module_load_include('inc', 'citeproc', 'CiteProcJSBibliography');
-  $times = array();
-  
-  array_push($times, microtime(TRUE));
+
   $item = new CiteProcJSItem();
-  dd(t('Instanciated CiteProcJSItem in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
-  
-  array_push($times, microtime(TRUE));
   $item->set($raw);
-  dd(t('Created item in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
-  
-  array_push($times, microtime(TRUE));
   $citation = new CiteProcJSCitation();
-  dd(t('Instanciated CiteProcJSCitation in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
-  
-  array_push($times, microtime(TRUE));
   $citation->addItem($item);
-  dd(t('Created citation in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
-  
-  array_push($times, microtime(TRUE));
   $bibliography = new CiteProcJSBibliography($style);
-  dd(t('Instanciated CiteProcJSBibliography in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
-  
-  array_push($times, microtime(TRUE));
   $bibliography->addCitation($citation);
-  dd(t('Created bibliography in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
   
   return $bibliography;
 }
@@ -83,8 +66,8 @@ function citeproc_bibliography_from_raw_array(CiteProcJSStyle $style, array $raw
 function citeproc_style($style) {
   module_load_include('inc', 'csl', 'CSL');
   module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
-  $doc = CSL::Get($style);
-  if($doc) {
+  $doc = CSL::Get($style, TRUE);
+  if(!empty($doc)) {
     return new CiteProcJSStyle($doc);
   }
   return FALSE;

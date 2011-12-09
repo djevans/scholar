@@ -20,8 +20,16 @@ class CSL {
    * @return boolean
    *   TRUE if the given style is valid, FALSE otherwise.
    */
-  public static function Valid(DOMDocument $style) {
+  public static function Valid($style_in) {
     $schema_filename = drupal_get_path('module', 'csl') . '/schema/csl.rng';
+    $style = NULL;
+    if ($style_in instanceof DOMDocument) {
+      $style = $style_in;
+    }
+    else {
+      $style = new DOMDocument();
+      $style->loadXML($style_in);
+    }
     return $style->relaxNGValidate($schema_filename);
   }
 
@@ -61,17 +69,26 @@ class CSL {
    *
    * @param string $style_name
    *   The name of the CSL style.
+   * @param boolean $as_string
+   *   Returns the CSL as a string (default is a DOMDocument)
    *
-   * @return DOMDocument
+   * @return mixed
    *   The CSL style definition if found, FALSE otherwise.
    */
-  public static function Get($style_name) {
+  public static function Get($style_name, $as_string=FALSE) {
     if (self::Exists($style_name)) {
       $query = db_query('SELECT style FROM {%s} WHERE name = "%s"', self::table, $style_name);
       $xml = db_result($query);
-      if (trim($xml) !== '') {
-        $definition = new DOMDocument();
-        $definition->loadXML($xml);
+      $xml = trim($xml);
+      if (!empty($xml)) {
+        $definition = NULL;
+        if (!$as_string) {
+          $definition = new DOMDocument();
+          $definition->loadXML($xml);
+        }
+        else {
+          $definition = $xml;
+        }
         return $definition;
       }
     }
@@ -85,20 +102,25 @@ class CSL {
    *
    * @param string $style_name
    *   The name of the CSL style.
-   * @param DOMDocument $definition
-   *   A CSL style definition.
+   * @param mixed $definition
+   *   A CSL style definition. (DOMDocument or string)
    *
    * @return boolean
    *  TRUE if successful, otherwise FALSE.
    */
-  public static function Create($style_name, DOMDocument $definition) {
+  public static function Create($style_name, $definition) {
     if (!self::Exists($style_name)) {
       if (!self::Valid($definition)) {
         drupal_set_message("The $style_name is not valid CSL 1.0 problems may occur.");
       }
       $object = new stdClass();
       $object->name = $style_name;
-      $object->style = $definition->saveXML();
+      if ($definition instanceof DOMDocument) {
+        $object->style = $definition->saveXML();
+      }
+      else { //Assume a string.
+        $object->style = trim($definition);
+      }
       return drupal_write_record(self::table, $object) !== FALSE;
     }
     return FALSE;
@@ -120,5 +142,4 @@ class CSL {
     }
     return FALSE;
   }
-
 }

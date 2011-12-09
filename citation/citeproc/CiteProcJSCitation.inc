@@ -116,5 +116,4 @@ class CiteProcJSCitation {
      */
     return '<span id="' . $this->id . '" class="citeproc-in-text"></span>';
   }
-
 }

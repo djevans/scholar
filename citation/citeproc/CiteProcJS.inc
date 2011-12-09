@@ -119,9 +119,7 @@ class CiteProcJS {
    *   The data to store in the drupal settings object.
    */
   private function storeInSettings(array $data) {
-    $time = microtime(TRUE);
     drupal_add_js(array('citeproc' => $data), 'setting');
-    dd(t("Adding data to Drupal.settings took !delta s", array('!delta' => (microtime(TRUE) - $time)))); //Figure it might take a while here, transforming stuff to JSON...  Apparently not.
   }
 
   /**
@@ -217,5 +215,4 @@ class CiteProcJS {
     $data = array('bibliography' => array($id => $json));
     $this->storeInSettings($data);
   }
-
 }

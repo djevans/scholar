@@ -99,7 +99,6 @@ function template_preprocess_scholar_search_item(array &$variables) {
     
     $bibliography = NULL;
     if (!empty($cached_raw)) {
-      //dd($cached_raw);
       $bibliography = citeproc_bibliography_from_raw_array($style, $cached_raw->data);
     }
     else {
