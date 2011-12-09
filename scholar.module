@@ -211,22 +211,31 @@ function scholar_form_content_model_viewer_edit_metadata_form_alter(array &$form
  * @returm The citation, or an empty string.
  */
 function scholar_citation_from_solr_doc($doc, $style=NULL, $solr_mods_field='mods_fullxml_store') {
+  dd('');
   $pid = $doc->PID;
+  $times = array();
   
+  array_push($times, microtime(TRUE));
   $cache_id = "citation_$pid";
   $cache_raw = cache_get($cache_id);
+  dd(t("Checking cache took !delta s", array('!delta' => (microtime(TRUE) - array_pop($times))))); //Figure it might take a while here, Iterating over stuff...  Apparently not.
   
   if (module_exists('citeproc')) {
-    module_load_include('inc', 'csl', 'CSL');
-    $styles = array_keys(CSL::GetNames()); //Array returned has keys == human readable.
-    $style = is_null($style)?
-      citeproc_style(variable_get('islandora_fjm_recent_additions_csl', $styles[0])): //@todo:  Specify a default CSL
-      $style;
+    if (is_null($style)) {
+      array_push($times, microtime(TRUE));
+      module_load_include('inc', 'csl', 'CSL');
+      $styles = array_keys(CSL::GetNames()); //Array returned has keys == human readable.
+      $style = citeproc_style(variable_get('islandora_fjm_recent_additions_csl', $styles[0])); //@todo:  Specify a default CSL
+      dd(t("Checking for and getting CSL took !delta s", array('!delta' => (microtime(TRUE) - array_pop($times))))); //Figure it might take a while here, Iterating over stuff...  Apparently not.
+    }
+    
     
     $bibliograpy = NULL;
     if (!empty($cache_raw)) {
       dd('Got citation info from cache');
+      array_push($times, microtime(TRUE));
       $bibliography = citeproc_bibliography_from_raw_array($style, $cache_raw->data);
+      dd(t("Generating Bibliography from cache took !delta s", array('!delta' => (microtime(TRUE) - array_pop($times))))); //Figure it might take a while here, Iterating over stuff...  Apparently not.
     }
     else {
       $mods = '';
@@ -238,18 +247,22 @@ function scholar_citation_from_solr_doc($doc, $style=NULL, $solr_mods_field='mod
       if (empty($mods)) {
         //Try to get from Fedora...
         module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+        array_push($times, microtime(TRUE));
         $item = new Fedora_Item($pid);
         if ($item->exists() && $item->datastreams['MODS']) {
           dd('Trying to get MODS from Fedora');
           $mods = trim($item->get_datastream_dissemination('MODS'));
         }
+        dd(t('Getting MODS from Fedora took !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
       }
       else {
         dd('Got MODS from Solr');
       }
 
       if (!empty($mods)) { 
+        array_push($times, microtime(TRUE));
         $bibliography = citeproc_bibliography_from_mods($style, $mods, $cache_id);
+        dd(t('Generating bibliography from MODS took !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
       }
       else {
         watchdog('islandora_fjm', 'Wanting to do citations, but failed loading mods');
@@ -257,7 +270,10 @@ function scholar_citation_from_solr_doc($doc, $style=NULL, $solr_mods_field='mod
     }
     
     if (!is_null($bibliography)) {
-      return $bibliography->render();
+      array_push($times, microtime(TRUE));
+      $toReturn = $bibliography->render();
+      dd(t("Rendering bibliography (in scholar.module) took !delta s", array('!delta' => (microtime(TRUE) - array_pop($times))))); //Figure it might take a while here, Iterating over stuff...  Apparently not.
+      return $toReturn;
     }
   }
   return '';

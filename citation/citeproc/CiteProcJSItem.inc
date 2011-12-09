@@ -170,7 +170,9 @@ class CiteProcJSItem {
    * Create a CiteProcItem.
    */
   public function __construct() {
-    $this->id = uniqid();
+    $times = array();
+    array_push($times, microtime(TRUE));
+    dd(t('Got id in CiteProcJSItem in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
     $this->data = array();
   }
 
@@ -178,7 +180,7 @@ class CiteProcJSItem {
    * Clone this CiteProcItem.
    */
   public function __clone() {
-    $this->id = uniqid(); // Preserve uniqueness.
+    $this->id = citeproc_get_id(); // Preserve uniqueness.
   }
 
   /**
@@ -316,11 +318,13 @@ class CiteProcJSItem {
   public function toJSON() {
     $data = $this->data;
     $data['id'] = $this->id;
+    $time = microtime(TRUE);
     foreach ($data as $key => $value) {
       if (empty($value)) {
         unset($data[$key]);
       }
     }
+    dd(t("Iterating over item data took !delta s", array('!delta' => microtime(TRUE) - $time))); //Figure it might take a while here, transforming stuff to JSON...  Apparently not.
     return $data;
   }
 

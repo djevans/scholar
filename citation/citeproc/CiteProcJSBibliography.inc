@@ -52,10 +52,17 @@ class CiteProcJSBibliography {
    *   Any abbreviations we wan't to apply.
    */
   public function __construct(CiteProcJSStyle $style, CiteProcJSAbbreviation $abbreviation = NULL) {
-    $this->id = uniqid();
+    $times = array();
+    
+    array_push($times, microtime(TRUE));
+    $this->id = citeproc_get_id();
+    dd(t('Got id in CiteProcJSBilbio in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
+  
+    array_push($times, microtime(TRUE));
     $this->style = $style;
     $this->abbreviation = $abbreviation;
     $this->citations = array();
+    dd(t('Did other stuff in CiteProcJSBilbio in !delta s', array('!delta' => (microtime(TRUE) - array_pop($times)))));
   }
 
   /**
@@ -99,9 +106,11 @@ class CiteProcJSBibliography {
       'abbreviation' => isset($this->abbreviation) ? $this->abbreviation->getID() : NULL,
       'items' => array()
     );
+    $time = microtime(TRUE);
     foreach ($this->citations as $id => $citation) {
       $data['items'][$id] = $citation->toJSON();
     }
+    dd(t("Iterating over data in Bibliography took !delta s", array('!delta' => (microtime(TRUE) - $time)))); //Figure it might take a while here, Iterating over stuff...  Apparently not.
     return $data;
   }
 
