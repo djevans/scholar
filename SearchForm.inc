@@ -94,7 +94,7 @@ EOT
       ),
       'hidden_submit' => array(// Used for when the user presses enter on the search field.
         '#type' => 'submit',
-        '#value' => 'Search',
+        '#value' => t('Search'),
         '#attributes' => array('style' => 'visibility:hidden;position:fixed;top:-1000px;right:-1000px;')
       ),
       'add' => array(
