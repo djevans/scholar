@@ -170,7 +170,7 @@ class CiteProcJSItem {
    * Create a CiteProcItem.
    */
   public function __construct() {
-    $this->id = uniqid();
+    $this->id = citeproc_get_id();
     $this->data = array();
   }
 
@@ -178,7 +178,7 @@ class CiteProcJSItem {
    * Clone this CiteProcItem.
    */
   public function __clone() {
-    $this->id = uniqid(); // Preserve uniqueness.
+    $this->id = citeproc_get_id(); // Preserve uniqueness.
   }
 
   /**
@@ -323,5 +323,4 @@ class CiteProcJSItem {
     }
     return $data;
   }
-
 }

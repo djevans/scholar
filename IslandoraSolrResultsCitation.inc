@@ -30,7 +30,6 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
       $query_processor->executeQuery();
     }
     $total = (int) $query_processor->solrResult->response->numFound;
-    $output = '<h4>Advanced Search</h4>';
     $output .= drupal_get_form('scholar_search_form');
     if ($total === 0) {
       $output .= "<h2>Search Results</h2>";
@@ -79,9 +78,7 @@ function template_preprocess_scholar_search_alt_item(array &$vars)  {
   
   $vars['title'] = l($title, 'fedora/repository/' . htmlspecialchars($pid, ENT_QUOTES, 'utf-8'));
   
-  $style = $vars['style'];
-  
-  $vars['citation'] = scholar_citation_from_solr_doc($s_doc);
+  $vars['citation'] = scholar_citation_from_solr_doc($s_doc, $vars['style']);
 }
 
 /**
@@ -102,7 +99,6 @@ function template_preprocess_scholar_search_item(array &$variables) {
     
     $bibliography = NULL;
     if (!empty($cached_raw)) {
-      //dd($cached_raw);
       $bibliography = citeproc_bibliography_from_raw_array($style, $cached_raw->data);
     }
     else {

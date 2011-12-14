@@ -29,11 +29,20 @@ class CiteProcJSStyle {
 
   /**
    * Create a CiteProcStyle instance.
+   * @param mixed $style either a DOMDocument or string containing the XML for the style.
    */
-  public function __construct(DOMDocument $style) {
+  public function __construct($style) {
     module_load_include('inc', 'citeproc', 'CiteProcJS');
-    $this->id = uniqid();
-    $this->data = $style->saveXML();
+    
+    $this->id = citeproc_get_id();
+    
+    if ($style instanceof DOMDocument) {
+      $this->data = $style->saveXML();
+    }
+    else { //Assume it's a string...  Possibly save parsing?
+      $this->data = trim($style);
+    }
+    
     $citeproc = CiteProcJS::getInstance();
     $citeproc->addStyle($this);
   }
@@ -64,5 +73,4 @@ class CiteProcJSStyle {
   public function toJSON() {
     return $this->data;
   }
-
 }

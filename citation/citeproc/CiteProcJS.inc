@@ -215,5 +215,4 @@ class CiteProcJS {
     $data = array('bibliography' => array($id => $json));
     $this->storeInSettings($data);
   }
-
 }

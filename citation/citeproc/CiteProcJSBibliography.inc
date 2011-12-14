@@ -52,7 +52,8 @@ class CiteProcJSBibliography {
    *   Any abbreviations we wan't to apply.
    */
   public function __construct(CiteProcJSStyle $style, CiteProcJSAbbreviation $abbreviation = NULL) {
-    $this->id = uniqid();
+    $this->id = citeproc_get_id();
+  
     $this->style = $style;
     $this->abbreviation = $abbreviation;
     $this->citations = array();
@@ -62,7 +63,7 @@ class CiteProcJSBibliography {
    * Clone this CiteProcBibliography.
    */
   public function __clone() {
-    $this->id = spl_object_hash($this); // Preserve uniqueness.
+    $this->id = citeproc_get_id(); // Preserve uniqueness.
   }
 
   /**
@@ -123,5 +124,4 @@ class CiteProcJSBibliography {
     $citeproc->addBibliography($this);
     return '<div id="' . $this->id . '" class="citeproc-bibliography">[Page generation failure.  The bibliography processor requires a browser with Javascript enabled.]</div>';
   }
-
 }

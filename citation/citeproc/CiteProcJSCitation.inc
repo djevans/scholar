@@ -34,7 +34,7 @@ class CiteProcJSCitation {
    * Create a CiteProcCitation instance.
    */
   public function __construct() {
-    $this->id = uniqid();
+    $this->id = citeproc_get_id();
     $this->items = array();
   }
 
@@ -42,7 +42,7 @@ class CiteProcJSCitation {
    * Clone this CiteProcCitation.
    */
   public function __clone() {
-    $this->id = uniqid(); // Preserve uniqueness.
+    $this->id = citeproc_get_id(); // Preserve uniqueness.
   }
 
   /**
@@ -116,5 +116,4 @@ class CiteProcJSCitation {
      */
     return '<span id="' . $this->id . '" class="citeproc-in-text"></span>';
   }
-
 }

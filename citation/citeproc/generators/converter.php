@@ -61,8 +61,9 @@ function convert_mods_to_citeproc_jsons($mods_in) {
       $mods = simplexml_load_string($mods_in);
     }
     catch (Exception $e) {
-      dd($e);
-      dd(libxml_get_errors());
+      watchdog('citeproc', t('Got exception while parsing.  Message: !msg Errors: !error', array(
+        '!msg' => $e->getMessage(),
+        '!error' => libxml_get_errors())));
       return array();
     }
   }
@@ -100,7 +101,7 @@ function convert_mods_to_citeproc_jsons($mods_in) {
     return $output;
   }
   else {
-    dd('Not a SimpleXMLElement!');
+    watchdog('citeproc', 'Not a SimpleXMLElement!');
     return array();
   }
   
