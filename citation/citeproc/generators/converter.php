@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file 
  *   this file is used to convert mods data into json for citeproc-js
@@ -30,18 +31,18 @@ function convert_mods_to_citeproc_jsons_escape(&$item, $key) {
 function add_mods_namespace(SimpleXMLElement &$mods) {
   static $used_namespace = NULL;
   static $mods_namespace = 'http://www.loc.gov/mods/v3';
-  
+
   $namespaces = $mods->getNamespaces();
-  
-  if (is_null($used_namespace)) { 
+
+  if (is_null($used_namespace)) {
     if (array_search($mods_namespace, $namespaces) !== FALSE) { //The namespace is there; possibly default, though
-    $used_namespace = $mods_namespace;
+      $used_namespace = $mods_namespace;
     }
     else {
       $used_namespace = '';
     }
   }
-  
+
   if (array_key_exists('mods', $namespaces) === FALSE) {
     $mods->registerXPathNamespace('mods', $used_namespace);
   }
@@ -59,44 +60,42 @@ function convert_mods_to_citeproc_jsons($mods_in) {
   else {
     try {
       $mods = simplexml_load_string($mods_in);
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
       watchdog('citeproc', t('Got exception while parsing.  Message: !msg Errors: !error', array(
-        '!msg' => $e->getMessage(),
-        '!error' => libxml_get_errors())));
+            '!msg' => $e->getMessage(),
+            '!error' => libxml_get_errors())));
       return array();
     }
   }
-
   if ($mods instanceof SimpleXMLElement) {
     //$mods->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
     add_mods_namespace($mods);
     $names = convert_mods_to_citeproc_json_names($mods); // Merge with main object
     $dates = convert_mods_to_citeproc_json_dates($mods);
     $output = array_merge(array(
-    'title' => convert_mods_to_citeproc_json_title($mods),
-    'abstract' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:abstract'),
-    'call-number' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:classification'),
-    'collection-title' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:relatedItem[@type="series"]/mods:titleInfo/mods:title'),
-    'container-title' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:relatedItem[@type="host"]/mods:titleInfo/mods:title'),
-    'DOI' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="doi"]'),
-    'edition' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:originInfo/mods:edition'),
-    'event' => convert_mods_to_citeproc_json_event($mods),
-    'event-place' => convert_mods_to_citeproc_json_event_place($mods),
-    //'genre' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:relatedItem[@type="host"]/mods:genre[@authority="marcgt"]'),
-    'ISBN' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="isbn"]'),
-    'volume' => (int) convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:part/mods:detail[@type="volume"]/mods:number'),
-    'issue' => (int) convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:part/mods:detail[@type="issue"]/mods:number'),
-    'note' => convert_mods_to_citeproc_json_note($mods),
-    'number' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:relatedItem[@type="series"]/mods:titleInfo/mods:partNumber'),
-    'page' => convert_mods_to_citeproc_json_page($mods),
-    'publisher' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:originInfo/mods:publisher'),
-    //'publisher-place' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:originInfo/mods:place/mods:placeTerm'),
-    'URL' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:location/mods:url'),
-    'number-pmid' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="pmid"]'),
-    'number-pmcid' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="pmcid"]'),
-    'number-nihmsid' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="nihmsid"]'),
-    'type' => convert_mods_to_citeproc_json_type($mods)), $names, $dates
+      'title' => convert_mods_to_citeproc_json_title($mods),
+      'abstract' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:abstract'),
+      'call-number' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:classification'),
+      'collection-title' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:relatedItem[@type="series"]/mods:titleInfo/mods:title'),
+      'container-title' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:relatedItem[@type="host"]/mods:titleInfo/mods:title'),
+      'DOI' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="doi"]'),
+      'edition' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:originInfo/mods:edition'),
+      'event' => convert_mods_to_citeproc_json_event($mods),
+      'event-place' => convert_mods_to_citeproc_json_event_place($mods),
+      //'genre' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:relatedItem[@type="host"]/mods:genre[@authority="marcgt"]'),
+      'ISBN' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="isbn"]'),
+      'volume' => (int) convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:part/mods:detail[@type="volume"]/mods:number'),
+      'issue' => (int) convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:part/mods:detail[@type="issue"]/mods:number'),
+      'note' => convert_mods_to_citeproc_json_note($mods),
+      'number' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:relatedItem[@type="series"]/mods:titleInfo/mods:partNumber'),
+      'page' => convert_mods_to_citeproc_json_page($mods),
+      'publisher' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:originInfo/mods:publisher'),
+      //'publisher-place' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:originInfo/mods:place/mods:placeTerm'),
+      'URL' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:location/mods:url'),
+      'number-pmid' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="pmid"]'),
+      'number-pmcid' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="pmcid"]'),
+      'number-nihmsid' => convert_mods_to_citeproc_json_query($mods, '/mods:mods/mods:identifier[@type="nihmsid"]'),
+      'type' => convert_mods_to_citeproc_json_type($mods)), $names, $dates
     );
     return $output;
   }
@@ -104,7 +103,6 @@ function convert_mods_to_citeproc_jsons($mods_in) {
     watchdog('citeproc', 'Not a SimpleXMLElement!');
     return array();
   }
-  
 }
 
 /**
@@ -256,7 +254,7 @@ function convert_mods_to_citeproc_json_type(SimpleXMLElement $mods) {
   // First try: item's local marcgt genre.
   $type_marcgt = $mods->xpath("/mods:mods/mods:genre[@authority='marcgt']");
   if (!empty($type_marcgt)) {
-    $interim_type =& $type_marcgt[0];
+    $interim_type = & $type_marcgt[0];
     add_mods_namespace($interim_type);
     if (!strcasecmp($interim_type, 'book')) {
       $host_titles = $interim_type->xpath("../mods:relatedItem[@type='host']/mods:titleInfo/mods:title");
@@ -269,9 +267,19 @@ function convert_mods_to_citeproc_json_type(SimpleXMLElement $mods) {
       }
     }
     else {
-      $output = marcgt_to_csl((string)$interim_type);
+      $output = marcgt_to_csl((string) $interim_type);
     }
-    $csl_type = marcgt_to_csl((string)$interim_type);
+    $csl_type = marcgt_to_csl((string) $interim_type);
+  }
+  // Check anon before marcgt
+  if (empty($output)) {
+    $type_related = $mods->xpath("/mods:mods/mods:relatedItem/mods:genre[not(@authority)]");
+    if (!empty($type_related)) {
+      $interim_type = (string) $type_related[0];
+      if (!strcasecmp($interim_type, 'article-journal')) {
+        $output = 'article-journal';
+      }
+    }
   }
   // Second try: item's parent marcgt genre (often applies to the original item itself).
   if (empty($output)) {
@@ -531,7 +539,7 @@ function convert_mods_to_citeproc_json($mods, $item_id) {
   //  try binding to an empty string?  Dunno...  Something like:
   add_mods_namespace($xml);
   //$mods_namespace = $xml->getNamespaces()['mods'];
-  
+
 
   /**
     FROM HERE ON IN, WE'RE DOING XPATH QUERIES AND POPULATING CSL VARIABLES.
@@ -543,13 +551,13 @@ function convert_mods_to_citeproc_json($mods, $item_id) {
   // My answer is to take the *longest*. 
 
   $titles = $xml->xpath("//mods:mods/mods:titleInfo/mods:title");
-  
+
 
   if (!empty($titles))
     while (list($num, $node) = each($titles)) {
       //$node->registerXPathNamespace('mods', $mods_namespace);
       add_mods_namespace($node);
-      
+
       $title = (string) $node;
       $subtitle = $node->xpath("../mods:subTitle");
       if (!empty($subtitle)) {
@@ -733,7 +741,7 @@ function convert_mods_to_citeproc_json($mods, $item_id) {
     if (!strcasecmp($interim_type, 'book')) {
       //$type_marcgt[0]->registerXPathNamespace('mods', $mods_namespace);
       add_mods_namespace($type_marcgt[0]);
-      
+
       $host_titles = $type_marcgt[0]->xpath("../mods:relatedItem[@type='host']/mods:titleInfo/mods:title/text()");
       if (!empty($host_titles)) {
         // This is but a chapter in a book
