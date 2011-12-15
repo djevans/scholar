@@ -5,22 +5,21 @@
  *
  * Implements hooks and callbacks for this module.
  */
-
 function citeproc_item_from_mods($mods, $cache_id = NULL) {
   module_load_include('inc', 'citeproc', 'CiteProcJSItem');
   module_load_include('php', 'citeproc', 'generators/converter');
 
-  
+
   $raw = '';
   if (!is_null($cache_id)) {
     //Stupid, because if it were cached, we didn't have to load the MODS at an earlier step...
     $obj = cache_get($cache_id);
-    $raw = $obj->data;
+    $raw = isset($obj->data) ? $obj->data : NULL;
   }
-  
+
   if (empty($raw)) {
     $raw = convert_mods_to_citeproc_jsons($mods);
-    
+
     if (!is_null($cache_id)) {
       //Cache for 12 hours...  Might be better to have them be permanent, and have the form submit clear them?
       cache_set($cache_id, $raw, 'cache', time() + (3600 * 1000 * variable_get('citeproc_cache_expiry_hours', 12)));
@@ -59,7 +58,7 @@ function citeproc_bibliography_from_raw_array(CiteProcJSStyle $style, array $raw
   $citation->addItem($item);
   $bibliography = new CiteProcJSBibliography($style);
   $bibliography->addCitation($citation);
-  
+
   return $bibliography;
 }
 
@@ -67,7 +66,7 @@ function citeproc_default_style() {
   module_load_include('inc', 'csl', 'CSL');
   module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
   $doc = CSL::GetDefault(TRUE);
-  if(!empty($doc)) {
+  if (!empty($doc)) {
     return new CiteProcJSStyle($doc);
   }
   return FALSE;
@@ -77,7 +76,7 @@ function citeproc_style($style) {
   module_load_include('inc', 'csl', 'CSL');
   module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
   $doc = CSL::Get($style, TRUE);
-  if(!empty($doc)) {
+  if (!empty($doc)) {
     return new CiteProcJSStyle($doc);
   }
   return FALSE;
