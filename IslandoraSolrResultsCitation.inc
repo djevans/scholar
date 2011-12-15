@@ -63,7 +63,7 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $styles = array_values(CSL::GetNames()); //Array returned has keys == values, for some reason...  Whatever.
     $style = citeproc_style($styles[0]);
     foreach ($results->response->docs as $doc) {
-      $output .= theme(THEME_SCHOLAR_SEARCH_ITEM_ALT, $doc, $style);
+      $output .= theme(THEME_SCHOLAR_SEARCH_ITEM, $doc->PID, $style);
     }
     return $output;
   }
@@ -138,7 +138,7 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
     $pid = $doc->PID;
     $result = '';
       $pids[] = $pid;
-      $result = theme(THEME_SCHOLAR_SEARCH_ITEM_ALT, $doc, $style);
+      $result = theme(THEME_SCHOLAR_SEARCH_ITEM, $pid, $style);
       $table['rows'][] = array(
         '#pid' => $pid,
         'result' => array('#value' => $result),
