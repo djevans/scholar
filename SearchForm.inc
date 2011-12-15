@@ -177,7 +177,7 @@ function scholar_search_form_submit(array $form, array &$form_state) {
  * @param array $form_state 
  */
 function scholar_search_form_build_query(array &$form_state) {
-  $query = 'dc.title:*';
+  $query = 'coh_search_title:*';
   $statements = array();
   foreach ($form_state['values']['terms'] as $term) {
     $field = $term['field'];
