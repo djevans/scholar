@@ -61,13 +61,24 @@ function csl_manage(array &$form_state) {
   );
   $styles = CSL::GetNames();
   foreach ($styles as $style) {
+    $default_style = CSL::GetDefaultName();
+    $is_default = array(
+      '#value' => 'Is Default'
+    );
+    $set_default = array(
+      '#type' => 'submit',
+      '#value' => 'Set Default',
+      '#name' => 'row-' . count($table['rows']) . '-set-default',
+      '#style' => $style,
+      '#submit' => array('csl_manage_set_default_style_submit'),
+    );
     $table['rows'][] = array(
       'name' => array('#value' => $style),
-      'space' => array('#value' => ''),
+      'default' => ($default_style == $style) ? $is_default : $set_default,
       'delete' => array(
         '#type' => 'submit',
         '#value' => 'Delete',
-        '#name' => 'row-' . count($table['rows']),
+        '#name' => 'row-' . count($table['rows']) . '-delete',
         '#style' => $style,
         '#submit' => array('csl_manage_delete_style_submit'),
       )
@@ -108,12 +119,30 @@ function csl_manage_delete_style_submit(array $form, array &$form_state) {
   module_load_include('inc', 'csl', 'CSL');
   $style = $form_state['clicked_button']['#style'];
   $style_t = array('%style' => $style);
-  if (CSL::Delete($style)) {
+  if (count(CSL::GetNames()) == 1) {
+    drupal_set_message(t('Can\'t delete the last style: %style, there must always be at least one.', $style_t), 'error');
+  }
+  else if (CSL::Delete($style)) {
     drupal_set_message(t('Successfully deleted style: %style', $style_t));
   }
   else {
-    drupal_set_message(t('Failed to deleted style: %style', $style_t));
+    drupal_set_message(t('Failed to deleted style: %style', $style_t), 'error');
   }
+}
+
+/**
+ * Submit callback that sets the default style.
+ * 
+ * @param array $form
+ *   The drupal form.
+ * @param array $form_state 
+ *   The drupal form state.
+ */
+function csl_manage_set_default_style_submit(array $form, array &$form_state) {
+  module_load_include('inc', 'csl', 'CSL');
+  $style_name = $form_state['clicked_button']['#style'];
+  CSL::SetDefaultName($style_name);
+  drupal_set_message(t('Successfully changed default style: %style', array('%style' => $style_name)));
 }
 
 /**

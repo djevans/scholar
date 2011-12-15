@@ -65,6 +65,30 @@ class CSL {
   }
 
   /**
+   * Sets the given style name to default if it exists.
+   * 
+   * @param string $style_name 
+   *   The name of the style to set to the default.
+   */
+  public static function SetDefaultName($style_name) {
+    if (self::Exists($style_name)) {
+      variable_set('csl_default_style', $style_name);
+    }
+  }
+
+  /**
+   * Gets the default style name, if it has not been previously set it will be the first
+   * name from self::GetNames().
+   *
+   * @return string
+   *   The default style name
+   */
+  public static function GetDefaultName() {
+    $default = variable_get('csl_default_style', array_shift(self::GetNames()));
+    return $default;
+  }
+
+  /**
    * Gets the CSL style definition identified by name.
    *
    * @param string $style_name
@@ -93,6 +117,19 @@ class CSL {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Gets the default style.
+   * 
+   * @param boolean $as_string
+   *   Return a string if TRUE, a DOMDocument if FALSE.
+   * @return mixed
+   *   Returns teh default style as a string or DOMDocument depending on the $as_string argument.
+   */
+  public static function GetDefault($as_string = FALSE) {
+    $style_name = self::GetDefaultName();
+    return self::Get($style_name, $as_string);
   }
 
   /**
@@ -142,4 +179,5 @@ class CSL {
     }
     return FALSE;
   }
+
 }
