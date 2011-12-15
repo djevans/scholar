@@ -60,8 +60,7 @@ class IslandoraSolrResultsCitation extends IslandoraSolrResults {
     $record_start = $results->response->start;
     $limit_results = variable_get('islandora_solr_search_limit_result_fields', 0);
     module_load_include('inc', 'csl', 'CSL');
-    $styles = array_values(CSL::GetNames()); //Array returned has keys == values, for some reason...  Whatever.
-    $style = citeproc_style($styles[0]);
+    $style = citeproc_default_style();
     foreach ($results->response->docs as $doc) {
       $output .= theme(THEME_SCHOLAR_SEARCH_ITEM, $doc->PID, $style);
     }
@@ -130,9 +129,7 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
   );
 
   module_load_include('inc', 'csl', 'CSL');
-  $styles = CSL::GetNames();
-  $ss = array_keys($styles);
-  $style = citeproc_style($ss[0]); //array_shift($styles));
+  $style = citeproc_default_style();
   $pids = array();
   foreach ($results->response->docs as $doc) {
     $pid = $doc->PID;
@@ -171,7 +168,7 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
       ),
       'style' => array(
         '#type' => 'select',
-        '#options' => $styles
+        '#options' => CSL::GetNames()
       ),
       'export all' => array(
         '#type' => 'submit',

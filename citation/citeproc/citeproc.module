@@ -63,6 +63,16 @@ function citeproc_bibliography_from_raw_array(CiteProcJSStyle $style, array $raw
   return $bibliography;
 }
 
+function citeproc_default_style() {
+  module_load_include('inc', 'csl', 'CSL');
+  module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
+  $doc = CSL::GetDefault(TRUE);
+  if(!empty($doc)) {
+    return new CiteProcJSStyle($doc);
+  }
+  return FALSE;
+}
+
 function citeproc_style($style) {
   module_load_include('inc', 'csl', 'CSL');
   module_load_include('inc', 'citeproc', 'CiteProcJSStyle');
