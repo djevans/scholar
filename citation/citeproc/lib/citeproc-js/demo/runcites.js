@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -215,7 +215,7 @@ var citationBB2 = {
         {
 			id: "ITEM-6",
 			locator: "15",
-			prefix:"<i>but see</i> "
+			prefix:"<i>but see</i>"
 		}
 	],
 	"properties": {
@@ -324,7 +324,7 @@ var citationBB8 = {
 	"citationItems": [
         {
 			id: "ITEM-19",
-			"suffix":" (appeal taken from Scot.)"
+			"suffix":"(appeal taken from Scot.)"
 		}
 	],
 	"properties": {
@@ -336,7 +336,7 @@ var citationBB9 = {
 	"citationItems": [
         {
 			id: "ITEM-20",
-			suffix:" (appeal taken from B.C.)"
+			suffix:"(appeal taken from B.C.)"
 		}
 	],
 	"properties": {
@@ -348,12 +348,12 @@ var citationBB10 = {
 	"citationItems": [
         {
 			id: "ITEM-3",
-			prefix:"<b>En sinn Scholl beschéngt ass, da Mamm frësch blénken hun?</b> <i>See, e.g.</i> "
+			prefix:"<b>En sinn Scholl beschéngt ass, da Mamm frësch blénken hun?</b> <i>See, e.g.</i>"
 		},
         {
-			prefix:"<b>Der mä gutt Dach, eng onser bléit geplot mä.</b>  <i>See generally</i> ",
+			prefix:"<b>Der mä gutt Dach, eng onser bléit geplot mä.</b>  <i>See generally</i>",
 			id: "ITEM-3",
-			suffix:" <b>(Iwer Engel Milliounen nei fu, blëtzen néierens d'Gaassen rou do.)</b>"
+			suffix:"<b>(Iwer Engel Milliounen nei fu, blëtzen néierens d'Gaassen rou do.)</b>"
 		}
 	],
 	"properties": {

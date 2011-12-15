@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,9 +46,6 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
-
 /**
  * Utilities for various things.
  * @namespace Utilities
@@ -59,97 +56,104 @@ CSL.Util = {};
  * Also dumping this stuff here temporarily.
  */
 CSL.Util.Match = function () {
+	var func, pos, len, reslist, res, ppos, llen;
 
-    this.any = function (token, state, Item, item) {
-        //
-        // assume false, return true on any single true hit
-        //
-        var ret = false;
-        for (var i = 0, ilen = token.tests.length; i < ilen; i += 1) {
-            var func = token.tests[i];
-            var reslist = func.call(token, state, Item, item);
-            if ("object" !== typeof reslist) {
-                reslist = [reslist];
-            }
-            for (var j = 0, jlen = reslist.length; j < jlen; j += 1) {
-                if (reslist[j]) {
-                    ret = true;
-                    break;
-                }
-            }
-            if (ret) {
-                break;
-            }
-        }
-        if (ret) {
-            ret = token.succeed;
-            state.tmp.jump.replace("succeed");
-        } else {
-            ret = token.fail;
-            state.tmp.jump.replace("fail");
-        }
-        return ret;
-    };
+	this.any = function (token, state, Item, item) {
+		//
+		// assume false, return true on any single true hit
+		//
+		var ret = false;
+		len = token.tests.length;
+		for (pos = 0; pos < len; pos += 1) {
+			func = token.tests[pos];
+			reslist = func.call(token, state, Item, item);
+			if ("object" !== typeof reslist) {
+				reslist = [reslist];
+			}
+			llen = reslist.length;
+			for (ppos = 0; ppos < llen; ppos += 1) {
+				if (reslist[ppos]) {
+					ret = true;
+					break;
+				}
+			}
+			if (ret) {
+				break;
+			}
+		}
+		if (ret) {
+			ret = token.succeed;
+			state.tmp.jump.replace("succeed");
+		} else {
+			ret = token.fail;
+			state.tmp.jump.replace("fail");
+		}
+		return ret;
+	};
 
-    this.none = function (token, state, Item, item) {
-        //
-        // assume true, return false on any single true hit
-        //
-        var ret = true;
-        for (var i = 0, ilen = this.tests.length; i < ilen; i += 1) {
-            var func = this.tests[i];
-            var reslist = func.call(token, state, Item, item);
-            if ("object" !== typeof reslist) {
-                reslist = [reslist];
-            }
-            for (var j = 0, jlen = reslist.length; j < jlen; j += 1) {
-                if (reslist[j]) {
-                    ret = false;
-                    break;
-                }
-            }
-            if (!ret) {
-                break;
-            }
-        }
-        if (ret) {
-            ret = token.succeed;
-            state.tmp.jump.replace("succeed");
-        } else {
-            ret = token.fail;
-            state.tmp.jump.replace("fail");
-        }
-        return ret;
-    };
+	this.none = function (token, state, Item, item) {
+		//
+		// assume true, return false on any single true hit
+		//
+		var ret = true;
+		len = this.tests.length;
+		for (pos = 0; pos < len; pos += 1) {
+			func = this.tests[pos];
+			reslist = func.call(token, state, Item, item);
+			if ("object" !== typeof reslist) {
+				reslist = [reslist];
+			}
+			llen = reslist.length;
+			for (ppos = 0; ppos < llen; ppos += 1) {
+				if (reslist[ppos]) {
+					ret = false;
+					break;
+				}
+			}
+			if (!ret) {
+				break;
+			}
+		}
+		if (ret) {
+			ret = token.succeed;
+			state.tmp.jump.replace("succeed");
+		} else {
+			ret = token.fail;
+			state.tmp.jump.replace("fail");
+		}
+		return ret;
+	};
 
-    this.all = function (token, state, Item, item) {
-        //
-        // assume true, return false on any single false hit
-        //
-        var ret = true;
-        for (var i = 0, ilen = this.tests.length; i < ilen; i += 1) {
-            var func = this.tests[i];
-            var reslist = func.call(token, state, Item, item);
-            if ("object" !== typeof reslist) {
-                reslist = [reslist];
-            }
-            for (var j = 0, jlen = reslist.length; j < jlen; j += 1) {
-                if (!reslist[j]) {
-                    ret = false;
-                    break;
-                }
-            }
-            if (!ret) {
-                break;
-            }
-        }
-        if (ret) {
-            ret = token.succeed;
-            state.tmp.jump.replace("succeed");
-        } else {
-            ret = token.fail;
-            state.tmp.jump.replace("fail");
-        }
-        return ret;
-    };
+	this.all = function (token, state, Item, item) {
+		//
+		// assume true, return false on any single false hit
+		//
+		var ret = true;
+		len = this.tests.length;
+		for (pos = 0; pos < len; pos += 1) {
+			func = this.tests[pos];
+			reslist = func.call(token, state, Item, item);
+			if ("object" !== typeof reslist) {
+				reslist = [reslist];
+			}
+			llen = reslist.length;
+			for (pos = 0; pos < len; pos += 1) {
+				if (!reslist[ppos]) {
+					ret = false;
+					break;
+				}
+			}
+			if (!ret) {
+				break;
+			}
+		}
+		if (ret) {
+			ret = token.succeed;
+			state.tmp.jump.replace("succeed");
+		} else {
+			ret = token.fail;
+			state.tmp.jump.replace("fail");
+		}
+		return ret;
+	};
 };

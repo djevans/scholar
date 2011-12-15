@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -48,10 +48,6 @@
 
 var Sys = function(abbreviations){
 	this.abbreviations = abbreviations;
-	this.abbrevsname = "default";
-    if (!this.abbreviations) {
-        this.abbreviations = {};
-    }
 };
 
 Sys.prototype.retrieveItem = function(id){
@@ -62,18 +58,6 @@ Sys.prototype.retrieveLocale = function(lang){
 	return locale[lang];
 };
 
-Sys.prototype.getAbbreviation = function(dummy, obj, jurisdiction, vartype, key){
-    try {
-    if (this.abbreviations[this.abbrevsname][vartype][key]) {
-        obj["default"][vartype][key] = this.abbreviations[this.abbrevsname][vartype][key];
-    } else {
-        obj["default"][vartype][key] = "";
-    }
-    } catch (e) {
-        // There is breakage here that needs investigating.
-    }
+Sys.prototype.getAbbreviations = function(name,vartype){
+	return this.abbreviations[name][vartype];
 };
-
-Sys.prototype.setAbbreviations = function (abbrevsname) {
-	this.abbrevsname = abbrevsname;
-}

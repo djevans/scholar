@@ -1,12 +1,5 @@
 syntax: regexp
 
-clear.sh
-schemas.xml
-\.tar\.gz$
-\.zip$
-^jshint_done.txt
-^Diffs
-^tools/jslint.*
 ^csl-locales$
 ^locale$
 /bundled$
@@ -37,4 +30,3 @@ UPLOAD.sh$
 ^citeproc-doc.tar.gz$
 ^citeproc_zotero.js$
 ^std$
-^.*/styletests$

@@ -7,19 +7,19 @@ Integrator's Manual
 
 .. class:: fixed
 
-   `CitationStylist.org`__
+   `citationstyles.org`__
 
-__ http://citationstylist.org/documentation/
+__ http://citationstyles.org/
 
 
 
 .. class:: info-version
 
-   version 1.00##a113##
+   version 1.00##a111##
 
 .. class:: info-date
 
-   =D=25 August 2011=D=
+   =D=2 February 2011=D=
 
 .. class:: contributors
 
@@ -147,12 +147,14 @@ Obtaining the Locale Files
 ##########################
 
 The processor requires a set of standard CSL 1.0 locale files in order
-to run.  These may be installed using the following command
-(under Linux command line). From the root of the ``citeproc-js`` source directory:
+to run.  These may be installed and set up using the following two commands
+(under Linux):
 
    ::
 
-      git clone git://github.com/citation-style-language/locales.git locale
+      hg clone http://bitbucket.org/bdarcus/csl-locales
+      ln -s csl-locales/trunk/ locale
+
 
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,110 +46,104 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Util.fixDateNode = function (parent, pos, node) {
-    var form, variable, datexml, subnode, partname, attr, val, prefix, suffix, children, key, subchildren, kkey, display;
-    
-    form = this.sys.xml.getAttributeValue(node, "form");
-    var lingo = this.sys.xml.getAttributeValue(node, "lingo");
+	var form, variable, datexml, subnode, partname, attr, val, prefix, suffix, children, key, subchildren, kkey, display;
+	
+	form = this.sys.xml.getAttributeValue(node, "form");
+	var lingo = this.sys.xml.getAttributeValue(node, "lingo");
 
-    if (!this.state.getDate(form)) {
-        return parent;
-    }
+	if (!this.state.getDate(form)) {
+		return parent;
+	}
 
-    var dateparts = this.sys.xml.getAttributeValue(node, "date-parts");
+	var dateparts = this.sys.xml.getAttributeValue(node, "date-parts");
 
-    variable = this.sys.xml.getAttributeValue(node, "variable");
-    prefix = this.sys.xml.getAttributeValue(node, "prefix");
-    suffix = this.sys.xml.getAttributeValue(node, "suffix");
-    display = this.sys.xml.getAttributeValue(node, "display");
-    
-    //
-    // Xml: Copy a node
-    //
-    datexml = this.sys.xml.nodeCopy(this.state.getDate(form));
-    this.sys.xml.setAttribute(datexml, 'lingo', this.state.opt.lang);
-    this.sys.xml.setAttribute(datexml, 'form', form);
-    this.sys.xml.setAttribute(datexml, 'date-parts', dateparts);
-    //
-    // Xml: Set attribute
-    //
-    this.sys.xml.setAttribute(datexml, 'variable', variable);
-    //
-    // Xml: Set flag
-    //
-    if (prefix) {
-        //
-        // Xml: Set attribute
-        //
-        this.sys.xml.setAttribute(datexml, "prefix", prefix);
-    }
-    if (suffix) {
-        //
-        // Xml: Set attribute
-        //
-        this.sys.xml.setAttribute(datexml, "suffix", suffix);
-    }
-    if (display) {
-        //
-        // Xml: Set attribute
-        //
-        this.sys.xml.setAttribute(datexml, "display", display);
-    }
-    //
-    // Step through any date-part children of the layout date node,
-    // and lay their attributes onto the corresponding node in the
-    // locale template node copy.
-    //
-    // tests: language_BaseLocale
-    // tests: date_LocalizedTextInStyleLocaleWithTextCase
-    // 
-    children = this.sys.xml.children(node);
-    for (key in children) {
-        // Ah. Object children is XML. Can pass it along,
-        // but hasOwnProperty() won't work on it.
-        //if (children.hasOwnProperty(key)) {
-            // lie to jslint
-            subnode = children[key];
-            if ("date-part" === this.sys.xml.nodename(subnode)) {
-                partname = this.sys.xml.getAttributeValue(subnode, "name");
-                subchildren = this.sys.xml.attributes(subnode);
-                for (attr in subchildren) {
-                    if (subchildren.hasOwnProperty(attr)) {
-                        if ("@name" === attr) {
-                            continue;
-                        }
-                        if (lingo && lingo !== this.state.opt.lang) {
-                            if (["@suffix", "@prefix", "@form"].indexOf(attr) > -1) {
-                                continue;
-                            }
-                        }
-                        val = subchildren[attr];
-                        this.sys.xml.setAttributeOnNodeIdentifiedByNameAttribute(datexml, "date-part", partname, attr, val);
-                    }
-                }
-            }
-            //}
-    }
-    
-    if ("year" === this.sys.xml.getAttributeValue(node, "date-parts")) {
+	variable = this.sys.xml.getAttributeValue(node, "variable");
+	prefix = this.sys.xml.getAttributeValue(node, "prefix");
+	suffix = this.sys.xml.getAttributeValue(node, "suffix");
+	display = this.sys.xml.getAttributeValue(node, "display");
+	
+	//
+	// Xml: Copy a node
+	//
+	datexml = this.sys.xml.nodeCopy(this.state.getDate(form));
+	this.sys.xml.setAttribute(datexml, 'lingo', this.state.opt.lang);
+	this.sys.xml.setAttribute(datexml, 'form', form);
+	this.sys.xml.setAttribute(datexml, 'date-parts', dateparts);
+	//
+	// Xml: Set attribute
+	//
+	this.sys.xml.setAttribute(datexml, 'variable', variable);
+	//
+	// Xml: Set flag
+	//
+	if (prefix) {
+		//
+		// Xml: Set attribute
+		//
+		this.sys.xml.setAttribute(datexml, "prefix", prefix);
+	}
+	if (suffix) {
+		//
+		// Xml: Set attribute
+		//
+		this.sys.xml.setAttribute(datexml, "suffix", suffix);
+	}
+	if (display) {
+		//
+		// Xml: Set attribute
+		//
+		this.sys.xml.setAttribute(datexml, "display", display);
+	}
+	//
+	// Step through any date-part children of the layout date node,
+	// and lay their attributes onto the corresponding node in the
+	// locale template node copy.
+	//
+	// tests: language_BaseLocale
+	// tests: date_LocalizedTextInStyleLocaleWithTextCase
+	// 
+	children = this.sys.xml.children(node);
+	for (key in children) {
+		// lie to jslint
+		subnode = children[key];
+		if ("date-part" === this.sys.xml.nodename(subnode)) {
+			partname = this.sys.xml.getAttributeValue(subnode, "name");
+			subchildren = this.sys.xml.attributes(subnode);
+			for (attr in subchildren) {
+				if (subchildren.hasOwnProperty(attr)) {
+					if ("@name" === attr) {
+						continue;
+					}
+					if (lingo && lingo !== this.state.opt.lang) {
+						if (["@suffix", "@prefix", "@form"].indexOf(attr) > -1) {
+							continue;
+						}
+					}
+					val = subchildren[attr];
+					this.sys.xml.setAttributeOnNodeIdentifiedByNameAttribute(datexml, "date-part", partname, attr, val);
+				}
+			}
+		}
+	}
+	
+	if ("year" === this.sys.xml.getAttributeValue(node, "date-parts")) {
 
-        //
-        // Xml: Find one node by attribute and delete
-        //
-        this.sys.xml.deleteNodeByNameAttribute(datexml, 'month');
-        //
-        // Xml: Find one node by attribute and delete
-        //
-        this.sys.xml.deleteNodeByNameAttribute(datexml, 'day');
+		//
+		// Xml: Find one node by attribute and delete
+		//
+		this.sys.xml.deleteNodeByNameAttribute(datexml, 'month');
+		//
+		// Xml: Find one node by attribute and delete
+		//
+		this.sys.xml.deleteNodeByNameAttribute(datexml, 'day');
 
 
-    } else if ("year-month" === this.sys.xml.getAttributeValue(node, "date-parts")) {
-        //
-        // Xml: Find one node by attribute and delete
-        //
-        this.sys.xml.deleteNodeByNameAttribute(datexml, 'day');
-    }
-    return this.sys.xml.insertChildNodeAfter(parent, node, pos, datexml);
+	} else if ("year-month" === this.sys.xml.getAttributeValue(node, "date-parts")) {
+		//
+		// Xml: Find one node by attribute and delete
+		//
+		this.sys.xml.deleteNodeByNameAttribute(datexml, 'day');
+	}
+	return this.sys.xml.insertChildNodeAfter(parent, node, pos, datexml);
 };

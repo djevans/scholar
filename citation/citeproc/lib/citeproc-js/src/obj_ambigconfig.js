@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,17 +46,15 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 /**
  * Ambiguous Cite Configuration Object
  * @class
  */
 CSL.AmbigConfig = function () {
-    this.maxvals = [];
-    this.minval = 1;
-    this.names = [];
-    this.givens = [];
-    this.year_suffix = false;
-    this.disambiguate = 0;
+	this.maxvals = [];
+	this.minval = 1;
+	this.names = [];
+	this.givens = [];
+	this.year_suffix = false;
+	this.disambiguate = 0;
 };

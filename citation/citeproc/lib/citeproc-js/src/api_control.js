@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,83 +46,70 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Engine.prototype.setOutputFormat = function (mode) {
-    this.opt.mode = mode;
-    this.fun.decorate = CSL.Mode(mode);
-    if (!this.output[mode]) {
-        this.output[mode] = {};
-        this.output[mode].tmp = {};
-    }
+	this.opt.mode = mode;
+	this.fun.decorate = CSL.Mode(mode);
+	if (!this.output[mode]) {
+		this.output[mode] = {};
+		this.output[mode].tmp = {};
+	}
 };
 
 CSL.Engine.prototype.setLangTagsForCslSort = function (tags) {
-    var i, ilen;
-    this.opt['locale-sort'] = [];
-    for (i = 0, ilen = tags.length; i < ilen; i += 1) {
-        this.opt['locale-sort'].push(tags[i]);
-    }
-};
-    
+	var i, ilen;
+	this.opt['locale-sort'] = [];
+	for (i = 0, ilen = tags.length; i < ilen; i += 1) {
+		this.opt['locale-sort'].push(tags[i]);
+	}
+}
+	
 CSL.Engine.prototype.setLangTagsForCslTransliteration = function (tags) {
-    var i, ilen;
-    this.opt['locale-translit'] = [];    
-    for (i = 0, ilen = tags.length; i < ilen; i += 1) {
-        this.opt['locale-translit'].push(tags[i]);
-    }
-};
-    
+	var i, ilen;
+	this.opt['locale-pri'] = [];	
+	for (i = 0, ilen = tags.length; i < ilen; i += 1) {
+		this.opt['locale-pri'].push(tags[i]);
+	}
+}
+	
 CSL.Engine.prototype.setLangTagsForCslTranslation = function (tags) {
-    var i, ilen;
-    this.opt['locale-translat'] = [];
-    for (i = 0, ilen = tags.length; i < ilen; i += 1) {
-        this.opt['locale-translat'].push(tags[i]);
-    }
+	var i, ilen;
+	this.opt['locale-sec'] = [];
+	for (i = 0, ilen = tags.length; i < ilen; i += 1) {
+		this.opt['locale-sec'].push(tags[i]);
+	}
 };
 
-CSL.Engine.prototype.setLangPrefsForCites = function (params) {
-	var opt = this.opt['cite-lang-prefs'];
-	// Set values in place
-	for (var segment in params) {
-        //
-        // Normalize the sequence of secondary and tertiary
-        // in the provided params list.
-        //
-        var supplements = [];
-        while (params[segment].length > 1) {
-            supplements.push(params[segment].pop());
-        }
-        var sortval = {orig:1,translit:2,translat:3};
-        if (supplements.length === 2 && sortval[supplements[0]] < sortval[supplements[1]]) {
-            supplements.reverse();
-        }
-        while (supplements.length) {
-            params[segment].push(supplements.pop());
-        }
-        //
-        // normalization done.
-        //
-		var lst = opt[segment];
-		while (lst.length) {
-			lst.pop();
-		}
-		for (var i = 0, ilen = params[segment].length; i < ilen; i += 1) {
-			lst.push(params[segment][i]);
-		}
+	
+CSL.Engine.prototype.setOriginalCreatorNameFormsOption = function (arg) {
+	if (arg) {
+		this.opt["locale-show-original-names"] = true;
+	} else {
+		this.opt["locale-show-original-names"] = false;
+	}
+};
+
+
+CSL.Engine.prototype.setOriginalCreatorNameFormatOption = function (arg) {
+	if (arg) {
+		this.opt["locale-use-original-name-format"] = true;
+	} else {
+		this.opt["locale-use-original-name-format"] = false;
+	}
+};
+
+CSL.Engine.prototype.setSuppressTitleTransliterationOption = function (arg) {
+	if (arg) {
+		this.opt["locale-suppress-title-transliteration"] = true;
+	} else {
+		this.opt["locale-suppress-title-transliteration"] = false;
 	}
 };
 
 CSL.Engine.prototype.setAutoVietnameseNamesOption = function (arg) {
-    if (arg) {
-        this.opt["auto-vietnamese-names"] = true;
-    } else {
-        this.opt["auto-vietnamese-names"] = false;
-    }
+	if (arg) {
+		this.opt["auto-vietnamese-names"] = true;
+	} else {
+		this.opt["auto-vietnamese-names"] = false;
+	}
 };
 
-CSL.Engine.prototype.setAbbreviations = function (arg) {
-	if (this.sys.setAbbreviations) {
-		this.sys.setAbbreviations(arg);
-	}
-}

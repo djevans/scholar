@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -57,7 +57,7 @@ citation
 # of the CSL code are otherwise identical.
 
 >>===== RESULT =====>>
-Rosales, Osvaldo y Mikio Kuwayama (2007), «América latina y china e india: hacia una nueva alianza de comercio e inversión,» Serie de Comercio Internacional, N° 81 (LC/L.2656-P), Santiago de Chile, Naciones Unidas - ECLAC, enero. Publicación de las Naciones Unidas, N<sup>o</sup> de venta: S.07.II.G.6.
+Rosales, Osvaldo y Mikio Kuwayama (2007), “América latina y china e india: hacia una nueva alianza de comercio e inversión,” Serie de Comercio Internacional, N° 81 (LC/L.2656-P), Santiago de Chile, Naciones Unidas - ECLAC, enero. Publicación de las Naciones Unidas, Nº de venta: S.07.II.G.6.
 <<===== RESULT =====<<
 
 
@@ -65,8 +65,8 @@ Rosales, Osvaldo y Mikio Kuwayama (2007), «América latina y china e india: ha
 <style 
       xmlns="http://purl.org/net/xbiblio/csl"
       class="note"
-      default-locale="es"
-      version="1.1mlz1">
+      version="1.1x"
+      default-locale="es">
   <info>
     <id />
     <title />
@@ -75,15 +75,15 @@ Rosales, Osvaldo y Mikio Kuwayama (2007), «América latina y china e india: ha
   <locale xml:lang="en">
     <style-options punctuation-in-quote="true"/>
     <terms>
-      <term name="number-00">United Nations Publication, sales N°</term>
-      <term name="number-01">N°</term>
+      <term name="un-sales-number-label">United Nations Publication, sales N°</term>
+      <term name="collection-number-label">N°</term>
     </terms>
   </locale>
   <locale xml:lang="es">
     <style-options punctuation-in-quote="true"/>
     <terms>
-      <term name="number-00">Publicación de las Naciones Unidas, Nº de venta</term>
-      <term name="number-01">N°</term>
+      <term name="un-sales-number-label">Publicación de las Naciones Unidas, Nº de venta</term>
+      <term name="collection-number-label">N°</term>
       <term name="month-01">enero</term>
       <term name="month-02">febrero</term>
       <term name="month-03">marzo</term>
@@ -112,8 +112,8 @@ Rosales, Osvaldo y Mikio Kuwayama (2007), «América latina y china e india: ha
   </locale>
   <macro name="un-sales-number-identifier">
     <group delimiter=": ">
-      <text term="number-00"/>
-      <text variable="issue"/>
+      <text term="un-sales-number-label"/>
+      <text variable="un-sales-number"/>
     </group>
   </macro>
   <macro name="issued-month">
@@ -127,18 +127,14 @@ Rosales, Osvaldo y Mikio Kuwayama (2007), «América latina y china e india: ha
   <macro name="publisher-place">
     <text variable="publisher-place"/>
   </macro>
-  <macro name="document-number-parens-un-only">
-    <choose>
-      <if jurisdiction="un.org">
-        <text variable="number" prefix="(" suffix=")"/>
-      </if>
-    </choose>
+  <macro name="document-number-parens">
+    <text variable="number" prefix="(" suffix=")"/>
   </macro>
   <macro name="collection-identifier">
     <group delimiter=", ">
       <text variable="collection-title"/>
       <group delimiter=" ">
-        <text term="number-01" />
+        <text term="collection-number-label" />
         <text variable="collection-number"/>
       </group>
     </group>
@@ -169,18 +165,14 @@ Rosales, Osvaldo y Mikio Kuwayama (2007), «América latina y china e india: ha
             <text macro="title-quotes"/>
             <group delimiter=" ">
               <text macro="collection-identifier"/>
-              <text macro="document-number-parens-un-only"/>
+              <text macro="document-number-parens"/>
             </group>
             <text macro="publisher-place"/>
             <text macro="publisher"/>
             <text macro="issued-month"/>
           </group>
         </group>
-        <choose>
-          <if jurisdiction="un.org">
-            <text macro="un-sales-number-identifier"/>
-          </if>
-        </choose>
+        <text macro="un-sales-number-identifier"/>
       </group>
     </layout>
   </citation>
@@ -219,8 +211,7 @@ Rosales, Osvaldo y Mikio Kuwayama (2007), «América latina y china e india: ha
         "publisher-place": "Santiago de Chile", 
         "title": "América latina y china e india: hacia una nueva alianza de comercio e inversión", 
         "type": "book", 
-        "issue": "S.07.II.G.6",
-        "language": "es-x-lex-un.org",
+        "un-sales-number": "S.07.II.G.6",
 		"multi":{
 			"_keys":{
 				"publisher":{

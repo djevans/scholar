@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -54,7 +54,7 @@ bibliography
 
 >>===== RESULT =====>>
 <div class="csl-bib-body">
-  <div class="csl-entry">Prawn, Christopher the (as primary author) -- Merwe, Wikus van der, Multi-National United</div>
+  <div class="csl-entry">Prawn, Christopher the (as primary author), with Merwe, Wikus van der, Multi-National United</div>
 </div>
 <<===== RESULT =====<<
 
@@ -83,16 +83,14 @@ bibliography
   </citation>
   <bibliography et-al-min="2" et-al-use-first="1">
     <layout>
-      <group delimiter=" -- ">
-        <names variable="author" suffix=" (as primary author)">
-          <name sort-separator=", " name-as-sort-order="first" et-al-min="1"/>
-          <et-al term="and others"/>
+      <names variable="author" suffix=" (as primary author)">
+        <name sort-separator=", " name-as-sort-order="first" et-al-min="1"/>
+        <et-al term="and others"/>
+      </names>
+      <group delimiter=" ">
+        <names variable="author">
+          <name sort-separator=", " name-as-sort-order="all" et-al-min="0"/>
         </names>
-        <group delimiter=" ">
-          <names variable="author">
-            <name sort-separator=", " name-as-sort-order="all" et-al-min="0"/>
-          </names>
-        </group>
       </group>
     </layout>
   </bibliography>

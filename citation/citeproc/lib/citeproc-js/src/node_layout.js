@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,191 +46,188 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Node.layout = {
-    build: function (state, target) {
-        var func, prefix_token, suffix_token, tok;
+	build: function (state, target) {
+		var func, prefix_token, suffix_token;
 
-        if (this.tokentype === CSL.START && !state.tmp.cite_affixes) {
-            //
-            // done_vars is used to prevent the repeated
-            // rendering of variables
-            //
-            // initalize done vars
-            func = function (state, Item) {
-                state.tmp.done_vars = [];
-                //CSL.debug(" === init rendered_name === ");
-                state.tmp.rendered_name = false;
-                state.tmp.name_node = {};
-            };
-            this.execs.push(func);
-            // set opt delimiter
-            func = function (state, Item) {
-                // just in case
-                state.tmp.sort_key_flag = false;
-            };
-            this.execs.push(func);
-            
-            // reset nameset counter [all nodes]
-            func = function (state, Item) {
-                state.tmp.nameset_counter = 0;
-            };
-            this.execs.push(func);
-                
-            // declare thyself [once only???  This is getting messed up again]
-            func = function (state, Item) {
-                state.output.openLevel("empty");
-                // Pointer to top-level blob for each cite is tracked, to
-                // allow per-cite values to be set for can_suppress_identical_year.
-                state.tmp.citeblob = state.output.queue[state.output.queue.length - 1];
-            };
-            this.execs.push(func);
-            target.push(this);
+		if (this.tokentype === CSL.START && !state.tmp.cite_affixes) {
+			//
+			// done_vars is used to prevent the repeated
+			// rendering of variables
+			//
+			// initalize done vars
+			func = function (state, Item) {
+				state.tmp.done_vars = [];
+				//CSL.debug(" === init rendered_name === ");
+				state.tmp.rendered_name = false;
+			};
+			this.execs.push(func);
+			// set opt delimiter
+			func = function (state, Item) {
+				// just in case
+				state.tmp.sort_key_flag = false;
 
-            if (state.build.area === "citation") {
-                prefix_token = new CSL.Token("text", CSL.SINGLETON);
-                func = function (state, Item, item) {
-                    var sp;
-                    if (item && item.prefix) {
-                        sp = "";
-                        if (item.prefix.match(CSL.ENDSWITH_ROMANESQUE_REGEXP)) {
-                            sp = " ";
-                        }
-                        state.output.append((item.prefix + sp), this);
-                    }
-                };
-                prefix_token.execs.push(func);
-                target.push(prefix_token);
-            }
-        }
+				// XXXX: this SHOULD be useless.  layout_delimiter is the right key.
+				state[state.tmp.area].opt.delimiter = "";
+				if (this.strings.delimiter) {
+					state[state.tmp.area].opt.delimiter = this.strings.delimiter;
+				}
+			};
+			this.execs.push(func);
+			
+			// reset nameset counter [all nodes]
+			func = function (state, Item) {
+				state.tmp.nameset_counter = 0;
+			};
+			this.execs.push(func);
+				
+			// declare thyself [once only???  This is getting messed up again]
+			func = function (state, Item) {
+				state.output.openLevel("empty");
+				// Pointer to top-level blob for each cite is tracked, to
+				// allow per-cite values to be set for can_suppress_identical_year.
+				state.tmp.citeblob = state.output.queue[state.output.queue.length - 1];
+			};
+			this.execs.push(func);
+			target.push(this);
 
-        // Cast token to be used in one of the configurations below.
-        var my_tok;
-        if (this.locale_raw) {
-            my_tok = new CSL.Token("dummy", CSL.START);
-            my_tok.locale = this.locale_raw;
-            my_tok.strings.delimiter = this.strings.delimiter;
-            my_tok.strings.suffix = this.strings.suffix;
-            if (!state.tmp.cite_affixes) {
-                state.tmp.cite_affixes = {};
-            }
-        }
+			if (state.build.area === "citation") {
+				prefix_token = new CSL.Token("text", CSL.SINGLETON);
+				func = function (state, Item, item) {
+					var sp;
+					if (item && item.prefix) {
+						sp = "";
+						if (item.prefix.match(CSL.ROMANESQUE_REGEXP)) {
+							sp = " ";
+						}
+						state.output.append((item.prefix + sp), this);
+					}
+				};
+				prefix_token.execs.push(func);
+				target.push(prefix_token);
+			}
+		}
+		if (this.locale_raw) {
+			var my_tok = new CSL.Token("dummy", CSL.START);
+			my_tok.locale = this.locale_raw;
+			my_tok.strings.delimiter = this.strings.delimiter;
+			my_tok.strings.suffix = this.strings.suffix;
+			if (!state.tmp.cite_affixes) {
+				state.tmp.cite_affixes = {};
+			}
+		}
+		if (this.tokentype === CSL.START) {
+			state.build.layout_flag = true;
+							
+			// Only run the following once, to set up the final layout node ...
+			if (!this.locale_raw) {
+				//
+				// save out decorations for flipflop processing [final node only]
+				//
+				state[state.tmp.area].opt.topdecor = [this.decorations];
+				state[(state.tmp.area + "_sort")].opt.topdecor = [this.decorations];
 
-        if (this.tokentype === CSL.START) {
-            state.build.layout_flag = true;
-                            
-            // Only run the following once, to set up the final layout node ...
-            if (!this.locale_raw) {
-                //
-                // save out decorations for flipflop processing [final node only]
-                //
-                state[state.tmp.area].opt.topdecor = [this.decorations];
-                state[(state.tmp.area + "_sort")].opt.topdecor = [this.decorations];
+				state[state.build.area].opt.layout_prefix = this.strings.prefix;
+				state[state.build.area].opt.layout_suffix = this.strings.suffix;
+				state[state.build.area].opt.layout_delimiter = this.strings.delimiter;
 
-                state[state.build.area].opt.layout_prefix = this.strings.prefix;
-                state[state.build.area].opt.layout_suffix = this.strings.suffix;
-                state[state.build.area].opt.layout_delimiter = this.strings.delimiter;
+				state[state.build.area].opt.layout_decorations = this.decorations;
+				
+				// Only do this if we're running conditionals
+				if (state.tmp.cite_affixes) {
+					// if build_layout_locale_flag is true,
+					// write cs:else START to the token list.
+					tok = new CSL.Token("else", CSL.START);
+					CSL.Node["else"].build.call(tok, state, target);
+				}
 
-                state[state.build.area].opt.layout_decorations = this.decorations;
-                
-                // Only do this if we're running conditionals
-                if (state.tmp.cite_affixes) {
-                    // if build_layout_locale_flag is true,
-                    // write cs:else START to the token list.
-                    tok = new CSL.Token("else", CSL.START);
-                    CSL.Node["else"].build.call(tok, state, target);
-                }
+			} // !this.locale_raw
 
-            } // !this.locale_raw
+			// Conditionals
+			if (this.locale_raw) {
+				if (!state.build.layout_locale_flag) {
+					// if layout_locale_flag is untrue,
+					// write cs:choose START and cs:if START
+					// to the token list.
+					var choose_tok = new CSL.Token("choose", CSL.START);
+					CSL.Node.choose.build.call(choose_tok, state, target);
+					my_tok.name = "if";
+					CSL.Attributes["@locale"].call(my_tok, state, this.locale_raw);
+					CSL.Node["if"].build.call(my_tok, state, target);
+				} else {
+					// if build_layout_locale_flag is true,
+					// write cs:else-if START to the token list.
+					my_tok.name = "else-if";
+					CSL.Attributes["@locale"].call(my_tok, state, this.locale_raw);
+					CSL.Node["else-if"].build.call(my_tok, state, target);
+				}
+				// cite_affixes for this node
+				state.tmp.cite_affixes[my_tok.locale] = {};
+				state.tmp.cite_affixes[my_tok.locale].delimiter = this.strings.delimiter;
+				state.tmp.cite_affixes[my_tok.locale].suffix = this.strings.suffix;
+			}
+		}
+		if (this.tokentype === CSL.END) {
+			if (this.locale_raw) {
+				if (!state.build.layout_locale_flag) {
+					// If layout_locale_flag is untrue, write cs:if END
+					// to the token list.
+					my_tok.name = "if";
+					my_tok.tokentype = CSL.END;
+					CSL.Attributes["@locale"].call(my_tok, state, this.locale_raw);
+					CSL.Node["if"].build.call(my_tok, state, target);
+					state.build.layout_locale_flag = true;
+				} else {
+					// If layout_locale_flag is true, write cs:else-if END
+					// to the token list.
+					my_tok.name = "else-if";
+					my_tok.tokentype = CSL.END;
+					CSL.Attributes["@locale"].call(my_tok, state, this.locale_raw);
+					CSL.Node["else-if"].build.call(my_tok, state, target);
+				}
+			}
+			if (!this.locale_raw) {
+				// Only add this if we're running conditionals
+				if (state.tmp.cite_affixes) {
+					// If layout_locale_flag is true, write cs:else END
+					// and cs:choose END to the token list.
+					tok = new CSL.Token("else", CSL.END);
+					CSL.Node["else"].build.call(tok, state, target);
+					tok = new CSL.Token("choose", CSL.END);
+					CSL.Node.choose.build.call(tok, state, target);
+				}
+				state.build_layout_locale_flag = true;
+				if (state.build.area === "citation") {
+					suffix_token = new CSL.Token("text", CSL.SINGLETON);
+					func = function (state, Item, item) {
+						var sp;
+						if (item && item.suffix) {
+							sp = "";
+							if (item.suffix.match(CSL.ROMANESQUE_REGEXP)) {
+								sp = " ";
+							}
+							state.output.append((sp + item.suffix), this);
+						}
+					};
+					suffix_token.execs.push(func);
+					target.push(suffix_token);
+				}
 
-            // Conditionals
-            if (this.locale_raw) {
-                if (!state.build.layout_locale_flag) {
-                    // if layout_locale_flag is untrue,
-                    // write cs:choose START and cs:if START
-                    // to the token list.
-                    var choose_tok = new CSL.Token("choose", CSL.START);
-                    CSL.Node.choose.build.call(choose_tok, state, target);
-                    my_tok.name = "if";
-                    CSL.Attributes["@locale"].call(my_tok, state, this.locale_raw);
-                    CSL.Node["if"].build.call(my_tok, state, target);
-                } else {
-                    // if build_layout_locale_flag is true,
-                    // write cs:else-if START to the token list.
-                    my_tok.name = "else-if";
-                    CSL.Attributes["@locale"].call(my_tok, state, this.locale_raw);
-                    CSL.Node["else-if"].build.call(my_tok, state, target);
-                }
-                // cite_affixes for this node
-                state.tmp.cite_affixes[my_tok.locale] = {};
-                state.tmp.cite_affixes[my_tok.locale].delimiter = this.strings.delimiter;
-                state.tmp.cite_affixes[my_tok.locale].suffix = this.strings.suffix;
-            }
-        }
-        if (this.tokentype === CSL.END) {
-            if (this.locale_raw) {
-                if (!state.build.layout_locale_flag) {
-                    // If layout_locale_flag is untrue, write cs:if END
-                    // to the token list.
-                    my_tok.name = "if";
-                    my_tok.tokentype = CSL.END;
-                    CSL.Attributes["@locale"].call(my_tok, state, this.locale_raw);
-                    CSL.Node["if"].build.call(my_tok, state, target);
-                    state.build.layout_locale_flag = true;
-                } else {
-                    // If layout_locale_flag is true, write cs:else-if END
-                    // to the token list.
-                    my_tok.name = "else-if";
-                    my_tok.tokentype = CSL.END;
-                    CSL.Attributes["@locale"].call(my_tok, state, this.locale_raw);
-                    CSL.Node["else-if"].build.call(my_tok, state, target);
-                }
-            }
-            if (!this.locale_raw) {
-                // Only add this if we're running conditionals
-                if (state.tmp.cite_affixes) {
-                    // If layout_locale_flag is true, write cs:else END
-                    // and cs:choose END to the token list.
-                    if (state.build.layout_locale_flag) {
-                        tok = new CSL.Token("else", CSL.END);
-                        CSL.Node["else"].build.call(tok, state, target);
-                        tok = new CSL.Token("choose", CSL.END);
-                        CSL.Node.choose.build.call(tok, state, target);
-                    }
-                }
-                state.build_layout_locale_flag = true;
-                if (state.build.area === "citation") {
-                    suffix_token = new CSL.Token("text", CSL.SINGLETON);
-                    func = function (state, Item, item) {
-                        var sp;
-                        if (item && item.suffix) {
-                            sp = "";
-                            if (item.suffix.match(CSL.STARTSWITH_ROMANESQUE_REGEXP)) {
-                                sp = " ";
-                            }
-                            state.output.append((sp + item.suffix), this);
-                        }
-                    };
-                    suffix_token.execs.push(func);
-                    target.push(suffix_token);
-                }
-
-                // mergeoutput
-                func = function (state, Item) {
-                    if (state.tmp.area === "bibliography") {
-                        if (state.bibliography.opt["second-field-align"]) {
-                            // closes bib_other
-                            state.output.endTag();
-                        }
-                    }
-                    state.output.closeLevel();
-                };
-                this.execs.push(func);
-                target.push(this);
-                state.build.layout_flag = false;
-                state.build.layout_locale_flag = false;
-            } // !this.layout_raw
-        }
-    }
+				// mergeoutput
+				func = function (state, Item) {
+					if (state.tmp.area === "bibliography") {
+						if (state.bibliography.opt["second-field-align"]) {
+							// closes bib_other
+							state.output.endTag();
+						}
+					}
+					state.output.closeLevel();
+				};
+				this.execs.push(func);
+				target.push(this);
+				state.build.layout_flag = false;
+				state.build.layout_locale_flag = false;
+			} // !this.layout_raw
+		}
+	}
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,99 +46,103 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
-
 CSL.compareAmbigConfig = function(a, b) {
-    var ret, pos, len, ppos, llen;
-    // return of true means the ambig configs differ
-    if (a.names.length !== b.names.length) {
-        return 1;
-    } else {
-        for (pos = 0, len = a.names.length; pos < len; pos += 1) {
-            if (a.names[pos] !== b.names[pos]) {
-                return 1;
-            } else {
-                for (ppos = 0, llen = a.names[pos]; ppos < llen; ppos += 1) {
-                    if (a.givens[pos][ppos] !== b.givens[pos][ppos]) {
-                        return 1;
-                    }
-                }
-            }
-        }
-    }
-    return 0;
+	var ret, pos, len, ppos, llen;
+	// return of true means the ambig configs differ
+	if (a.names.length !== b.names.length) {
+		return 1;
+	} else {
+		for (pos = 0, len = a.names.length; pos < len; pos += 1) {
+			if (a.names[pos] !== b.names[pos]) {
+				return 1;
+			} else {
+				for (ppos = 0, llen = a.names[pos]; ppos < llen; ppos += 1) {
+					if (a.givens[pos][ppos] !== b.givens[pos][ppos]) {
+						return 1;
+					}
+				}
+			}
+		}
+	}
+	return 0;
 };
 
 CSL.cloneAmbigConfig = function (config, oldconfig, tainters) {
-    var i, ilen, j, jlen, k, klen, param;
-    var ret = {};
-    ret.names = [];
-    ret.givens = [];
-    ret.year_suffix = false;
-    ret.disambiguate = false;
-    for (i = 0, ilen = config.names.length; i < ilen; i += 1) {
-        param = config.names[i];
-        // Fixes update bug affecting plugins, without impacting
-        // efficiency with update of large numbers of year-suffixed
-        // items.
-        if (oldconfig && (!oldconfig.names[i] || oldconfig.names[i] !== param)) {
-            for (j = 0, jlen = tainters.length; j < jlen; j += 1) {
-                this.tmp.taintedItemIDs[tainters[j].id] = true;
-            }
-            oldconfig = false;
-        }
-        ret.names[i] = param;
-    }
-    for (i  = 0, ilen = config.givens.length; i < ilen; i += 1) {
-        param = [];
-        for (j = 0, jlen = config.givens[i].length; j < jlen; j += 1) {
-            // condition at line 312 of disambiguate.js protects against negative
-            // values of j
-            if (oldconfig && oldconfig.givens[i][j] !== config.givens[i][j]) {
-                for (k = 0, klen = tainters.length; k < klen; k += 1) {
-                    this.tmp.taintedItemIDs[tainters[k].id] = true;
-                }
-                oldconfig = false;
-            }
-            param.push(config.givens[i][j]);
-        }
-        ret.givens.push(param);
-    }
-    // XXXX Is this necessary at all?
-    if (oldconfig) {
-        ret.year_suffix = oldconfig.year_suffix;
-        ret.disambiguate = oldconfig.disambiguate;
-    } else {
-        ret.year_suffix = config.year_suffix;
-        ret.disambiguate = config.disambiguate;
-    }
-    return ret;
+	var ret, param, pos, ppos, len, llen;
+	ret = {};
+	ret.names = [];
+	ret.givens = [];
+	ret.year_suffix = false;
+	ret.disambiguate = false;
+	for (pos = 0, len = config.names.length; pos < len; pos += 1) {
+		param = config.names[pos];
+		// Fixes update bug affecting plugins, without impacting
+		// efficiency with update of large numbers of year-suffixed
+		// items.
+		if (oldconfig && (!oldconfig.names[pos] || oldconfig.names[pos] !== param)) {
+			for (ppos = 0, llen = tainters.length; ppos < llen; ppos += 1) {
+				this.tmp.taintedItemIDs[tainters[ppos].id] = true;
+			}
+			oldconfig = false;
+		}
+		ret.names[pos] = param;
+	}
+	for (pos = 0, len = config.givens.length; pos < len; pos += 1) {
+		param = [];
+		llen = config.givens[pos].length;
+		for (ppos = 0; ppos < llen; ppos += 1) {
+			// condition at line 312 of disambiguate.js protects against negative
+			// values of j
+			if (oldconfig && oldconfig.givens[pos][ppos] !== config.givens[pos][ppos]) {
+				for (ppos = 0, llen = tainters.length; ppos < llen; ppos += 1) {
+					this.tmp.taintedItemIDs[tainters[ppos].id] = true;
+				}
+				oldconfig = false;
+			}
+			param.push(config.givens[pos][ppos]);
+		}
+		ret.givens.push(param);
+	}
+	if (tainters && tainters.length > 1) {
+		if (tainters.length == 2 || (oldconfig && oldconfig.year_suffix !== config.year_suffix)) {
+			for (pos = 0, len = tainters.length; pos < len; pos += 1) {
+				var oldYS = this.registry.registry[tainters[pos].id].disambig.year_suffix;
+
+				if (tainters && (false === oldYS || oldYS != pos)) {
+					this.tmp.taintedItemIDs[tainters[pos].id] = true;
+				}
+			}
+			oldconfig = false;
+		}
+	}
+	ret.year_suffix = config.year_suffix;
+	ret.disambiguate = config.disambiguate;
+	return ret;
 };
 
 /**
  * Return current base configuration for disambiguation
  */
 CSL.getAmbigConfig = function () {
-    var config, ret;
-    config = this.tmp.disambig_request;
-    if (!config) {
-        config = this.tmp.disambig_settings;
-    }
-    ret = CSL.cloneAmbigConfig(config);
-    return ret;
+	var config, ret;
+	config = this.tmp.disambig_request;
+	if (!config) {
+		config = this.tmp.disambig_settings;
+	}
+	ret = CSL.cloneAmbigConfig(config);
+	return ret;
 };
 
 /**
  * Return max values for disambiguation
  */
 CSL.getMaxVals = function () {
-    return this.tmp.names_max.mystack.slice();
+	return this.tmp.names_max.mystack.slice();
 };
 
 /**
  * Return min value for disambiguation
  */
 CSL.getMinVal = function () {
-    return this.tmp["et-al-min"];
+	return this.tmp["et-al-min"];
 };

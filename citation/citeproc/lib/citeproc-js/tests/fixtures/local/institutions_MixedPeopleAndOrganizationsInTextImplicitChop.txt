@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -51,15 +51,9 @@ citation
 <<===== MODE =====<<
 
 
-At the first stage of full processor deployment, let's eliminate
-the implicit chop behavior. If there is merit in the implicit
-chop of namesets after the first personal author, as this test
-had it originally, that will emerge in feedback on processor
-behavior.
-
 
 >>===== RESULT =====>>
-Noakes with Roe, Tiny Subcommittee, Big Ministry and Doe et al., Trivial Working Group, Wasteful Enterprise eds.
+Noakes et al. eds.
 <<===== RESULT =====<<
 
 
@@ -67,7 +61,7 @@ Noakes with Roe, Tiny Subcommittee, Big Ministry and Doe et al., Trivial Working
 <style 
       xmlns="http://purl.org/net/xbiblio/csl"
       class="in-text"
-      version="1.1mlz1"
+      version="1.1x"
       default-locale="en">
   <info>
     <id />
@@ -102,7 +96,7 @@ Noakes with Roe, Tiny Subcommittee, Big Ministry and Doe et al., Trivial Working
                 "given": "Jane"
             }, 
             {
-                "literal": "Big Ministry|Busy Committee|Tiny Subcommittee"
+                "literal": "Tiny Subcommittee, Busy Committee, Big Ministry"
             }, 
             {
                 "family": "Doe", 
@@ -117,7 +111,7 @@ Noakes with Roe, Tiny Subcommittee, Big Ministry and Doe et al., Trivial Working
                 "given": "Richard"
             }, 
             {
-                "literal": "Wasteful Enterprise|Evil Division|Trivial Working Group"
+                "literal": "Trivial Working Group, Evil Division, Wasteful Enterprise"
             }, 
             {
                 "family": "Noakes", 

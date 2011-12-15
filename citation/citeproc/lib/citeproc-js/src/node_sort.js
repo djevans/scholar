@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,38 +46,22 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Node.sort = {
-    build: function (state, target) {
-        if (this.tokentype === CSL.START) {
-            if (state.build.area === "citation") {
-                state.parallel.use_parallels = false;
-                state.opt.sort_citations = true;
-            }
-            state.build.area = state.build.root + "_sort";
-            state.build.extension = "_sort";
-            
-            var func = function (state, Item) {
-                //state.tmp.area = state.tmp.root + "_sort";
-                //state.tmp.extension = "_sort";
-            }
-            this.execs.push(func);
-            
-        }
-        if (this.tokentype === CSL.END) {
-            state.build.area = state.build.root;
-            state.build.extension = "";
-            /*
-            var func = function (state, Item) {
-                state.tmp.area = state.tmp.root;
-                state.tmp.extension = "";
-            }
-            this.execs.push(func);
-            */
-        }
-        target.push(this);
-    }
+	build: function (state, target) {
+		if (this.tokentype === CSL.START) {
+			if (state.build.area === "citation") {
+				state.parallel.use_parallels = false;
+				state.opt.sort_citations = true;
+			}
+			state.build.sort_flag  = true;
+			state.build.area_return = state.build.area;
+			state.build.area = state.build.area + "_sort";
+		}
+		if (this.tokentype === CSL.END) {
+			state.build.area = state.build.area_return;
+			state.build.sort_flag  = false;
+		}
+	}
 };
 
 

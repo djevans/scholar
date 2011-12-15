@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,139 +46,93 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Node.group = {
-    build: function (state, target) {
-        var func, execs;
-        if (this.tokentype === CSL.START) {
+	build: function (state, target, quashquash) {
+		var func, execs;
+		if (this.tokentype === CSL.START) {
+			CSL.Util.substituteStart.call(this, state, target);
+			if (state.build.substitute_level.value()) {
+				state.build.substitute_level.replace((state.build.substitute_level.value() + 1));
+			}
+			if (!quashquash || true) {
+				// fieldcontentflag
+				func = function (state, Item) {
+					// (see below)
+					state.tmp.term_sibling.push([false, false, false], CSL.LITERAL);
+					//print("++ SET: "+typeof state.tmp.term_sibling.value()+" ["+state.tmp.term_sibling.mystack.length+"]");
+				};
+				this.execs.push(func);
+			}
+			// newoutput
+			func = function (state, Item) {
+				state.output.startTag("group", this);
+			};
+			//
+			// Paranoia.  Assure that this init function is the first executed.
+			execs = [];
+			execs.push(func);
+			this.execs = execs.concat(this.execs);
 
-            CSL.Util.substituteStart.call(this, state, target);
-            if (state.build.substitute_level.value()) {
-                state.build.substitute_level.replace((state.build.substitute_level.value() + 1));
-            }
-            // newoutput
-            func = function (state, Item) {
-                state.output.startTag("group", this);
-                if (state.tmp.group_context.mystack.length) {
-                    state.output.current.value().parent = state.tmp.group_context.value()[4];
-                }
-                // fieldcontentflag
-                state.tmp.group_context.push([false, false, false, false, state.output.current.value()], CSL.LITERAL);
+		} else {
 
-                // Oops is triggered in two situations:
-                //   (1) Where rendering of content fails; and
-                //   (2) Where content is rendered, but the rendered
-                //       content within the group is entirely removed
-                //       before the output queue is flattened.
-                // The "this" value above should be used to grab
-                // the target of the "oops" delimiter in both cases.
-                if (this.strings.oops) {
-                    state.tmp.group_context.value()[3] = this.strings.oops;
-                }
-            };
-            //
-            // Paranoia.  Assure that this init function is the first executed.
-            execs = [];
-            execs.push(func);
-            this.execs = execs.concat(this.execs);
+			if (!quashquash || true) {
+				// quashnonfields
+				func = function (state, Item) {
+					var flag = state.tmp.term_sibling.value();
+					//if (false === flag) {
+						//print("X"+state.output.current.value().strings.prefix+"X");
+						//state.output.clearlevel();
+						//print(state.output.queue[0].blobs[2].strings.prefix)
+					//}
 
-            // "Special handling" for nodes that contain only
-            // publisher and place, with no affixes. For such
-            // nodes only, parallel publisher/place pairs
-            // will be parsed out and properly joined, piggybacking on
-            // join parameters set on cs:citation or cs:bibliography.
-            if (this.strings["has-publisher-and-publisher-place"]) {
-                // Set the handling function only if name-delimiter
-                // is set on the parent cs:citation or cs:bibliography
-                // node.
-                state.build["publisher-special"] = true;
-                // Pass variable string values to the closing
-                // tag via a global, iff they conform to expectations.
-                func = function (state, Item) {
-                    if (this.strings["subgroup-delimiter"]
-                        && Item.publisher && Item["publisher-place"]) {
-                        var publisher_lst = Item.publisher.split(/;\s*/);
-                        var publisher_place_lst = Item["publisher-place"].split(/;\s*/);
-                        if (publisher_lst.length > 1
-                            && publisher_lst.length === publisher_place_lst.length) {
-                            state.publisherOutput = new CSL.PublisherOutput(state, this);
-                            state.publisherOutput["publisher-list"] = publisher_lst;
-                            state.publisherOutput["publisher-place-list"] = publisher_place_lst;
-                        }
-                    }
-                };
-                this.execs.push(func);
-            }
-        } else {
+					state.output.endTag();
+					//print("-- QUASHER: "+typeof state.tmp.term_sibling.value()+" ["+state.tmp.term_sibling.mystack.length+"]");
+					//
+					// 0 marks an intention to render a term or value
+					// 1 marks an attempt to render a variable
+					// 2 marks an actual variable rendering
+					//
+					if (!flag[2] && (flag[1] || (!flag[1] && !flag[0]))) {
+						//print("POP!");
+						//state.output.current.pop();
+						if (state.output.current.value().blobs) {
+							//print("pop");
+							state.output.current.value().blobs.pop();
+							//state.output.formats.pop();
+						}
+					}
+					state.tmp.term_sibling.pop();
+					//
+					// Heals group quashing glitch with nested groups.
+					//
 
-            // Unbundle and print publisher lists
-            // Same constraints on creating the necessary function here
-            // as above. The full content of the group formatting token
-            // is apparently not available on the closing tag here,
-            // hence the global flag on state.build.
-            if (state.build["publisher-special"]) {
-                state.build["publisher-special"] = false;
-                if ("string" === typeof state[state.build.root].opt["name-delimiter"]) {
-                    func = function (state, Item) {
-                        if (state.publisherOutput) {
-                            state.publisherOutput.render();
-                            state.publisherOutput = false;
-                        }
-                    };
-                    this.execs.push(func);
-                }
-            }
-            
-            // quashnonfields
-            func = function (state, Item) {
-                var flag = state.tmp.group_context.pop();
-                
-                state.output.endTag();
-                //
-                // 0 marks an intention to render a term or value
-                // 1 marks an attempt to render a variable
-                // 2 marks an actual variable rendering
-                // 3 is an oops substitute string, rendered when nothing else does
-                //
-                var upperflag = state.tmp.group_context.value();
-                // print("leaving with flags: "+flag+" (stack length: "+ (state.tmp.group_context.mystack.length + 1) +")");
-                if (flag[1]) {
-                    state.tmp.group_context.value()[1] = true;
-                }
-                if (flag[2] || (flag[0] && !flag[1])) {
-                    state.tmp.group_context.value()[2] = true;
-                } else {
-                    if (state.output.current.value().blobs) {
-                        state.output.current.value().blobs.pop();
-                    }
-                    // Oops. Replace the delimiter TWO levels above the
-                    // current level with the oops string value. Used for
-                    // very rare cases in which the ACTUAL rendering/non-rendering
-                    // of a name value (not the presence/non-presence of field
-                    // content) alters delimiter joins.
-                    if (state.tmp.group_context.value()[3]) {
-                        state.output.current.mystack[state.output.current.mystack.length - 2].strings.delimiter = state.tmp.group_context.value()[3];
-                    }
-                }
-            };
-            this.execs.push(func);
-            
-            // mergeoutput
-            //func = function (state, Item) {
-            //    state.output.endTag();
-            //};
-            //this.execs.push(func);
+					// aha, I think.  There could be conditions that do NOTHING,
+					// which would leave behind an "undefined" on the flag.
+					// We need four states, not three: (1) rendered a variable;
+					// (2) failed to render a variable; (3) rendered a term;
+					// (4) didn't try to do anything.
+					if ((flag[2] || (!flag[1] && flag[0])) && state.tmp.term_sibling.mystack.length > 1) {
+						state.tmp.term_sibling.replace([false, false, true]);
+					}
+				};
+				this.execs.push(func);
+			}
 
-        }
-        target.push(this);
+			// mergeoutput
+			//func = function (state, Item) {
+			//	state.output.endTag();
+			//};
+			//this.execs.push(func);
 
-        if (this.tokentype === CSL.END) {
-            if (state.build.substitute_level.value()) {
-                state.build.substitute_level.replace((state.build.substitute_level.value() - 1));
-            }
-            CSL.Util.substituteEnd.call(this, state, target);
-        }
-    }
+		}
+		target.push(this);
+
+		if (this.tokentype === CSL.END) {
+			if (state.build.substitute_level.value()) {
+				state.build.substitute_level.replace((state.build.substitute_level.value() - 1));
+			}
+			CSL.Util.substituteEnd.call(this, state, target);
+		}
+	}
 };
 

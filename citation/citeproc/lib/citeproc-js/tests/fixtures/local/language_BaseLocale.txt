@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -56,8 +56,8 @@ citation
 1965年6月1日 + 10月 (Japan)
 1 juin 1965 + octobre (France)
 June 01, 1965 + October (US English)
-1. Juni 1965 + Oktober (Austria)
-1. Juni 1965 + Oktober (Austria)
+1 Juni 1965 + Oktober (Austria)
+1 Juni 1965 + Oktober (Austria)
 1965年6月1日 + 10月 (Mainland China)
 1965年6月1日 + 10月 (Taiwan)
 1 de Junho de 1965 + Outubro (Portugal)
@@ -69,7 +69,7 @@ June 01, 1965 + October (US English)
 <style 
       xmlns="http://purl.org/net/xbiblio/csl"
       class="note"
-      version="1.1mlz1">
+      version="1.0">
   <info>
     <id />
     <title />

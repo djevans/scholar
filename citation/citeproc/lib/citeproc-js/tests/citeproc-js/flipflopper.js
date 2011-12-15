@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -56,8 +56,8 @@ doh.register("citeproc_js.flipflopper", [
 		var ff = new CSL.Util.FlipFlopper(state);
 		ff.init("head<i>italic</b>bold's");
 		ff.processTags();
-		doh.assertEqual(39,ff.blob.blobs.length);
-		doh.assertEqual("head&#60;i&#62;italic&#60;/b&#62;bold\u2019s",ff.blob.blobs);
+		doh.assertEqual(35,ff.blob.blobs.length);
+		doh.assertEqual("head&lt;i&gt;italic&lt;/b&gt;bold\u02bcs",ff.blob.blobs);
 	},
 	function testImmediateClosingSingleQuote(){
 		var myxml = "<style></style>";
@@ -76,7 +76,7 @@ doh.register("citeproc_js.flipflopper", [
 		var ff = new CSL.Util.FlipFlopper(state);
 		ff.init("hello\\<b>hello\\</b>again<i>ok</i>now");
 		doh.assertEqual(5, ff.strs.length);
-		doh.assertEqual("hello&#60;b&#62;hello&#60;/b&#62;again", ff.strs[0]);
+		doh.assertEqual("hello&lt;b&gt;hello&lt;/b&gt;again", ff.strs[0]);
 		doh.assertEqual("ok", ff.strs[2]);
 		doh.assertEqual("</i>",ff.strs[3]);
 	},
@@ -87,8 +87,8 @@ doh.register("citeproc_js.flipflopper", [
 		var ff = new CSL.Util.FlipFlopper(state);
 		ff.init("hello\\<b>hello");
 		doh.assertEqual(1, ff.strs.length);
-		doh.assertEqual(21, ff.strs[0].length);
-		doh.assertEqual("hello&#60;b&#62;hello",ff.strs[0]);
+		doh.assertEqual(19, ff.strs[0].length);
+		doh.assertEqual("hello&lt;b&gt;hello",ff.strs[0]);
 	},
 	function testProcessTagsOpenEnded(){
 		var myxml = "<style></style>";
@@ -102,7 +102,7 @@ doh.register("citeproc_js.flipflopper", [
 		doh.assertEqual("italic ",ff.blob.blobs[1].blobs[0].blobs);
 		doh.assertEqual("bold+italic",ff.blob.blobs[1].blobs[1].blobs[0].blobs);
 		doh.assertEqual(" YY ",ff.blob.blobs[1].blobs[2].blobs);
-		doh.assertEqual("ITALIC \u201cquote -- &#60;i&#62;important",ff.blob.blobs[2].blobs);
+		doh.assertEqual("ITALIC \u201cquote -- &lt;i&gt;important",ff.blob.blobs[2].blobs);
 	},
 	function testProcessTagsCrossNesting(){
 		var myxml = "<style></style>";

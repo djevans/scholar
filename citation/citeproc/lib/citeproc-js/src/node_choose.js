@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,34 +46,32 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Node.choose = {
-    build: function (state, target) {
-        var func;
-        if (this.tokentype === CSL.START) {
-            //open condition
-            func = function (state, Item) {
-                state.tmp.jump.push(undefined, CSL.LITERAL);
-            };
-        }
-        if (this.tokentype === CSL.END) {
-            //close condition
-            func = function (state, Item) {
-                state.tmp.jump.pop();
-            };
-        }
-        this.execs.push(func);
-        target.push(this);
-    },
+	build: function (state, target) {
+		var func;
+		if (this.tokentype === CSL.START) {
+			//open condition
+			func = function (state, Item) {
+				state.tmp.jump.push(undefined, CSL.LITERAL);
+			};
+		}
+		if (this.tokentype === CSL.END) {
+			//close condition
+			func = function (state, Item) {
+				state.tmp.jump.pop();
+			};
+		}
+		this.execs.push(func);
+		target.push(this);
+	},
 
-    configure: function (state, pos) {
-        if (this.tokentype === CSL.END) {
-            state.configure.fail.push((pos));
-            state.configure.succeed.push((pos));
-        } else {
-            state.configure.fail.pop();
-            state.configure.succeed.pop();
-        }
-    }
+	configure: function (state, pos) {
+		if (this.tokentype === CSL.END) {
+			state.configure.fail.push((pos));
+			state.configure.succeed.push((pos));
+		} else {
+			state.configure.fail.pop();
+			state.configure.succeed.pop();
+		}
+	}
 };

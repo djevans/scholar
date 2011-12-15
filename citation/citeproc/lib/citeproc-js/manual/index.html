@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.6: http://docutils.sourceforge.net/" />
 <title>The citeproc-js Citation Processor</title>
 <style type="text/css">
 
@@ -329,14 +329,13 @@ pre.codeblock span.Error { color: red; font-weight: bold; }
 </style>
 </head>
 <body>
-
 <div class="document" id="the-citeproc-js-citation-processor">
 <h1 class="title">The <tt class="docutils literal"><span class="pre">citeproc-js</span></tt> Citation Processor</h1>
 <h2 class="subtitle" id="integrator-s-manual">Integrator's Manual</h2>
 
-<p class="fixed"><a class="reference external" href="http://citationstylist.org/documentation/">CitationStylist.org</a></p>
-<p class="info-version">version 1.00<sub>a113</sub></p>
-<p class="info-date">25 August 2011</p>
+<p class="fixed"><a class="reference external" href="http://citationstyles.org/">citationstyles.org</a></p>
+<p class="info-version">version 1.00<sub>a111</sub></p>
+<p class="info-date">2 February 2011</p>
 <dl class="contributors docutils">
 <dt>Author of this manual</dt>
 <dd><ul class="first last simple">
@@ -560,11 +559,12 @@ address.</p>
 <div class="section" id="obtaining-the-locale-files">
 <h2><a class="toc-backref" href="#id48">Obtaining the Locale Files</a></h2>
 <p>The processor requires a set of standard CSL 1.0 locale files in order
-to run.  These may be installed using the following command
-(under Linux command line). From the root of the <tt class="docutils literal"><span class="pre">citeproc-js</span></tt> source directory:</p>
+to run.  These may be installed and set up using the following two commands
+(under Linux):</p>
 <blockquote>
 <pre class="literal-block">
-git clone git://github.com/citation-style-language/locales.git locale
+hg clone http://bitbucket.org/bdarcus/csl-locales
+ln -s csl-locales/trunk/ locale
 </pre>
 </blockquote>
 </div>

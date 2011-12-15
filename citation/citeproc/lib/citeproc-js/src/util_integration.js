@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,32 +46,29 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
-
 CSL.Engine.prototype.setCitationId = function (citation, force) {
-    var ret, id, direction;
-    ret = false;
-    if (!citation.citationID || force) {
-        id = Math.floor(Math.random() * 100000000000000);
-        while (true) {
-            direction = 0;
-            if (!this.registry.citationreg.citationById[id]) {
-                citation.citationID = id.toString(32);
-                break;
-            } else if (!direction && id < 50000000000000) {
-                direction = 1;
-            } else {
-                direction = -1;
-            }
-            if (direction === 1) {
-                id += 1;
-            } else {
-                id += -1;
-            }
-        }
-        ret = "" + id;
-    }
-    this.registry.citationreg.citationById[citation.citationID] = citation;
-    return ret;
+	var ret, id, direction;
+	ret = false;
+	if (!citation.citationID || force) {
+		id = Math.floor(Math.random() * 100000000000000);
+		while (true) {
+			direction = 0;
+			if (!this.registry.citationreg.citationById[id]) {
+				citation.citationID = id.toString(32);
+				break;
+			} else if (!direction && id < 50000000000000) {
+				direction = 1;
+			} else {
+				direction = -1;
+			}
+			if (direction === 1) {
+				id += 1;
+			} else {
+				id += -1;
+			}
+		}
+		ret = "" + id;
+	}
+	this.registry.citationreg.citationById[citation.citationID] = citation;
+	return ret;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,231 +46,476 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Util.Names = {};
 
-CSL.Util.Names.compareNamesets = CSL.NameOutput.prototype._compareNamesets;
+/**
+ * Build a set of names, less any label or et al. tag
+ */
+CSL.Util.Names.outputNames = function (state, display_names) {
+	var segments, and;
+	segments = new this.StartMiddleEnd(state, display_names);
+	and = state.output.getToken("name").strings.delimiter;
+	if (state.tmp.use_ellipsis) {
+	    //		and = state.output.getToken("inner").strings.delimiter + state.getTerm("ellipsis") + " ";
+		and = state.output.getToken("inner").strings.delimiter + "\u2026 ";
+	} else if (state.output.getToken("name").strings["delimiter-precedes-last"] === "always") {
+		and = state.output.getToken("inner").strings.delimiter + and;
+	} else if (state.output.getToken("name").strings["delimiter-precedes-last"] === "never") {
+		if (!and) {
+			and = state.output.getToken("inner").strings.delimiter;
+		}
+	} else if ((segments.segments.start.length + segments.segments.middle.length) > 1) {
+		and = state.output.getToken("inner").strings.delimiter + and;
+	} else {
+		if (!and) {
+			and = state.output.getToken("inner").strings.delimiter;
+		}
+	}
+	if (and.match(CSL.STARTSWITH_ROMANESQUE_REGEXP)) {
+		and = " " + and;
+	}
+	if (and.match(CSL.ENDSWITH_ROMANESQUE_REGEXP)) {
+		and = and + " ";
+	}
+	state.output.getToken("name").strings.delimiter = and;
+
+	state.output.openLevel("name");
+	state.output.openLevel("inner");
+	segments.outputSegmentNames("start");
+	segments.outputSegmentNames("middle");
+	state.output.closeLevel(); // inner
+	segments.outputSegmentNames("end");
+	state.output.closeLevel(); // name
+};
+
+CSL.Util.Names.StartMiddleEnd = function (state, names) {
+	var start, middle, endstart, end, ret;
+	this.state = state;
+	this.nameoffset = 0;
+	//
+	// what to do here?  we need config for this, tokens to
+	// control the joining that will come.  how do we get
+	// them into this function?
+	start = names.slice(0, 1);
+	middle = names.slice(1, (names.length - 1));
+	endstart = 1;
+	if (names.length > 1) {
+		endstart = (names.length - 1);
+	}
+	end = names.slice(endstart, (names.length));
+	ret = {};
+	ret.start = start;
+	ret.middle = middle;
+	ret.end = end;
+	this.segments = ret;
+};
+
+CSL.Util.Names.StartMiddleEnd.prototype.outputSegmentNames = function (seg) {
+	var state, value, sequence, pos, len;
+	state = this.state;
+	len = this.segments[seg].length;
+	for (pos = 0; pos < len; pos += 1) {
+		this.namenum = parseInt(pos, 10);
+		this.name = this.segments[seg][pos];
+		// Get the language tags from the names transliteration
+		// preference, and feed it to the following function.
+		var translit = state.opt["locale-pri"];
+		this.outputName(seg, pos, translit);
+	}
+	this.nameoffset += this.segments[seg].length;
+};
+
+CSL.Util.Names.StartMiddleEnd.prototype.outputName = function (seg, pos, translit, tokenname) {
+
+	var name = this.state.transform.name(this.state, this.name, translit);
+
+	if (name.literal) {
+		value = name.literal;
+		this.state.output.append(name.literal, "empty");
+	} else {
+
+		if (name.transliterated) {
+			this.state.output.openLevel("empty");
+		}
+
+		if (tokenname) {
+			this.state.output.openLevel(tokenname);
+		} 
+
+		sequence = CSL.Util.Names.getNamepartSequence(this.state, seg, name);
+		
+		this.state.output.openLevel(sequence[0][0]); // articular join
+		this.state.output.openLevel(sequence[0][1]); // join to last element (?)
+		this.state.output.openLevel(sequence[0][2]); // inter-element join (?)
+		
+		this.outputNameParts(name, sequence[1]);
+		
+		this.state.output.closeLevel();
+		this.state.output.openLevel(sequence[0][2]);
+		
+		this.outputNameParts(name, sequence[2]);
+		
+		this.state.output.closeLevel();
+		this.state.output.closeLevel();
+		//
+		// articular goes here  //
+		//
+		this.outputNameParts(name, sequence[3]);
+		
+		this.state.output.closeLevel();
+
+		if (tokenname) {
+			this.state.output.closeLevel(); // parens
+		}
+
+		if (this.state.opt["locale-show-original-names"] 
+			&& this.state.tmp.area === "bibliography"
+			&& name.transliterated 
+			&& this.name.given) {
+
+			var parens = new CSL.Blob();
+			parens.strings.prefix = " (";
+			parens.strings.suffix = ")";
+			this.state.output.addToken("parens", false, parens);
+			this.outputName(seg, pos, false, "parens");
+		}
+
+		if (name.transliterated) {
+			this.state.output.closeLevel(); // wrapper to avoid delimiter between names.
+		}
+
+	}
+	return name.transliterated;
+};
+
+CSL.Util.Names.StartMiddleEnd.prototype.outputNameParts = function (name, subsequence) {
+	var state, len, pos, key, namepart, initialize_with, preffie;
+	state = this.state;
+    	// Purge empty name parts from keylist
+	for (var i = subsequence.length - 1; i > -1; i += -1) {
+	    if (!name[subsequence[i]]) {
+		subsequence = subsequence.slice(0, i).concat(subsequence.slice(i + 1));
+	    }
+	}
+	preffie = "";
+	len = subsequence.length;
+	for (pos = 0; pos < len; pos += 1) {
+		key = subsequence[pos];
+		namepart = name[key];
+		if (preffie) {
+		    namepart = preffie + namepart;
+		    preffie = "";
+		}
+		// Do not include given name, dropping particle or suffix in strict short form of name
+		if (["given", "suffix", "dropping-particle"].indexOf(key) > -1 && 0 === state.tmp.disambig_settings.givens[state.tmp.nameset_counter][this.namenum + this.nameoffset]) {
+			if (!(key === "given" && !name.family)) {
+				if (key === "suffix") {
+					if (name.suffix !== name.suffix.toLowerCase()) {
+						continue;
+					}
+				} else {
+					continue;
+				}
+			}
+		}
+		// If ends in an apostrophe, is a particle, and is immediately
+		// followed by family, merge particle to family.
+		if (key === "dropping-particle" 
+		    && ["'","\u02bc","\u2019"].indexOf(namepart.slice(-1)) > -1
+		    && pos < subsequence.length - 1
+		    && subsequence[pos + 1] === "family") {
+			preffie = namepart;
+			continue;
+		}
+		// initialize if appropriate
+		if ("given" === key) {
+			if (1 === state.tmp.disambig_settings.givens[state.tmp.nameset_counter][(this.namenum + this.nameoffset)] && !name.block_initialize) {
+				initialize_with = state.output.getToken("name").strings["initialize-with"];
+				namepart = CSL.Util.Names.initializeWith(state, namepart, initialize_with);
+			} else {
+				namepart = CSL.Util.Names.unInitialize(state, namepart);
+			}
+		}
+		state.output.append(namepart, key);
+	}
+};
+
+CSL.Util.Names.getNamepartSequence = function (state, seg, name) {
+	var token, suffix_sep, romanesque, sequence;
+	token = state.output.getToken("name");
+	// Set the rendering order and separators of the core nameparts
+	// sequence[0][0] separates elements inside each of the the two lists
+	// sequence[0][1] separates the two lists
+	if (name["comma-suffix"]) {
+		state.output.getToken("suffixsep").strings.delimiter = ", ";
+	} else {
+		state.output.getToken("suffixsep").strings.delimiter = " ";
+	}
+	romanesque = name.family.match(CSL.ROMANESQUE_REGEXP);
+	// neither roman nor Cyrillic characters
+	if (!romanesque) {
+		sequence = [["empty", "empty", "empty"], ["non-dropping-particle", "family"], ["given"], []];
+	} else if (name["static-ordering"]) { // entry likes sort order
+		sequence = [["empty", "space", "space"], ["non-dropping-particle", "family"], ["given"], []];
+	} else if (state.tmp.sort_key_flag) {
+		if (state.opt["demote-non-dropping-particle"] === "never") {
+			sequence = [["suffixsep", "sortsep", "space"], ["non-dropping-particle", "family", "dropping-particle"], ["given"], ["suffix"]];
+		} else {
+			sequence = [["suffixsep", "sortsep", "space"], ["family"], ["given", "dropping-particle", "non-dropping-particle"], ["suffix"]];
+		}
+	} else if (token && (token.strings["name-as-sort-order"] === "all" || (token.strings["name-as-sort-order"] === "first" && seg === "start"))) {
+		//
+		// Discretionary sort ordering and inversions
+		//
+		if (["always", "display-and-sort"].indexOf(state.opt["demote-non-dropping-particle"]) > -1) {
+			// Drop non-dropping particle
+			sequence = [["sortsep", "sortsep", "space"], ["family"], ["given", "dropping-particle", "non-dropping-particle"], ["suffix"]];
+		} else {
+			// Don't drop particle.
+			sequence = [["sortsep", "sortsep", "space"], ["non-dropping-particle", "family"], ["given", "dropping-particle"], ["suffix"]];
+		}
+	} else { // plain vanilla
+		sequence = [["suffixsep", "space", "space"], ["given"], ["dropping-particle", "non-dropping-particle", "family"], ["suffix"]];
+	}
+	return sequence;
+};
+
+//
+// Apparently never used.
+//
+//CSL.Util.Names.deep_copy = function (nameset) {
+//	var nameset2, len, pos, name2, name;
+//	print("USING");
+//	nameset2 = [];
+//	len = nameset.length;
+//	for (pos = 0; pos < len; pos += 1) {
+//		name = nameset[pos];
+//		name2 = {};
+//		for (var i in name) {
+//			name2[i] = name[i];
+//		}
+//		nameset2.push(name2);
+//	}
+//	return nameset2;
+//};
+
+
+/**
+ * Reinitialize scratch variables used by names machinery.
+ */
+//
+// XXXX A handy guide to variable assignments that need
+// XXXX to be eliminated.  :)
+//
+CSL.Util.Names.reinit = function (state, Item) {
+	state.tmp.value = [];
+	state.tmp.name_et_al_term = false;
+	state.tmp.name_et_al_decorations = false;
+
+
+	state.tmp.name_et_al_form = "long";
+	state.tmp.et_al_prefix = false;
+};
+
+CSL.Util.Names.getCommonTerm = function (state, namesets) {
+	var base_nameset, varnames, len, pos, short_namesets, nameset;
+	if (namesets.length < 2) {
+		return false;
+	}
+	base_nameset = namesets[0];
+	
+	varnames = [];
+	varnames.push(base_nameset.variable);
+	short_namesets = namesets.slice(1);
+	len = short_namesets.length;
+	for (pos = 0; pos < len; pos += 1) {
+		nameset = short_namesets[pos];
+		if (!CSL.Util.Names.compareNamesets(base_nameset, nameset)) {
+			return false;
+		}
+		if (varnames.indexOf(nameset.variable) === -1) {
+			varnames.push(nameset.variable);
+		}
+	}
+	varnames.sort();
+	var combined_terms = varnames.join("");
+	if (state.locale[state.opt.lang].terms[combined_terms]) {
+		return varnames.join("");
+	} else {
+		return false;
+	}
+};
+
+
+CSL.Util.Names.compareNamesets = function (base_nameset, nameset) {
+	var name, pos, len, part, ppos, llen;
+	if (!base_nameset.names || !nameset.names || base_nameset.names.length !== nameset.names.length || base_nameset.etal !== nameset.etal) {
+		return false;
+	}
+	len = nameset.names.length;
+	for (pos = 0; pos < len; pos += 1) {
+		name = nameset.names[pos];
+		llen = CSL.NAME_PARTS.length;
+		for (ppos = 0; ppos < llen; ppos += 1) {
+			part = CSL.NAME_PARTS[ppos];
+			if (!base_nameset.names[pos] || base_nameset.names[pos][part] != name[part]) {
+				return false;
+			}
+		}
+	}
+	return true;
+};
 
 /**
  * Un-initialize a name (quash caps after first character)
  */
 CSL.Util.Names.unInitialize = function (state, name) {
-    var i, ilen, namelist, punctlist, ret;
-    if (!name) {
-        return "";
-    }
-    namelist = name.split(/(?:\-|\s+)/);
-    punctlist = name.match(/(\-|\s+)/g);
-    ret = "";
-    for (i = 0, ilen = namelist.length; i < ilen; i += 1) {
-        if (CSL.ALL_ROMANESQUE_REGEXP.exec(namelist[i].slice(0,-1)) 
-            && namelist[i] 
-            && namelist[i] !== namelist[i].toUpperCase()) {
-
-            // More or less like this, to address the following fault report:
-            // http://forums.zotero.org/discussion/17610/apsa-problems-with-capitalization-of-mc-mac-etc/
-            namelist[i] = namelist[i].slice(0, 1) + namelist[i].slice(1, 2).toLowerCase() + namelist[i].slice(2);
-        }
-        ret += namelist[i];
-        if (i < ilen - 1) {
-            ret += punctlist[i];
-        }
-    }
-    return ret;
+	var namelist, punctlist, ret, pos, len;
+	if (!name) {
+		return "";
+	}
+	namelist = name.split(/(?:\-|\s+)/);
+	punctlist = name.match(/(\-|\s+)/g);
+	ret = "";
+	for (pos = 0, len = namelist.length; pos < len; pos += 1) {
+		if (CSL.ALL_ROMANESQUE_REGEXP.exec(namelist[pos].slice(0,-1))) {
+			namelist[pos] = namelist[pos].slice(0, 1) + namelist[pos].slice(1).toLowerCase();
+		}
+		ret += namelist[pos];
+		if (pos < len - 1) {
+			ret += punctlist[pos];
+		}
+	}
+	return ret;
 };
 
 /**
  * Initialize a name.
  */
-CSL.Util.Names.initializeWith = function (state, name, terminator, normalizeOnly) {
-    var i, ilen, j, jlen, n, m, mm, str, lst, ret;
-    if (!name) {
-        return "";
-    }
-    if (["Lord", "Lady"].indexOf(name) > -1) {
-        return name;
-    }
-    if (!terminator) {
-        terminator = "";
-    }
-    var namelist = name;
-    if (state.opt["initialize-with-hyphen"] === false) {
-        namelist = namelist.replace(/\-/g, " ");
-    }
-
-    // Oh boy.
-    // We need to suss out what is a set of initials or abbreviation,
-    // so that they can be selectively normalized. Steps might be:
-    //   (1) Split the string
-    //   (2) Step through the string, deleting periods and, if initalize="false", then
-    //       (a) note abbreviations and initials (separately).
-    //   (3) If initialize="false" then:
-    //       (a) Do the thing below, but only pushing terminator; or else
-    //       (b) Do the thing below
-
-    // (1) Split the string
-    namelist = namelist.replace(/\s*\-\s*/g, "-").replace(/\s+/g, " ");
-    // Workaround for Internet Explorer
-    //namelist = namelist.split(/(\-|\s+)/);
-    // Workaround for Internet Explorer
-    mm = namelist.match(/[\-\s]+/g);
-    lst = namelist.split(/[\-\s]+/);
-
-    if (lst.length === 0) {
-        namelist = mm;
-    } else {
-        namelist = [lst[0]];
-        for (i = 1, ilen = lst.length; i < ilen; i += 1) {
-            namelist.push(mm[i - 1]);
-            namelist.push(lst[i]);
-        }
-    }
-    lst = namelist;
-    // This case remains: John T.S. Smith. Fix up by stepping through
-    // in reverse.
-    for (i = lst.length -1; i > -1; i += -1) {
-        if (lst[i] && lst[i].slice(0, -1).indexOf(".") > -1) {
-            var lstend = lst.slice(i + 1);
-            var lstmid = lst[i].slice(0, -1).split(".");
-            lst = lst.slice(0, i);
-            for (j = 0, jlen = lstmid.length; j < jlen; j += 1) {
-                lst.push(lstmid[j] + ".");
-                if (j < lstmid.length - 1) {
-                    lst.push(" ");
-                }
-            }
-            lst = lst.concat(lstend);
-        }
-    }
-
-    // Use doInitializeName or doNormalizeName, depending on requirements.
-    if (normalizeOnly) {
-        ret = CSL.Util.Names.doNormalize(state, lst, terminator);
-    } else {
-        ret = CSL.Util.Names.doInitialize(state, lst, terminator);
-    }
-    return ret;
-};
-
-CSL.Util.Names.doNormalize = function (state, namelist, terminator, mode) {
-    var i, ilen;
-    //   (2) Step through the string, deleting periods and, if initalize="false", then
-    //       (a) note abbreviations and initials (separately).
-
-    var isAbbrev = [];
-    for (i = 0, ilen = namelist.length; i < ilen; i += 1) {
-        if (namelist[i].length > 1 && namelist[i].slice(-1) === ".") {
-            namelist[i] = namelist[i].slice(0, -1);
-            isAbbrev.push(true);
-        } else if (namelist[i].length === 1 && namelist[i].toUpperCase() === namelist[i]) {
-            isAbbrev.push(true);
-        } else {
-            isAbbrev.push(false);
-        }
-    }
-    //   (3) If initialize="false" then:
-    //       (a) Do the thing below, but only pushing terminator; or else
-    //       (b) Do the thing below
-    var ret = [];
-    for (i = 0, ilen = namelist.length; i < ilen; i += 2) {
-        if (isAbbrev[i]) {
-            if (i < namelist.length - 2) {
-                namelist[i + 1] = "";
-                // If terminator does not end in a space,
-                // and this is a ROMANESQUE,
-                // and this or partner is not an initial,
-                // add a space.
-                // Otherwise, just use terminator.
-                
-                if ((!terminator || terminator.slice(-1) && terminator.slice(-1) !== " ")
-                    && namelist[i].length && namelist[i].match(CSL.ALL_ROMANESQUE_REGEXP)
-                    && (namelist[i].length > 1 || namelist[i + 2].length > 1)) {
-                    namelist[i + 1] = " ";
-                }
-                namelist[i] = namelist[i] + terminator;
-            }
-            if (i === namelist.length - 1) {
-                namelist[i] = namelist[i] + terminator;
-            }
-        }
-    }
-    return namelist.join("").replace(/\s+$/,"");
-};
-
-CSL.Util.Names.doInitialize = function (state, namelist, terminator, mode) {
-    var i, ilen, m, j, jlen, lst, n;
-    for (i = 0, ilen = namelist.length; i < ilen; i += 2) {
-        n = namelist[i];
-        if (!n) {
-            continue;
-        }
-        m = n.match(CSL.NAME_INITIAL_REGEXP);
-        if (!m && (!n.match(CSL.STARTSWITH_ROMANESQUE_REGEXP) && n.length > 1 && terminator.match("%s"))) {
-            m = n.match(/(.)(.*)/);
-        }
-        if (m && m[1] === m[1].toUpperCase()) {
-            var extra = "";
-            if (m[2]) {
-                var s = "";
-                lst = m[2].split("");
-                for (j = 0, jlen = lst.length; j < jlen; j += 1) {
-                    var c = lst[j];
-                    if (c === c.toUpperCase()) {
-                        s += c;
-                    } else {
-                        break;
-                    }
-                }
-                if (s.length < m[2].length) {
-                    extra = s.toLocaleLowerCase();
-                }
-            }
-            namelist[i] = m[1].toLocaleUpperCase() + extra;
-            if (i < (ilen - 1)) {
-                if (terminator.match("%s")) {
-                    namelist[i] = terminator.replace("%s", namelist[i]);
-                } else {
-                    if (namelist[i + 1].indexOf("-") > -1) {
-                        namelist[i + 1] = terminator + namelist[i + 1];
-                    } else {
-                        namelist[i + 1] = terminator;
-                    }
-                }
-            } else {
-                if (terminator.match("%s")) {
-                    namelist[i] = terminator.replace("%s", namelist[i]);
-                } else {
-                    namelist.push(terminator);
-                }
-            }
-        } else if (n.match(CSL.ROMANESQUE_REGEXP)) {
-            namelist[i] = " " + n;
-        }
-    }
-    var ret = CSL.Util.Names.stripRight(namelist.join(""));
-    ret = ret.replace(/\s*\-\s*/g, "-").replace(/\s+/g, " ");
-    return ret;
+CSL.Util.Names.initializeWith = function (state, name, terminator) {
+	var namelist, l, i, n, m, extra, ret, s, c, pos, len, ppos, llen, llst, mx, lst;
+	if (!name) {
+		return "";
+	}
+	if (!terminator) {
+		terminator = "";
+	}
+	namelist = name;
+	if (state.opt["initialize-with-hyphen"] === false) {
+		namelist = namelist.replace(/\-/g, " ");
+	}
+	namelist = namelist.replace(/\./g, " ").replace(/\s*\-\s*/g, "-").replace(/\s+/g, " ");
+	// Workaround for Internet Explorer
+	namelist = namelist.split(/(\-|\s+)/);
+	for (i = 0, ilen = namelist.length; i < ilen; i += 2) {
+		n = namelist[i];
+		if (!n) {
+			continue;
+		}
+		m = n.match(CSL.NAME_INITIAL_REGEXP);
+		if (!m && (!n.match(CSL.STARTSWITH_ROMANESQUE_REGEXP) && n.length > 1 && terminator.match("%s"))) {
+			m = n.match(/(.)(.*)/);
+		}
+		if (m && m[1] === m[1].toUpperCase()) {
+			extra = "";
+			if (m[2]) {
+				s = "";
+				lst = m[2].split("");
+				for (j = 0, jlen = lst.length; j < jlen; j += 1) {
+					c = lst[j];
+					if (c === c.toUpperCase()) {
+						s += c;
+					} else {
+						break;
+					}
+				}
+				if (s.length < m[2].length) {
+					extra = s.toLocaleLowerCase();
+				}
+			}
+			namelist[i] = m[1].toLocaleUpperCase() + extra;
+			if (i < (ilen - 1)) {
+				if (terminator.match("%s")) {
+					namelist[i] = terminator.replace("%s", namelist[i]);
+				} else {
+					if (namelist[i + 1].indexOf("-") > -1) {
+						namelist[i + 1] = terminator + namelist[i + 1];
+					} else {
+						namelist[i + 1] = terminator;
+					}
+				}
+			} else {
+				if (terminator.match("%s")) {
+					namelist[i] = terminator.replace("%s", namelist[i]);
+				} else {
+					namelist.push(terminator);
+				}
+			}
+		} else if (n.match(CSL.ROMANESQUE_REGEXP)) {
+			namelist[i] = " " + n;
+		}
+	}
+	ret = CSL.Util.Names.stripRight(namelist.join(""));
+	ret = ret.replace(/\s*\-\s*/g, "-").replace(/\s+/g, " ");
+	return ret;
 };
 
 
 CSL.Util.Names.stripRight = function (str) {
-    var end, pos, len;
-    end = 0;
-    len = str.length - 1;
-    for (pos = len; pos > -1; pos += -1) {
-        if (str[pos] !== " ") {
-            end = pos + 1;
-            break;
-        }
-    }
-    return str.slice(0, end);
+	var end, pos, len;
+	end = 0;
+	len = str.length - 1;
+	for (pos = len; pos > -1; pos += -1) {
+		if (str[pos] !== " ") {
+			end = pos + 1;
+			break;
+		}
+	}
+	return str.slice(0, end);
 };
 
-// deleted CSL.Util.Names.initNameSlices()
-// no longer used.
+CSL.Util.Names.initNameSlices = function (state) {
+	var len, pos;
+	state.tmp.names_cut = {
+		counts: [],
+		variable: {}
+	};
+	len = CSL.NAME_VARIABLES.length;
+	for (pos = 0; pos < len; pos += 1) {
+		state.tmp.names_cut.counts[CSL.NAME_VARIABLES[pos]] = 0;
+	}
+};
 
 // deleted CSL.Util.Names,rescueNameElements()
 // apparently not used.
 
 
+CSL.Engine.prototype.parseName = function (name) {
+	var m, idx;
+	if (! name["non-dropping-particle"] && name.family) {
+		m = name.family.match(/^([ a-z]+\s+)/);
+		if (m) {
+			name.family = name.family.slice(m[1].length);
+			name["non-dropping-particle"] = m[1].replace(/\s+$/, "");
+
+		}
+	}
+	if (!name.suffix && name.given) {
+		m = name.given.match(/(\s*,!*\s*)/);
+		if (m) {
+			idx = name.given.indexOf(m[1]);
+			if (name.given.slice(idx, idx + m[1].length).replace(/\s*/g, "").length === 2) {
+				name["comma-suffix"] = true;
+			}
+			name.suffix = name.given.slice(idx + m[1].length);
+			name.given = name.given.slice(0, idx);
+		}
+	}
+	if (! name["dropping-particle"] && name.given) {
+		m = name.given.match(/^(\s+[ a-z]*[a-z])$/);
+		if (m) {
+			name.given = name.given.slice(0, m[1].length * -1);
+			name["dropping-particle"] = m[2].replace(/^\s+/, "");
+		}
+	}
+};

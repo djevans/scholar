@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,8 +46,6 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 /**
  * An output instance object representing a number or a range
  *
@@ -61,85 +59,84 @@
  */
 
 CSL.NumericBlob = function (num, mother_token) {
-    this.alldecor = [];
-    this.num = num;
-    this.blobs = num.toString();
-    this.status = CSL.START;
-    this.strings = {};
-    if (mother_token) {
-        this.gender = mother_token.gender;
-        this.decorations = mother_token.decorations;
-        this.strings.prefix = mother_token.strings.prefix;
-        this.strings.suffix = mother_token.strings.suffix;
-        this.strings["text-case"] = mother_token.strings["text-case"];
-        this.successor_prefix = mother_token.successor_prefix;
-        this.range_prefix = mother_token.range_prefix;
-        this.splice_prefix = mother_token.splice_prefix;
-        this.formatter = mother_token.formatter;
-        if (!this.formatter) {
-            this.formatter =  new CSL.Output.DefaultFormatter();
-        }
-        if (this.formatter) {
-            this.type = this.formatter.format(1);
-        }
-    } else {
-        this.decorations = [];
-        this.strings.prefix = "";
-        this.strings.suffix = "";
-        this.successor_prefix = "";
-        this.range_prefix = "";
-        this.splice_prefix = "";
-        this.formatter = new CSL.Output.DefaultFormatter();
-    }
+	this.alldecor = [];
+	this.num = num;
+	this.blobs = num.toString();
+	this.status = CSL.START;
+	this.strings = {};
+	if (mother_token) {
+		this.decorations = mother_token.decorations;
+		this.strings.prefix = mother_token.strings.prefix;
+		this.strings.suffix = mother_token.strings.suffix;
+		this.strings["text-case"] = mother_token.strings["text-case"];
+		this.successor_prefix = mother_token.successor_prefix;
+		this.range_prefix = mother_token.range_prefix;
+		this.splice_prefix = mother_token.splice_prefix;
+		this.formatter = mother_token.formatter;
+		if (!this.formatter) {
+			this.formatter =  new CSL.Output.DefaultFormatter();
+		}
+		if (this.formatter) {
+			this.type = this.formatter.format(1);
+		}
+	} else {
+		this.decorations = [];
+		this.strings.prefix = "";
+		this.strings.suffix = "";
+		this.successor_prefix = "";
+		this.range_prefix = "";
+		this.splice_prefix = "";
+		this.formatter = new CSL.Output.DefaultFormatter();
+	}
 };
 
 
 CSL.NumericBlob.prototype.setFormatter = function (formatter) {
-    this.formatter = formatter;
-    this.type = this.formatter.format(1);
+	this.formatter = formatter;
+	this.type = this.formatter.format(1);
 };
 
 
 CSL.Output.DefaultFormatter = function () {};
 
 CSL.Output.DefaultFormatter.prototype.format = function (num) {
-    return num.toString();
+	return num.toString();
 };
 
 CSL.NumericBlob.prototype.checkNext = function (next) {
-    if (! next || !next.num || this.type !== next.type || next.num !== (this.num + 1)) {
-        if (this.status === CSL.SUCCESSOR_OF_SUCCESSOR) {
-            this.status = CSL.END;
-        }
-        if ("object" === typeof next) {
-            next.status = CSL.SEEN;
-        }
-    } else { // next number is in the sequence
-        if (this.status === CSL.START || this.status === CSL.SEEN) {
-            next.status = CSL.SUCCESSOR;
-        } else if (this.status === CSL.SUCCESSOR || this.status === CSL.SUCCESSOR_OF_SUCCESSOR) {
-            if (this.range_prefix) {
-                next.status = CSL.SUCCESSOR_OF_SUCCESSOR;
-                this.status = CSL.SUPPRESS;
-            } else {
-                next.status = CSL.SUCCESSOR;
-            }
-        }
-        // wakes up the correct delimiter.
-        //if (this.status === CSL.SEEN) {
-        //    this.status = CSL.SUCCESSOR;
-        //}
+	if (! next || !next.num || this.type !== next.type || next.num !== (this.num + 1)) {
+		if (this.status === CSL.SUCCESSOR_OF_SUCCESSOR) {
+			this.status = CSL.END;
+		}
+		if ("object" === typeof next) {
+			next.status = CSL.SEEN;
+		}
+	} else { // next number is in the sequence
+		if (this.status === CSL.START || this.status === CSL.SEEN) {
+			next.status = CSL.SUCCESSOR;
+		} else if (this.status === CSL.SUCCESSOR || this.status === CSL.SUCCESSOR_OF_SUCCESSOR) {
+			if (this.range_prefix) {
+				next.status = CSL.SUCCESSOR_OF_SUCCESSOR;
+				this.status = CSL.SUPPRESS;
+			} else {
+				next.status = CSL.SUCCESSOR;
+			}
+		}
+		// wakes up the correct delimiter.
+		//if (this.status === CSL.SEEN) {
+		//	this.status = CSL.SUCCESSOR;
+		//}
 
-    }
+	}
 };
 
 
 CSL.NumericBlob.prototype.checkLast = function (last) {
     // Used to adjust final non-range join
     if (this.status === CSL.SEEN 
-    || (last.num !== (this.num - 1) && this.status === CSL.SUCCESSOR)) {
-        this.status = CSL.SUCCESSOR;
-        return true;
+	|| (last.num !== (this.num - 1) && this.status === CSL.SUCCESSOR)) {
+		this.status = CSL.SUCCESSOR;
+		return true;
     }
     return false;
 };

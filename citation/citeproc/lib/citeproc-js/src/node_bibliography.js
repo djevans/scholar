@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,39 +46,38 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Node = {};
 
 CSL.Node.bibliography = {
-    build: function (state, target) {
-        if (this.tokentype === CSL.START) {
+	build: function (state, target) {
+		if (this.tokentype === CSL.START) {
 
-            state.build.area = "bibliography";
-            state.build.root = "bibliography";
+			//state.parallel.use_parallels = false;
 
-            //state.parallel.use_parallels = false;
+			state.fixOpt(this, "names-delimiter", "delimiter");
 
-            state.fixOpt(this, "names-delimiter", "delimiter");
+			state.fixOpt(this, "name-delimiter", "delimiter");
+			state.fixOpt(this, "name-form", "form");
+			state.fixOpt(this, "and", "and");
+			state.fixOpt(this, "delimiter-precedes-last", "delimiter-precedes-last");
+			state.fixOpt(this, "delimiter-precedes-et-al", "delimiter-precedes-et-al");
+			state.fixOpt(this, "initialize-with", "initialize-with");
+			state.fixOpt(this, "name-as-sort-order", "name-as-sort-order");
+			state.fixOpt(this, "sort-separator", "sort-separator");
 
-            state.fixOpt(this, "name-delimiter", "delimiter");
-            state.fixOpt(this, "name-form", "form");
-            state.fixOpt(this, "and", "and");
-            state.fixOpt(this, "delimiter-precedes-last", "delimiter-precedes-last");
-            state.fixOpt(this, "delimiter-precedes-et-al", "delimiter-precedes-et-al");
-            state.fixOpt(this, "initialize-with", "initialize-with");
-            state.fixOpt(this, "initialize", "initialize");
-            state.fixOpt(this, "name-as-sort-order", "name-as-sort-order");
-            state.fixOpt(this, "sort-separator", "sort-separator");
-            state.fixOpt(this, "and", "and");
+			state.fixOpt(this, "et-al-min", "et-al-min");
+			state.fixOpt(this, "et-al-use-first", "et-al-use-first");
+			state.fixOpt(this, "et-al-use-last", "et-al-use-last");
+			state.fixOpt(this, "et-al-subsequent-min", "et-al-subsequent-min");
+			state.fixOpt(this, "et-al-subsequent-use-first", "et-al-subsequent-use-first");
 
-            state.fixOpt(this, "et-al-min", "et-al-min");
-            state.fixOpt(this, "et-al-use-first", "et-al-use-first");
-            state.fixOpt(this, "et-al-use-last", "et-al-use-last");
-            state.fixOpt(this, "et-al-subsequent-min", "et-al-subsequent-min");
-            state.fixOpt(this, "et-al-subsequent-use-first", "et-al-subsequent-use-first");
-        }
-        target.push(this);
-    }
+			state.build.area_return = state.build.area;
+			state.build.area = "bibliography";
+		}
+		if (this.tokentype === CSL.END) {
+			state.build.area = state.build.area_return;
+		}
+		target.push(this);
+	}
 };
 

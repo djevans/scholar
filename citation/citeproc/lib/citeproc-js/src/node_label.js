@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,43 +46,106 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.Node.label = {
-    build: function (state, target) {
-        var debug = false;
-        
-        if (this.strings.term) {
-            // Non-names labels
-            var plural = false;
-            if (!this.strings.form) {
-                this.strings.form = "long";
-            }
-            var func = function (state, Item, item) {
-                // Must accomplish this without touching strings
-                // shared with the calling application: "sub verbo"
-                // and "sub-verbo" must both pass, as they stand.
-                //if (item && item.label === "sub verbo") {
-                //    item.label = "sub-verbo";
-                //}
-                // This is abstracted away, because the same
-                // logic must be run in cs:names.
-                var termtxt = CSL.evaluateLabel(this, state, Item, item);
-                state.output.append(termtxt, this);
-            };
-            this.execs.push(func);
-        } else {
-            // Names labels
-            // Picked up in names END
-            if (!state.build.name_label) {
-                state.build.name_label = {};
-            }
-            if (!state.build.name_flag) {
-                state.build.name_label.before = this;
-            } else {
-                state.build.name_label.after = this;
-            }
-        }
-        target.push(this);
-    }
+	build: function (state, target) {
+		var func, term, plural, form, debug;
+		debug = false;
+		if (state.build.name_flag) {
+			this.strings.label_position = CSL.AFTER;
+		} else {
+			this.strings.label_position = CSL.BEFORE;
+		}
+		// set label info
+		func = function (state, Item) {
+			state.output.addToken("label", false, this);
+		};
+		this.execs.push(func);
+		if (state.build.term) {
+			term = state.build.term;
+			plural = false;
+			if (!this.strings.form) {
+				this.strings.form = "long";
+			}
+			func = function (state, Item, item) {
+				// This is abstracted away, because the same
+				// logic must be run in cs:names.
+				var termtxt = CSL.evaluateLabel(this, state, Item, item, term);
+				state.output.append(termtxt, this);
+			};
+			this.execs.push(func);
+			state.build.plural = false;
+			state.build.term = false;
+			state.build.form = false;
+		}
+		target.push(this);
+	}
+};
+
+CSL.evaluateLabel = function (node, state, Item, item, term, termvar) {
+	var myterm;
+	if ("locator" === term) {
+		if (item && item.label) {
+			myterm = item.label;
+		}
+		if (!myterm) {
+			myterm = "page";
+		}
+	} else {
+		myterm = term;
+	}
+	if (!termvar) {
+		termvar = term;
+	}
+	// Plurals detection.
+	var plural = node.strings.plural;
+	if ("number" !== typeof plural) {
+		if (CSL.CREATORS.indexOf(termvar) > -1) {
+			// check for plural creator
+			// This is a little tricky, because an institutional
+			// name following an individual is an affiliation.
+			var creatorCount = -1;
+			var lastWasPerson = true;
+			plural = 0;
+			for (var i = 0, ilen = Item[termvar].length; i < ilen; i += 1) {
+				if (Item[termvar][i].given) {
+					creatorCount += 1;
+					lastWasPerson = true;
+				} else {
+					if (!lastWasPerson) {
+						creatorCount += 1;
+					}
+					lastWasPerson = false;
+				}
+				if (creatorCount) {
+					plural = 1;
+					break;
+				}
+			}
+		} else if ("locator" == term) {
+			// check for plural flat field in supplementary item
+			if (item) {
+				plural = CSL.evaluateStringPluralism(item.locator);				
+			}
+		} else if (Item[term]) {
+			// check for plural flat field in main Item
+			plural = CSL.evaluateStringPluralism(Item[term]);			
+		}
+		// cleanup
+		if ("number" !== typeof plural) {
+			plural = 0;
+		}
+	}
+	var termtxt = state.getTerm(myterm, node.strings.form, plural);
+	if (node.strings["strip-periods"]) {
+		termtxt = termtxt.replace(/\./g, "");
+	}
+	return termtxt;
+}
+
+CSL.evaluateStringPluralism = function (str) {
+	if (str && str.match(/(?:[0-9], *[0-9]| and |&|[0-9] *- *[0-9])/)) {
+		return 1;
+	} else {
+		return 0;
+	}
 };

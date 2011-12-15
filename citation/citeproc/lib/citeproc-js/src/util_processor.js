@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights
  * Reserved.
  *
  * The contents of this file are subject to the Common Public
@@ -31,7 +31,7 @@
  *
  * The Initial Developer of the Original Code is Frank G. Bennett,
  * Jr. All portions of the code written by Frank G. Bennett, Jr. are
- * Copyright (c) 2009, 2010 and 2011 Frank G. Bennett, Jr. All Rights Reserved.
+ * Copyright (c) 2009 and 2010 Frank G. Bennett, Jr. All Rights Reserved.
  *
  * Alternatively, the contents of this file may be used under the
  * terms of the GNU Affero General Public License (the [AGPLv3]
@@ -46,17 +46,15 @@
  * or the [AGPLv3] License.”
  */
 
-/*global CSL: true */
-
 CSL.substituteOne = function (template) {
-    return function (state, list) {
-        if (!list) {
-            return "";
-        } else {
-            // ("string" === typeof list)
-            return template.replace("%%STRING%%", list);
-        }
-    };
+	return function (state, list) {
+		if (!list) {
+			return "";
+		} else {
+			// ("string" === typeof list)
+			return template.replace("%%STRING%%", list);
+		}
+	};
 };
 
 
@@ -72,17 +70,17 @@ CSL.substituteOne = function (template) {
  * examples.
  */
 CSL.substituteTwo = function (template) {
-    return function (param) {
-        var template2 = template.replace("%%PARAM%%", param);
-        return function (state, list) {
-            if (!list) {
-                return "";
-            } else {
-                //("string" === typeof list){
-                return template2.replace("%%STRING%%", list);
-            }
-        };
-    };
+	return function (param) {
+		var template2 = template.replace("%%PARAM%%", param);
+		return function (state, list) {
+			if (!list) {
+				return "";
+			} else {
+				//("string" === typeof list){
+				return template2.replace("%%STRING%%", list);
+			}
+		};
+	};
 };
 
 /**
@@ -91,45 +89,45 @@ CSL.substituteTwo = function (template) {
  * @param {String} mode Either "html" or "rtf", eventually.
  */
 CSL.Mode = function (mode) {
-    var decorations, params, param, func, val, args;
-    decorations = {};
-    params = CSL.Output.Formats[mode];
-    for (param in params) {
-        if (true) {
+	var decorations, params, param, func, val, args;
+	decorations = {};
+	params = CSL.Output.Formats[mode];
+	for (param in params) {
+		if (true) {
 
-            if ("@" !== param.slice(0, 1)) {
-                decorations[param] = params[param];
-                continue;
-            }
-            func = false;
-            val = params[param];
-            args = param.split('/');
+			if ("@" !== param.slice(0, 1)) {
+				decorations[param] = params[param];
+				continue;
+			}
+			func = false;
+			val = params[param];
+			args = param.split('/');
 
-            if (typeof val === "string" && val.indexOf("%%STRING%%") > -1)  {
-                if (val.indexOf("%%PARAM%%") > -1) {
-                    func = CSL.substituteTwo(val);
-                } else {
-                    func = CSL.substituteOne(val);
-                }
-            } else if (typeof val === "boolean" && !val) {
-                func = CSL.Output.Formatters.passthrough;
-            } else if (typeof val === "function") {
-                func = val;
-            } else {
-                throw "CSL.Compiler: Bad " + mode + " config entry for " + param + ": " + val;
-            }
+			if (typeof val === "string" && val.indexOf("%%STRING%%") > -1)  {
+				if (val.indexOf("%%PARAM%%") > -1) {
+					func = CSL.substituteTwo(val);
+				} else {
+					func = CSL.substituteOne(val);
+				}
+			} else if (typeof val === "boolean" && !val) {
+				func = CSL.Output.Formatters.passthrough;
+			} else if (typeof val === "function") {
+				func = val;
+			} else {
+				throw "CSL.Compiler: Bad " + mode + " config entry for " + param + ": " + val;
+			}
 
-            if (args.length === 1) {
-                decorations[args[0]] = func;
-            } else if (args.length === 2) {
-                if (!decorations[args[0]]) {
-                    decorations[args[0]] = {};
-                }
-                decorations[args[0]][args[1]] = func;
-            }
-        }
-    }
-    return decorations;
+			if (args.length === 1) {
+				decorations[args[0]] = func;
+			} else if (args.length === 2) {
+				if (!decorations[args[0]]) {
+					decorations[args[0]] = {};
+				}
+				decorations[args[0]][args[1]] = func;
+			}
+		}
+	}
+	return decorations;
 };
 
 
@@ -147,46 +145,18 @@ CSL.Mode = function (mode) {
  * the attributes and values extracted from an XML node.
  */
 CSL.setDecorations = function (state, attributes) {
-    var ret, key, pos;
-    // This applies a fixed processing sequence
-    ret = [];
-    for (pos in CSL.FORMAT_KEY_SEQUENCE) {
-        if (true) {
-            key = CSL.FORMAT_KEY_SEQUENCE[pos];
-            if (attributes[key]) {
-                ret.push([key, attributes[key]]);
-                delete attributes[key];
-            }
-        }
-    }
-    return ret;
+	var ret, key, pos;
+	// This applies a fixed processing sequence
+	ret = [];
+	for (pos in CSL.FORMAT_KEY_SEQUENCE) {
+		if (true) {
+			key = CSL.FORMAT_KEY_SEQUENCE[pos];
+			if (attributes[key]) {
+				ret.push([key, attributes[key]]);
+				delete attributes[key];
+			}
+		}
+	}
+	return ret;
 };
 
-CSL.Engine.prototype.normalDecorIsOrphan = function (blob, params) {
-    //print("params: "+params);
-    if (params[1] === "normal") {
-        var use_param = false;
-        var all_the_decor;
-        if (this.tmp.area === "citation") {
-            all_the_decor = [this.citation.opt.layout_decorations].concat(blob.alldecor);
-        } else {
-            all_the_decor = blob.alldecor;
-        }
-        for (var k = all_the_decor.length - 1; k > -1; k += -1) {
-            //print("  all decor: "+all_the_decor[k].length);
-            for (var n = all_the_decor[k].length - 1; n > -1; n += -1) {
-                //print("  superior param: "+all_the_decor[k][n]);
-                if (all_the_decor[k][n][0] === params[0]) {
-                    //print("  HIT!");
-                    if (all_the_decor[k][n][1] !== "normal") {
-                        use_param = true;
-                    }
-                }
-            }
-        }
-        if (!use_param) {
-            return true;
-        }
-    }
-    return false;
-};
