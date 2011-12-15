@@ -161,9 +161,9 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
         '#type' => 'select',
         '#length' => 50,
         '#options' => array(
-          'RIS' => 'RIS',
-          'RTF' => 'RTF',
-          'PDF' => 'PDF',
+          'RIS' => 'RIS (Endnote text Format)',
+          'RTF' => 'RTF (Word Proccessor Format)',
+          'PDF' => 'PDF (Adobe Format)',
         )
       ),
       'style' => array(

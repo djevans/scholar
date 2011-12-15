@@ -64,9 +64,9 @@ function islandora_bibliography_form(array &$form_state) {
           '#type' => 'select',
           '#length' => 50,
           '#options' => array(
-            'RIS' => 'RIS',
-            'RTF' => 'RTF',
-            'PDF' => 'PDF',
+            'RIS' => 'RIS (Endnote text Format)',
+            'RTF' => 'RTF (Word Proccessor Format)',
+            'PDF' => 'PDF (Adobe Format)',
           )
         ),
         'style' => array(
