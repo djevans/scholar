@@ -23,6 +23,12 @@
       <div id="subject-content" class="overview-field-content"><?php print print_r($subject, TRUE); ?></div>
     </div>
   <?php endif; ?>
+  <?php if (!empty($work_type)): ?>
+    <div id="work-type" class="overview-field">
+      <h3><?php print t('Work Type:') ?></h3>
+      <div id="work-type-content" class="overview-field-content"><?php print print_r($work_type, TRUE); ?></div>
+    </div>
+  <?php endif; ?>
   <?php if (!empty($grant_number)): ?>
     <div id="grant-number" class="overview-field">
       <h3><?php print t('Grant Number(s):') ?></h3>

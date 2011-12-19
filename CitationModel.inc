@@ -71,10 +71,10 @@ class CitationModel extends AbstractModel {
   public function getCitation($style_name) {
     if (isset($this->item->datastreams['MODS'])) {
       $style = citeproc_style($style_name);
-      
+
       $cache_id = "citation_{$this->pid}";
       $cached_raw = cache_get($cache_id);
-      
+
       $bibliography = NULL;
       if (!empty($cached_raw)) {
         $bibliography = citeproc_bibliography_from_raw_array($style, $cached_raw->data);
@@ -85,7 +85,6 @@ class CitationModel extends AbstractModel {
         if (!empty($mods)) {
           //$doc = new DOMDocument(); //DOM parsing is expensive, and the resultant object is not used (it's passed into citeproc, which eventually does a $doc->saveXML() and then parses with and uses SimpleXML) in this piece of code, so why bother?
           //$doc->loadXML($mods);
-          
           $bibliography = citeproc_bibliography_from_mods($style, $mods, $cache_id);
         }
       }
@@ -107,7 +106,7 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
   $pid = $variables['pid'];
   //$item = new Fedora_Item($pid);
   $model = new CitationModel($pid);
-  $item =& $model->item;
+  $item = & $model->item;
   // Citations
   $styles = CSL::GetNames();
   foreach ($styles as $name) {
@@ -127,12 +126,13 @@ function template_preprocess_scholar_overview_panel_citation(array &$variables) 
         'subject' => '/mods:mods/mods:subject/mods:topic',
         'grant_number' => '/mods:mods/mods:name[@type="corporate"]/mods:role[mods:roleTerm[@type="text"]="funding agency"]/../mods:description[@type="grant number"]',
         'funding_agency' => '/mods:mods/mods:name[@type="corporate"]/mods:role[mods:roleTerm[@type="text"]="funding agency"]/../mods:namePart',
-         'core_facility' => '/mods:mods/mods:note[@type="core facilities"]',
-         'source_system' => '/mods:mods/mods:recordInfo/mods:recordOrigin',
-         'ccsg_program' => 'string()', // @todo
-         'peer_reviewed' => '/mods:mods/mods:note[@type="peer reviewed"]'
+        'work_type' => '/mods:mods/mods:note[@type="work type"]',
+        'core_facility' => '/mods:mods/mods:note[@type="core facilities"]',
+        'source_system' => '/mods:mods/mods:recordInfo/mods:recordOrigin',
+        'ccsg_program' => 'string()', // @todo
+        'peer_reviewed' => '/mods:mods/mods:note[@type="peer reviewed"]'
       );
-      
+
       foreach ($parts as $key => $xpath) {
         $variables[$key] = implode('<br/>', $mods->xpath($xpath));
       }
