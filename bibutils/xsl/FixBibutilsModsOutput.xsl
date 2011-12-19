@@ -24,18 +24,4 @@
             </xsl:element>
         </xsl:copy>
     </xsl:template>
-    <!-- Move content from placeTerm into an affliated note -->
-    <xsl:template match="mods:mods">
-        <xsl:copy>
-            <xsl:apply-templates/>
-            <xsl:if test="current()/mods:originInfo/mods:place/mods:placeTerm">
-                <xsl:element name="note" namespace="http://www.loc.gov/mods/v3">
-                    <xsl:attribute name="note">affiliation</xsl:attribute>
-                    <xsl:copy-of select="//mods:originInfo/mods:place/mods:placeTerm/text()"/>
-                </xsl:element>
-            </xsl:if>
-        </xsl:copy>
-    </xsl:template>
-    <!-- Remove place where placeTerm that was moved into an affliated note -->
-    <xsl:template match="mods:mods/mods:originInfo/mods:place"/>
 </xsl:stylesheet>
