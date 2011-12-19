@@ -11,6 +11,7 @@
     <?php print print_r($citation[0], TRUE); ?>
     <?php print drupal_get_form('islandora_bibliography_citation_form', $pid); ?>
   </div>
+  <a href="http://gs4bq3cf5t.search.serialssolutions.com/OpenURL_local?sid=Entrez:PubMed&amp;id=pmid:22175078" ref="PrId=caucpilib&amp;itool=Abstract-otool&amp;uid=22175078&amp;nlmid=9319162&amp;db=pubmed&amp;log$=linkouticon" target="_blank"><img alt="Click here to read" border="0" src="<?php print $open_url_img; ?>"></a> 
   <?php if (!empty($abstract)): ?>
     <div id="abstract" class="overview-field">
       <h3><?php print t('Abstract:') ?></h3>

@@ -75,11 +75,11 @@ function scholar_theme() {
       'file' => 'IslandoraSolrResultsCitation.inc',
       'arguments' => array('element' => NULL)
     ),
-    THEME_SCHOLAR_OVERVIEW_PANEL_CITATION => array(
+    /*THEME_SCHOLAR_OVERVIEW_PANEL_CITATION => array(
       'template' => 'templates/CitationModel',
       'file' => 'CitationModel.inc',
       'arguments' => array('pid' => NULL)
-    )
+    )*/
   );
 }
 
@@ -88,12 +88,12 @@ function scholar_theme() {
  */
 function scholar_register_content_models_for_viewer() {
   $models = array();
-  $models['ir:citationCModel'] = array(
+  /*$models['ir:citationCModel'] = array(
     'type' => 'inc',
     'module' => 'scholar',
     'file' => 'CitationModel',
     'class' => 'CitationModel'
-  );
+  );*/
   $models['ir:authorityCModel'] = array(
     'type' => 'inc',
     'module' => 'content_model_viewer',
