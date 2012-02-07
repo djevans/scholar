@@ -57,7 +57,8 @@ class Bibliography {
     if ($item->exists()) {
       module_load_include('inc', 'fedora_repository', 'ContentModel');
       $content_model = ContentModel::loadFromObject($pid);
-      return $content_model->pid == 'ir:citationCModel';
+      // return $content_model->pid == 'ir:citationCModel'; // djevans
+      return TRUE; // djevans
     }
     return FALSE;
   }
