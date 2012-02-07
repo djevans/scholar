@@ -22,6 +22,8 @@ class Bibutils {
     ),
     'MODS' => array(
       'RIS' => 'xml2ris',
+      'Tagged' => 'xml2end',
+      'BibTEX' => 'xml2bib',
     )
   );
 
