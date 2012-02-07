@@ -106,7 +106,7 @@ function template_preprocess_scholar_search_item(array &$variables) {
       if (!empty($mods)) {
         $doc = new DOMDocument();
         $doc->loadXML($mods);
-        
+        $variables['coins'] = scholar_convert_mods_to_coins($doc); // djevans
         $bibliography = citeproc_bibliography_from_mods($style, $doc, $cache_id);
       }
     }
@@ -161,9 +161,12 @@ function scholar_search_results_form(array &$form_state, IslandoraSolrQueryProce
         '#type' => 'select',
         '#length' => 50,
         '#options' => array(
-          'RIS' => 'RIS (Endnote format)',
-          'RTF' => 'RTF (word proccessor format)',
+          'RIS' => 'RIS (EndNote format)',
+          'RTF' => 'RTF (word processor format)',
           'PDF' => 'PDF',
+          'Tagged' => 'EndNote (Tagged)',
+          'BibTEX' => 'BibTEX',
+          'MARCXML' => 'MARCXML',
         )
       ),
       'style' => array(
@@ -298,3 +301,35 @@ function theme_scholar_search_results_table(array $element) {
   return '<div class="scholar-search-results">' . theme_table($element['#header'], $rows, $attributes) . '</div>';
 }
 
+/**
+ * Convert an object's MODS datastream to COINS metadata.
+ *
+ * @param DOMDocument $doc
+ *  A DOMDocument containing the object's MODS metadata stream.
+ * @return string
+ *  A URL-encoded string containing CoiNS metadata.
+ */
+function scholar_convert_mods_to_coins($doc) {
+  
+  $path = drupal_get_path('module','scholar');
+  
+  $xsl = new DOMDocument();
+  $xsl->load($path .'/xsl/coins.xsl');
+  
+  $xsltproc = new XSLTProcessor();
+  $xsltproc->importStylesheet($xsl);
+  
+  $sid = variable_get('biblio_openurl_sid','biblio:'. variable_get('site_name','Drupal'));
+  $xsltproc->setParameter('','referer',$sid);
+  
+  $outputString = $xsltproc->transformToXML($doc); 
+
+  $pairs = explode('&',trim($outputString));
+  $new_pairs = array();
+  foreach ($pairs as $pair) {
+    list($key,$value) = explode('=',$pair);
+    $new_pairs[] = $key .'='. urlencode($value);
+  }
+  return implode('&amp;',$new_pairs);
+  
+}
