@@ -8,6 +8,9 @@
 module_load_include('inc', 'citation_exporter', 'BatchExportRIS');
 module_load_include('inc', 'citation_exporter', 'BatchExportRTF');
 module_load_include('inc', 'citation_exporter', 'BatchExportPDF');
+module_load_include('inc', 'citation_exporter', 'BatchExportBibTEX');
+module_load_include('inc', 'citation_exporter', 'BatchExportEndNote');
+module_load_include('inc', 'citation_exporter', 'BatchExportMARCXML');
 
 /**
  * Exports a collection of citations to a file.
@@ -32,6 +35,15 @@ function citation_exporter_batch_export(array $pids, $style, $file_format) {
       break;
     case 'PDF':
       $operations = citation_exporter_batch_get_pdf_operations($pids, $style);
+      break;
+    case 'Tagged':
+      $operations = citation_exporter_batch_get_endnote_operations($pids, $style);
+      break;
+    case 'BibTEX':
+      $operations = citation_exporter_batch_get_bibtex_operations($pids, $style);
+      break;
+    case 'MARCXML':
+      $operations = citation_exporter_batch_get_marcxml_operations($pids, $style);
       break;
   }
   if (count($operations) > 0) {
