@@ -160,7 +160,12 @@ function islandora_bibilgraphy_form_get_title_authors($pid) {
     $mods = simplexml_import_dom($mods);
     $mods->registerXPathNamespace('mods', 'http://www.loc.gov/mods/v3');
     $title = implode(' ', $mods->xpath('/mods:mods/mods:titleInfo/mods:title'));
-    $authors = implode(' ', $mods->xpath('/mods:mods/mods:name/mods:role[mods:roleTerm = "author"]/../mods:namePart[@type="family"]'));
+    $authors_xpath = $mods->xpath('/mods:mods/mods:name/mods:role[mods:roleTerm = "author"]/../mods:namePart[@type="family"]');
+    if (!empty($authors_xpath)) {
+      $authors = implode(' ', $mods->xpath(
+        '/mods:mods/mods:name/mods:role[mods:roleTerm ="author"]/../mods:namePart[@type="family"]'
+      ));
+    }
   }
   return array($title, $authors);
 }
